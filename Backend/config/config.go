@@ -1,0 +1,53 @@
+package config
+
+import (
+	"encoding/json"
+	"os"
+	tools "vServer/Backend/tools"
+)
+
+var ConfigPath = "WebServer/config.json"
+
+var ConfigData struct {
+	Site_www      []Site_www    `json:"Site_www"`
+	Soft_Settings Soft_Settings `json:"Soft_Settings"`
+}
+
+type Site_www struct {
+	Name              string   `json:"name"`
+	Host              string   `json:"host"`
+	Alias             []string `json:"alias"`
+	Status            string   `json:"status"`
+	Root_file         string   `json:"root_file"`
+	Root_file_routing bool     `json:"root_file_routing"`
+}
+
+type Soft_Settings struct {
+	Php_port   int    `json:"php_port"`
+	Php_host   string `json:"php_host"`
+	Mysql_port int    `json:"mysql_port"`
+	Mysql_host string `json:"mysql_host"`
+	Admin_port string `json:"admin_port"`
+	Admin_host string `json:"admin_host"`
+}
+
+func LoadConfig() {
+
+	data, err := os.ReadFile(ConfigPath)
+
+	if err != nil {
+		tools.Logs_file(0, "JSON", "Ошибка загрузки конфигурационного файла", "logs_config.log", true)
+	} else {
+		tools.Logs_file(0, "JSON", "config.json успешно загружен", "logs_config.log", true)
+	}
+
+	err = json.Unmarshal(data, &ConfigData)
+	if err != nil {
+		tools.Logs_file(0, "JSON", "Ошибка парсинга конфигурационного файла", "logs_config.log", true)
+	} else {
+		tools.Logs_file(0, "JSON", "config.json успешно прочитан", "logs_config.log", true)
+	}
+
+	println()
+
+}

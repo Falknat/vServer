@@ -1,0 +1,203 @@
+/* Стили навигации админ-панели */
+
+.admin-nav {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 280px;
+    height: 100vh;
+    background: linear-gradient(135deg, rgba(26, 37, 47, 0.95), rgba(20, 30, 40, 0.9));
+    backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(52, 152, 219, 0.3);
+    box-shadow: 
+        8px 0 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(52, 152, 219, 0.1),
+        inset -1px 0 0 rgba(255, 255, 255, 0.1);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Заголовок навигации */
+.nav-header {
+    padding: 2rem 1.5rem;
+    border-bottom: 1px solid rgba(52, 152, 219, 0.25);
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.08), rgba(46, 204, 113, 0.05));
+    position: relative;
+    box-shadow: 
+        0 4px 15px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.nav-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+    background-size: 400% 400%;
+    animation: gradientShift 4s ease infinite;
+}
+
+@keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.logo {
+    font-size: 2.2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 2px;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 2px 8px rgba(52, 152, 219, 0.4));
+}
+
+.logo-subtitle {
+    font-size: 0.9rem;
+    color: #95a5a6;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Меню навигации */
+.nav-menu {
+    list-style: none;
+    padding: 1rem 0;
+    flex: 1;
+}
+
+.nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: #bdc3c7;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    border-radius: 0 25px 25px 0;
+    margin-right: 1rem;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.nav-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: transparent;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.12), rgba(46, 204, 113, 0.06));
+    color: #3498db;
+    transform: translateX(0);
+    margin-right: 0.5rem;
+    border-radius: 0 12px 12px 0;
+    box-shadow: inset 2px 0 8px rgba(52, 152, 219, 0.15);
+}
+
+.nav-link:hover::before {
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+}
+
+.nav-item.active .nav-link {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.2), rgba(46, 204, 113, 0.1));
+    color: #3498db;
+    font-weight: 600;
+    transform: translateX(0);
+    margin-right: 0;
+    border-radius: 0;
+    box-shadow: inset 3px 0 12px rgba(52, 152, 219, 0.25);
+}
+
+.nav-item.active .nav-link::before {
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+}
+
+.nav-icon {
+    font-size: 1.3rem;
+    margin-right: 1rem;
+    width: 24px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.nav-link:hover .nav-icon {
+    transform: scale(1.1);
+}
+
+.nav-text {
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Мобильная адаптивность */
+@media (max-width: 1024px) {
+    .admin-nav {
+        transform: translateX(-100%);
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .admin-nav.open {
+        transform: translateX(0);
+    }
+    
+    /* Кнопка меню (будет добавлена в JS) */
+    .nav-toggle {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 1001;
+        background: rgba(26, 37, 47, 0.9);
+        border: 1px solid rgba(52, 152, 219, 0.3);
+        color: #3498db;
+        padding: 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-toggle:hover {
+        background: rgba(52, 152, 219, 0.2);
+        transform: scale(1.05);
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-nav {
+        width: 100%;
+    }
+    
+    .nav-link {
+        padding: 1.2rem 1.5rem;
+        margin-right: 0;
+        border-radius: 0;
+    }
+    
+    .nav-icon {
+        font-size: 1.4rem;
+    }
+    
+    .nav-text {
+        font-size: 1.1rem;
+    }
+}
+
+/* Анимация появления меню - убрано для избежания проблем с ресайзом */ 

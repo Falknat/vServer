@@ -1,0 +1,10 @@
+# Исключения
+myapp.exe
+.vscode/
+WebServer/www/home.voxsel.ru
+WebServer/cert/*
+!WebServer/cert/no_cert/
+WebServer/tools/logs/*
+WebServer/soft/*
+!WebServer/soft/soft.rar
+.cursorrules

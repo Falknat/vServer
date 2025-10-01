@@ -1,0 +1,652 @@
+/* Стили дашборда админ-панели */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    margin-bottom: 6rem;
+}
+
+@media (max-width: 1200px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+}
+
+/* Карточки дашборда */
+.dashboard-card {
+    background: linear-gradient(135deg, rgba(26, 37, 47, 0.95), rgba(20, 30, 40, 0.9));
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    border: 1px solid rgba(52, 152, 219, 0.25);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 0 0 1px rgba(52, 152, 219, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow: hidden;
+    position: relative;
+}
+
+.dashboard-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3498db, #2ecc71, #9b59b6);
+    background-size: 400% 400%;
+    animation: gradientFlow 6s ease-in-out infinite;
+    box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+}
+
+@keyframes gradientFlow {
+    0%, 100% { 
+        background-position: 0% 50%; 
+    }
+    25% { 
+        background-position: 100% 50%; 
+    }
+    50% { 
+        background-position: 200% 50%; 
+    }
+    75% { 
+        background-position: 300% 50%; 
+    }
+}
+
+
+
+
+.dashboard-card.full-width {
+    grid-column: 1 / -1;
+}
+
+/* Заголовки карточек */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid rgba(52, 152, 219, 0.15);
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.08), rgba(46, 204, 113, 0.05));
+    position: relative;
+}
+
+.card-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(52, 152, 219, 0.3), transparent);
+}
+
+.card-title {
+    display: flex;
+    align-items: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #ecf0f1;
+    margin: 0;
+}
+
+.card-icon {
+    font-size: 1.5rem;
+    margin-right: 1rem;
+}
+
+/* Содержимое карточек */
+.card-content {
+    padding: 1.5rem 2rem 2rem 2rem;
+}
+
+/* Статистика */
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #3498db, #2ecc71);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.stat-number.active-stat {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-number.inactive-stat {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-number.valid-stat {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-number.warning-stat {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.stat-label {
+    color: #95a5a6;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
+}
+
+/* Превью секции */
+.sites-preview, .certs-preview {
+    margin-top: 1rem;
+}
+
+.preview-header {
+    margin-bottom: 1rem;
+}
+
+.preview-title {
+    color: #bdc3c7;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Списки сайтов */
+.sites-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.site-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(52, 152, 219, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    gap: 1rem;
+}
+
+.site-item:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: translateX(4px);
+    border-color: rgba(52, 152, 219, 0.2);
+}
+
+.site-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.site-status.active {
+    background: #2ecc71;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+.site-status.inactive {
+    background: #e74c3c;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+}
+
+.site-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.site-name {
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.site-details {
+    color: #95a5a6;
+    font-size: 0.8rem;
+}
+
+.site-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Списки сертификатов */
+.certs-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.cert-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(52, 152, 219, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    gap: 1rem;
+}
+
+.cert-item:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: translateX(4px);
+    border-color: rgba(52, 152, 219, 0.2);
+}
+
+.cert-status {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.cert-status.valid {
+    background: #2ecc71;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+}
+
+.cert-status.warning {
+    background: #f39c12;
+    box-shadow: 0 0 8px rgba(243, 156, 18, 0.5);
+}
+
+.cert-status.expired {
+    background: #e74c3c;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.5);
+}
+
+.cert-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.cert-name {
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.cert-details {
+    color: #95a5a6;
+    font-size: 0.8rem;
+}
+
+.cert-expires {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.1rem;
+    min-width: 80px;
+}
+
+.expires-date {
+    color: #bdc3c7;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.expires-days {
+    color: #95a5a6;
+    font-size: 0.7rem;
+}
+
+.cert-expires.warning .expires-date {
+    color: #f39c12;
+}
+
+.cert-expires.warning .expires-days {
+    color: #e67e22;
+}
+
+.cert-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Серверы */
+.servers-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+.server-item {
+    display: flex;
+    align-items: center;
+    padding: 1rem;
+    background: rgba(52, 152, 219, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.server-item:hover {
+    background: rgba(52, 152, 219, 0.1);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.server-status {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.server-status.running {
+    background: #2ecc71;
+    box-shadow: 0 0 12px rgba(46, 204, 113, 0.5);
+    animation: pulse 2s infinite;
+}
+
+.server-status.stopped {
+    background: #e74c3c;
+    box-shadow: 0 0 12px rgba(231, 76, 60, 0.5);
+}
+
+.server-status.starting {
+    background: #f39c12;
+    box-shadow: 0 0 12px rgba(243, 156, 18, 0.5);
+    animation: pulse 1.5s infinite;
+}
+
+.server-status.stopping {
+    background: #f39c12;
+    box-shadow: 0 0 12px rgba(243, 156, 18, 0.5);
+    animation: pulse 1.5s infinite;
+}
+
+.server-status.warning {
+    background: #f39c12;
+    box-shadow: 0 0 12px rgba(243, 156, 18, 0.5);
+}
+
+.server-info {
+    flex: 1;
+}
+
+.server-name {
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.3rem;
+}
+
+.server-details {
+    color: #95a5a6;
+    font-size: 0.85rem;
+}
+
+/* Кнопки действий */
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0.3rem;
+    border-radius: 4px;
+    transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity: 0.7;
+}
+
+.btn-icon:hover {
+    opacity: 1;
+    background: rgba(52, 152, 219, 0.1);
+    transform: scale(1.1);
+}
+
+.btn-icon.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+.btn-icon.disabled:hover {
+    opacity: 0.4;
+    background: none;
+    transform: none;
+}
+
+.btn-icon.warning {
+    color: #f39c12;
+}
+
+.btn-icon.warning:hover {
+    background: rgba(243, 156, 18, 0.1);
+}
+
+/* Кнопки - новый дизайн */
+.btn-primary {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.25);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #2980b9, #3498db);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.25);
+}
+
+/* Иконка плюса */
+.btn-primary .btn-plus {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    margin-right: 0.5rem;
+    flex-shrink: 0;
+}
+
+/* Специальные стили для кнопки добавления сайта */
+#add-site-btn {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.25);
+}
+
+#add-site-btn:hover {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    box-shadow: 0 4px 12px rgba(46, 204, 113, 0.3);
+}
+
+#add-site-btn:active {
+    box-shadow: 0 2px 8px rgba(46, 204, 113, 0.25);
+}
+
+/* Специальные стили для кнопки добавления SSL */
+#add-cert-btn {
+    background: linear-gradient(135deg, #f39c12, #e67e22);
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.25);
+}
+
+#add-cert-btn:hover {
+    background: linear-gradient(135deg, #e67e22, #f39c12);
+    box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
+}
+
+#add-cert-btn:active {
+    box-shadow: 0 2px 8px rgba(243, 156, 18, 0.25);
+}
+
+/* Футер карточек */
+.card-footer {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(52, 152, 219, 0.1);
+    text-align: center;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #3498db;
+    font-size: 0.9rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-weight: 500;
+}
+
+.btn-link:hover {
+    background: rgba(52, 152, 219, 0.1);
+    color: #2ecc71;
+    transform: translateY(-1px);
+}
+
+.show-all-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+/* Адаптивность дашборда */
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-bottom: 4rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: stretch;
+        padding: 1.5rem;
+    }
+    
+    .card-content {
+        padding: 1rem 1.5rem 1.5rem 1.5rem;
+    }
+    
+    .card-title {
+        font-size: 1.3rem;
+    }
+    
+    .servers-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stats-row {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .site-item, .cert-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.8rem;
+    }
+    
+    .site-info, .cert-info {
+        order: 1;
+        width: 100%;
+    }
+    
+    .site-actions, .cert-actions {
+        order: 3;
+        align-self: flex-end;
+    }
+    
+    .cert-expires {
+        order: 2;
+        align-self: flex-start;
+        align-items: flex-start;
+        min-width: auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .stat-number {
+        font-size: 2rem;
+    }
+    
+    .card-title {
+        font-size: 1.1rem;
+    }
+    
+    .server-item {
+        padding: 0.8rem;
+    }
+} 
