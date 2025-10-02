@@ -21,7 +21,7 @@
     ],
 
     "Soft_Settings": {
-        "mysql_host": "192.168.1.6",
+        "mysql_host": "127.0.0.1",
         "mysql_port": 3306,
         "php_host": "localhost",
         "php_port": 8000,
