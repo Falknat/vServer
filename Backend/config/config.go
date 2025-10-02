@@ -9,8 +9,9 @@ import (
 var ConfigPath = "WebServer/config.json"
 
 var ConfigData struct {
-	Site_www      []Site_www    `json:"Site_www"`
-	Soft_Settings Soft_Settings `json:"Soft_Settings"`
+	Site_www      []Site_www      `json:"Site_www"`
+	Soft_Settings Soft_Settings   `json:"Soft_Settings"`
+	Proxy_Service []Proxy_Service `json:"Proxy_Service"`
 }
 
 type Site_www struct {
@@ -29,6 +30,14 @@ type Soft_Settings struct {
 	Mysql_host string `json:"mysql_host"`
 	Admin_port string `json:"admin_port"`
 	Admin_host string `json:"admin_host"`
+}
+
+type Proxy_Service struct {
+	Enable         bool   `json:"Enable"`
+	ExternalDomain string `json:"ExternalDomain"`
+	LocalAddress   string `json:"LocalAddress"`
+	LocalPort      string `json:"LocalPort"`
+	UseHTTPS       bool   `json:"UseHTTPS"`
 }
 
 func LoadConfig() {

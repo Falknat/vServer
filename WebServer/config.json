@@ -10,6 +10,16 @@
         }
     ],
 
+    "Proxy_Service": [
+        {
+            "Enable": false,
+            "ExternalDomain": "git.example.ru",
+            "LocalAddress": "127.0.0.1",
+            "LocalPort": "3333",
+            "UseHTTPS": false
+        }
+    ],
+
     "Soft_Settings": {
         "mysql_host": "192.168.1.6",
         "mysql_port": 3306,

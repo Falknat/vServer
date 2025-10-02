@@ -7,85 +7,54 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"vServer/Backend/config"
 	tools "vServer/Backend/tools"
 )
 
-// ProxyConfig хранит конфигурацию для прокси
-type ProxyConfig struct {
-	ExternalDomain string
-	LocalAddress   string
-	LocalPort      string
-	UseHTTPS       bool
-}
-
 var (
-	proxyConfigs  = make(map[int]*ProxyConfig)
-	configMutex   sync.RWMutex
-	configsLoaded = false
+	configMutex sync.RWMutex
 )
-
-// InitProxyConfigs инициализирует конфигурации прокси один раз при старте
-func InitProxyConfigs() {
-	configMutex.Lock()
-	defer configMutex.Unlock()
-
-	if configsLoaded {
-		return
-	}
-
-	// Конфигурация 1
-	config1 := &ProxyConfig{
-		ExternalDomain: "git.voxsel.ru",
-		LocalAddress:   "127.0.0.1",
-		LocalPort:      "3333",
-		UseHTTPS:       false, // Локальный сервис работает по HTTP
-	}
-	proxyConfigs[1] = config1
-
-	// Конфигурация 2
-	config2 := &ProxyConfig{
-		ExternalDomain: "localhost",
-		LocalAddress:   "127.0.0.1",
-		LocalPort:      "8000",
-		UseHTTPS:       false, // Локальный сервис работает по HTTP
-	}
-	proxyConfigs[2] = config2
-
-	configsLoaded = true
-}
 
 func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 	valid = false
 
-	// Инициализируем конфигурации если еще не сделано
-	if !configsLoaded {
-		InitProxyConfigs()
-	}
-
 	configMutex.RLock()
 	defer configMutex.RUnlock()
 
-	// Выбираем конфигурацию (пока используем 1)
-	config := proxyConfigs[1]
-	if config == nil {
-		return false
-	}
+	// Проходим по всем прокси конфигурациям
+	for _, proxyConfig := range config.ConfigData.Proxy_Service {
+		// Пропускаем отключенные прокси
+		if !proxyConfig.Enable {
+			continue
+		}
 
-	if r.Host == config.ExternalDomain {
+		// Проверяем совпадение домена
+		if r.Host != proxyConfig.ExternalDomain {
+			continue
+		}
+
 		valid = true
+
+		// Логирование прокси-запроса
+		https_check := !(r.TLS == nil)
+		if https_check {
+			tools.Logs_file(0, "P-HTTPS", "🔍 IP клиента: "+r.RemoteAddr+" Обработка запроса: https://"+r.Host+r.URL.Path+" → "+proxyConfig.LocalAddress+":"+proxyConfig.LocalPort, "logs_https.log", false)
+		} else {
+			tools.Logs_file(0, "P-HTTP", "🔍 IP клиента: "+r.RemoteAddr+" Обработка запроса: http://"+r.Host+r.URL.Path+" → "+proxyConfig.LocalAddress+":"+proxyConfig.LocalPort, "logs_http.log", false)
+		}
 
 		// Определяем протокол для локального соединения
 		protocol := "http"
-		if config.UseHTTPS {
+		if proxyConfig.UseHTTPS {
 			protocol = "https"
 		}
 
 		// Проксирование на локальный адрес
-		proxyURL := protocol + "://" + config.LocalAddress + ":" + config.LocalPort + r.URL.RequestURI()
+		proxyURL := protocol + "://" + proxyConfig.LocalAddress + ":" + proxyConfig.LocalPort + r.URL.RequestURI()
 		proxyReq, err := http.NewRequest(r.Method, proxyURL, r.Body)
 		if err != nil {
 			http.Error(w, "Ошибка создания прокси-запроса", http.StatusInternalServerError)
-			return
+			return valid
 		}
 
 		// Копируем ВСЕ заголовки без изменений (кроме технических)
@@ -116,7 +85,7 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 		}
 
 		// Для HTTPS соединений настраиваем TLS (если понадобится)
-		if config.UseHTTPS {
+		if proxyConfig.UseHTTPS {
 			client.Transport = &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true, // Простая настройка для внутренних соединений
@@ -126,8 +95,8 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 		resp, err := client.Do(proxyReq)
 		if err != nil {
 			http.Error(w, "Ошибка прокси-запроса", http.StatusBadGateway)
-			tools.Logs_file(1, "PROXY", "Ошибка прокси-запроса: "+err.Error(), "logs_proxy.log", true)
-			return
+			tools.Logs_file(1, "PROXY", "Ошибка прокси-запроса: "+err.Error(), "logs_proxy.log", false)
+			return valid
 		}
 		defer resp.Body.Close()
 
@@ -147,8 +116,7 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 		}
 
 		return valid
-
-	} else {
-		return valid
 	}
+
+	return valid
 }
