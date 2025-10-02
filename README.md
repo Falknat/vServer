@@ -88,7 +88,8 @@ go build -o MyApp.exe
       "ExternalDomain": "git.example.ru",
       "LocalAddress": "127.0.0.1",
       "LocalPort": "3333",
-      "UseHTTPS": false
+      "ServiceHTTPSuse": false,
+      "AutoHTTPS": true
     }
   ],
   "Soft_Settings": {
@@ -113,7 +114,8 @@ go build -o MyApp.exe
 - `ExternalDomain` - внешний домен для перехвата запросов
 - `LocalAddress` - локальный адрес сервиса
 - `LocalPort` - порт локального сервиса
-- `UseHTTPS` - использовать HTTPS для локального подключения (true/false)
+- `ServiceHTTPSuse` - использовать HTTPS для подключения к локальному сервису (true/false)
+- `AutoHTTPS` - автоматически перенаправлять HTTP → HTTPS (true/false)
 
 **Пример множественных прокси:**
 ```json
@@ -123,16 +125,33 @@ go build -o MyApp.exe
     "ExternalDomain": "git.example.com",
     "LocalAddress": "127.0.0.1",
     "LocalPort": "3000",
-    "UseHTTPS": false
+    "ServiceHTTPSuse": false,
+    "AutoHTTPS": true
   },
   {
     "Enable": false,
     "ExternalDomain": "api.example.com",
     "LocalAddress": "127.0.0.1",
     "LocalPort": "8080",
-    "UseHTTPS": false
+    "ServiceHTTPSuse": false,
+    "AutoHTTPS": false
   }
 ]
+```
+
+#### 📖 Подробное описание параметров:
+
+**`ServiceHTTPSuse`** - протокол подключения к локальному сервису:
+- `false` - vServer подключается к локальному сервису по HTTP (по умолчанию)
+- `true` - vServer подключается к локальному сервису по HTTPS
+
+**`AutoHTTPS`** - автоматический редирект на HTTPS:
+- `true` - все HTTP запросы автоматически перенаправляются на HTTPS (рекомендуется)
+- `false` - разрешены как HTTP, так и HTTPS запросы
+
+**Схема работы:**
+```
+Клиент (HTTP/HTTPS) → vServer (проверка AutoHTTPS) → Локальный сервис (ServiceHTTPSuse)
 ```
 
 **Применение изменений:**

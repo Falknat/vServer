@@ -35,8 +35,17 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 
 		valid = true
 
-		// Логирование прокси-запроса
+		// Проверяем AutoHTTPS - редирект с HTTP на HTTPS
 		https_check := !(r.TLS == nil)
+		if !https_check && proxyConfig.AutoHTTPS {
+			// Перенаправляем на HTTPS
+			httpsURL := "https://" + r.Host + r.URL.RequestURI()
+			http.Redirect(w, r, httpsURL, http.StatusMovedPermanently)
+			tools.Logs_file(0, "P-HTTP", "🔀 IP клиента: "+r.RemoteAddr+" Редирект HTTP → HTTPS: "+r.Host+r.URL.Path, "logs_http.log", false)
+			return valid
+		}
+
+		// Логирование прокси-запроса
 		if https_check {
 			tools.Logs_file(0, "P-HTTPS", "🔍 IP клиента: "+r.RemoteAddr+" Обработка запроса: https://"+r.Host+r.URL.Path+" → "+proxyConfig.LocalAddress+":"+proxyConfig.LocalPort, "logs_https.log", false)
 		} else {
@@ -45,7 +54,7 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 
 		// Определяем протокол для локального соединения
 		protocol := "http"
-		if proxyConfig.UseHTTPS {
+		if proxyConfig.ServiceHTTPSuse {
 			protocol = "https"
 		}
 
@@ -85,7 +94,7 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 		}
 
 		// Для HTTPS соединений настраиваем TLS (если понадобится)
-		if proxyConfig.UseHTTPS {
+		if proxyConfig.ServiceHTTPSuse {
 			client.Transport = &http.Transport{
 				TLSClientConfig: &tls.Config{
 					InsecureSkipVerify: true, // Простая настройка для внутренних соединений

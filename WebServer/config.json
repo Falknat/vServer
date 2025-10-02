@@ -16,7 +16,8 @@
             "ExternalDomain": "git.example.ru",
             "LocalAddress": "127.0.0.1",
             "LocalPort": "3333",
-            "UseHTTPS": false
+            "ServiceHTTPSuse": false,
+            "AutoHTTPS": true
         }
     ],
 

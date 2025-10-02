@@ -33,11 +33,12 @@ type Soft_Settings struct {
 }
 
 type Proxy_Service struct {
-	Enable         bool   `json:"Enable"`
-	ExternalDomain string `json:"ExternalDomain"`
-	LocalAddress   string `json:"LocalAddress"`
-	LocalPort      string `json:"LocalPort"`
-	UseHTTPS       bool   `json:"UseHTTPS"`
+	Enable          bool   `json:"Enable"`
+	ExternalDomain  string `json:"ExternalDomain"`
+	LocalAddress    string `json:"LocalAddress"`
+	LocalPort       string `json:"LocalPort"`
+	ServiceHTTPSuse bool   `json:"ServiceHTTPSuse"`
+	AutoHTTPS       bool   `json:"AutoHTTPS"`
 }
 
 func LoadConfig() {
