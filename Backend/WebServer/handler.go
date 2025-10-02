@@ -12,6 +12,70 @@ func StartHandler() {
 	http.HandleFunc("/", handler)
 }
 
+// Проверка wildcard паттерна для alias
+func matchWildcardAlias(pattern, host string) bool {
+	// Если нет звёздочки - точное совпадение
+	if !strings.Contains(pattern, "*") {
+		return pattern == host
+	}
+
+	// Поддержка wildcard: *.example.com, example.*, *example*, *
+	// Заменяем * на регулярное выражение
+	pattern = strings.ReplaceAll(pattern, ".", "\\.")
+	pattern = strings.ReplaceAll(pattern, "*", ".*")
+	pattern = "^" + pattern + "$"
+
+	// Простая проверка без regexp (более быстрая)
+	return matchSimplePattern(pattern, host)
+}
+
+// Простая проверка паттерна (без использования regexp для скорости)
+func matchSimplePattern(pattern, host string) bool {
+	// Убираем ^ и $ добавленные выше
+	pattern = strings.TrimPrefix(pattern, "^")
+	pattern = strings.TrimSuffix(pattern, "$")
+
+	// Если паттерн = .* (любой хост)
+	if pattern == ".*" {
+		return true
+	}
+
+	// Разбиваем паттерн на части по .*
+	parts := strings.Split(pattern, ".*")
+
+	// Проверяем каждую часть
+	currentPos := 0
+	for i, part := range parts {
+		if part == "" {
+			continue
+		}
+
+		// Ищем часть в хосте начиная с текущей позиции
+		idx := strings.Index(host[currentPos:], part)
+		if idx == -1 {
+			return false
+		}
+
+		// Для первой части проверяем что она в начале (если паттерн не начинается с *)
+		if i == 0 && !strings.HasPrefix(pattern, ".*") {
+			if idx != 0 {
+				return false
+			}
+		}
+
+		// Для последней части проверяем что она в конце (если паттерн не кончается на *)
+		if i == len(parts)-1 && !strings.HasSuffix(pattern, ".*") {
+			if currentPos+idx+len(part) != len(host) {
+				return false
+			}
+		}
+
+		currentPos += idx + len(part)
+	}
+
+	return true
+}
+
 func Alias_check(r *http.Request) (alias_found bool, host string) {
 
 	alias_found = false
@@ -20,10 +84,10 @@ func Alias_check(r *http.Request) (alias_found bool, host string) {
 
 		for _, alias := range site.Alias {
 
-			if alias == r.Host {
+			// Поддержка wildcard паттернов
+			if matchWildcardAlias(alias, r.Host) {
 				alias_found = true
 				return alias_found, site.Host
-
 			} else {
 				alias_found = false
 			}
