@@ -307,6 +307,103 @@ func matchExceptions(exceptions []string, requestPath string) bool {
 	return false
 }
 
+// Универсальная функция проверки правил vAccess
+// Возвращает (разрешён_доступ, страница_ошибки)
+func checkRules(rules []VAccessRule, requestPath string, r *http.Request, checkFileExtensions bool, logPrefix string, logFile string) (bool, string) {
+	// Проверяем каждое правило
+	for _, rule := range rules {
+		// Проверяем соответствие путей (если указаны)
+		pathMatched := true // По умолчанию true, если путей нет
+		if len(rule.PathAccess) > 0 {
+			pathMatched = false
+			for _, rulePath := range rule.PathAccess {
+				if matchPath(rulePath, requestPath) {
+					pathMatched = true
+					break
+				}
+			}
+		}
+
+		// Если путь не совпадает - переходим к следующему правилу
+		if !pathMatched {
+			continue
+		}
+
+		// Проверяем исключения - если путь в исключениях, пропускаем правило
+		if matchExceptions(rule.ExceptionsDir, requestPath) {
+			continue
+		}
+
+		// Проверяем соответствие расширения файла (если включена проверка)
+		fileMatches := true // По умолчанию true
+		if checkFileExtensions && len(rule.TypeFile) > 0 {
+			fileMatches = matchFileExtension(rule.TypeFile, requestPath)
+		}
+
+		// Проверяем соответствие IP адреса (если указаны)
+		ipMatches := true // По умолчанию true, если IP не указаны
+		if len(rule.IPList) > 0 {
+			clientIP := getClientIP(r)
+			ipMatches = matchIPAddress(rule.IPList, clientIP)
+		}
+
+		// Применяем правило в зависимости от типа
+		switch rule.Type {
+		case "Allow":
+			// Allow правило: разрешаем только если ВСЕ условия выполнены
+			conditionsFailed := false
+			if checkFileExtensions && len(rule.TypeFile) > 0 && !fileMatches {
+				conditionsFailed = true
+			}
+			if len(rule.IPList) > 0 && !ipMatches {
+				conditionsFailed = true
+			}
+
+			if conditionsFailed {
+				// Условия НЕ выполнены - блокируем
+				errorPage := rule.UrlError
+				if errorPage == "" {
+					errorPage = "404"
+				}
+				tools.Logs_file(1, logPrefix, "🚫 Доступ запрещён для "+getClientIP(r)+" к "+requestPath, logFile, false)
+				return false, errorPage
+			}
+			// Все условия Allow выполнены - разрешаем доступ
+			return true, ""
+
+		case "Disable":
+			// Disable правило: запрещаем если ЛЮБОЕ условие выполнено
+			shouldBlock := true
+
+			// Для расширений файлов (только если проверка включена)
+			if checkFileExtensions && len(rule.TypeFile) > 0 && !fileMatches {
+				shouldBlock = false
+			}
+
+			// Для IP адресов
+			if len(rule.IPList) > 0 && !ipMatches {
+				shouldBlock = false
+			}
+
+			if shouldBlock {
+				errorPage := rule.UrlError
+				if errorPage == "" {
+					errorPage = "404"
+				}
+				tools.Logs_file(1, logPrefix, "🚫 Доступ запрещён для "+getClientIP(r)+" к "+requestPath, logFile, false)
+				return false, errorPage
+			}
+
+		default:
+			// Неизвестный тип правила - игнорируем
+			continue
+		}
+	}
+
+	// Все проверки пройдены - разрешаем доступ
+	return true, ""
+}
+
 // Основная функция проверки доступа
 // Возвращает (разрешён_доступ, страница_ошибки)
 func CheckVAccess(requestPath string, host string, r *http.Request) (bool, string) {
@@ -326,70 +423,10 @@ func CheckVAccess(requestPath string, host string, r *http.Request) (bool, strin
 			continue
 		}
 
-		// Проверяем каждое правило в конфиге
-		for _, rule := range config.Rules {
-			// Проверяем соответствие путей (если указаны)
-			pathMatched := true // По умолчанию true, если путей нет
-			if len(rule.PathAccess) > 0 {
-				pathMatched = false
-				for _, rulePath := range rule.PathAccess {
-					if matchPath(rulePath, requestPath) {
-						pathMatched = true
-						break
-					}
-				}
-			}
-
-			// Если путь не совпадает - переходим к следующему правилу
-			if !pathMatched {
-				continue
-			}
-
-			// Проверяем исключения - если путь в исключениях, пропускаем правило
-			if matchExceptions(rule.ExceptionsDir, requestPath) {
-				continue
-			}
-
-			// Проверяем соответствие расширения файла (если указаны)
-			fileMatches := true // По умолчанию true, если типов файлов нет
-			if len(rule.TypeFile) > 0 {
-				fileMatches = matchFileExtension(rule.TypeFile, requestPath)
-			}
-
-			// Проверяем соответствие IP адреса (если указаны)
-			ipMatches := true // По умолчанию true, если IP не указаны
-			if len(rule.IPList) > 0 {
-				clientIP := getClientIP(r)
-				ipMatches = matchIPAddress(rule.IPList, clientIP)
-			}
-
-			// Применяем правило в зависимости от типа
-			switch rule.Type {
-			case "Allow":
-				// Allow правило: разрешаем только если ВСЕ условия выполнены
-				if (len(rule.TypeFile) > 0 && !fileMatches) || (len(rule.IPList) > 0 && !ipMatches) {
-					// Условия НЕ выполнены - блокируем
-					errorPage := rule.UrlError
-					if errorPage == "" {
-						errorPage = "404" // По умолчанию 404
-					}
-					return false, errorPage
-				}
-				// Все условия Allow выполнены - разрешаем доступ
-				return true, ""
-			case "Disable":
-				// Disable правило: запрещаем если ЛЮБОЕ условие выполнено
-				if (len(rule.TypeFile) == 0 || fileMatches) && (len(rule.IPList) == 0 || ipMatches) {
-					errorPage := rule.UrlError
-					if errorPage == "" {
-						errorPage = "404" // По умолчанию 404
-					}
-					return false, errorPage
-				}
-			default:
-				// Неизвестный тип правила - игнорируем
-				continue
-			}
+		// Используем универсальную функцию проверки правил (с проверкой расширений файлов)
+		allowed, errorPage := checkRules(config.Rules, requestPath, r, true, "vAccess", "logs_vaccess.log")
+		if !allowed {
+			return false, errorPage
 		}
 	}
 
@@ -418,5 +455,51 @@ func HandleVAccessError(w http.ResponseWriter, r *http.Request, errorPage string
 			http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
 			tools.Logs_file(1, "vAccess", "❌ Страница ошибки не найдена: "+localPath, "logs_vaccess.log", false)
 		}
+	}
+}
+
+// ========================================
+// ФУНКЦИИ ДЛЯ ПРОКСИ-СЕРВЕРА
+// ========================================
+
+// Основная функция проверки доступа для прокси-сервера
+// Возвращает (разрешён_доступ, страница_ошибки)
+func CheckProxyVAccess(requestPath string, domain string, r *http.Request) (bool, string) {
+	// Путь к конфигурационному файлу прокси
+	configPath := "WebServer/tools/Proxy_vAccess/" + domain + "_vAccess.conf"
+
+	// Проверяем существование файла
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		// Нет конфигурационного файла - разрешаем доступ
+		return true, ""
+	}
+
+	// Парсим конфигурационный файл
+	config, err := parseVAccessFile(configPath)
+	if err != nil {
+		tools.Logs_file(1, "vAccess-Proxy", "❌ Ошибка парсинга "+configPath+": "+err.Error(), "logs_vaccess_proxy.log", false)
+		return true, "" // При ошибке парсинга разрешаем доступ
+	}
+
+	// Используем универсальную функцию проверки правил (с проверкой расширений файлов)
+	return checkRules(config.Rules, requestPath, r, true, "vAccess-Proxy", "logs_vaccess_proxy.log")
+}
+
+// Обработка страницы ошибки vAccess для прокси
+func HandleProxyVAccessError(w http.ResponseWriter, r *http.Request, errorPage string) {
+	switch {
+	case errorPage == "404":
+		// Стандартная 404 страница
+		w.WriteHeader(http.StatusForbidden)
+		http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
+
+	case strings.HasPrefix(errorPage, "http://") || strings.HasPrefix(errorPage, "https://"):
+		// Внешний сайт - редирект
+		http.Redirect(w, r, errorPage, http.StatusFound)
+
+	default:
+		// Для прокси возвращаем 403 Forbidden
+		w.WriteHeader(http.StatusForbidden)
+		http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
 	}
 }

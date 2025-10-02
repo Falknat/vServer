@@ -35,6 +35,14 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 
 		valid = true
 
+		// Проверяем vAccess для прокси
+		accessAllowed, errorPage := CheckProxyVAccess(r.URL.Path, proxyConfig.ExternalDomain, r)
+		if !accessAllowed {
+			// Доступ запрещён - обрабатываем страницу ошибки
+			HandleProxyVAccessError(w, r, errorPage)
+			return valid
+		}
+
 		// Проверяем AutoHTTPS - редирект с HTTP на HTTPS
 		https_check := !(r.TLS == nil)
 		if !https_check && proxyConfig.AutoHTTPS {
