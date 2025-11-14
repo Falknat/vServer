@@ -1,0 +1,66 @@
+/* ============================================
+   Container Layout
+   Основной контейнер контента
+   ============================================ */
+
+.container {
+    height: calc(100vh - var(--header-height));
+    margin-top: var(--header-height);
+    margin-left: var(--sidebar-width);
+    padding: 40px var(--space-3xl);
+    position: relative;
+    z-index: var(--z-base);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Main Content */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xl);
+}
+
+/* Section */
+.section {
+    position: relative;
+}
+
+.section-title {
+    font-size: var(--text-md);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    
+    &::before {
+        content: '';
+        width: 4px;
+        height: 16px;
+        background: linear-gradient(180deg, var(--accent-purple), var(--accent-purple-light));
+        border-radius: 2px;
+    }
+}
+
+/* Footer */
+.footer {
+    margin-top: var(--space-3xl);
+    padding: 20px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+    opacity: 0.6;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .header {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+

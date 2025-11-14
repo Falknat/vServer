@@ -21,6 +21,11 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 	configMutex.RLock()
 	defer configMutex.RUnlock()
 
+	// Проверяем глобальный флаг прокси
+	if !config.ConfigData.Soft_Settings.Proxy_enabled {
+		return false
+	}
+
 	// Проходим по всем прокси конфигурациям
 	for _, proxyConfig := range config.ConfigData.Proxy_Service {
 		// Пропускаем отключенные прокси

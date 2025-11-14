@@ -13,6 +13,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 	config "vServer/Backend/config"
 	tools "vServer/Backend/tools"
@@ -29,6 +30,11 @@ var (
 
 var address_php string
 var Сonsole_php bool = false
+
+// GetPHPStatus возвращает статус PHP сервера
+func GetPHPStatus() bool {
+	return len(phpProcesses) > 0 && !stopping
+}
 
 // FastCGI константы
 const (
@@ -98,6 +104,12 @@ func startFastCGIWorker(port int, workerID int) {
 		"PHP_FCGI_CHILDREN=0",        // Один процесс на порт
 		"PHP_FCGI_MAX_REQUESTS=1000", // Перезапуск после 1000 запросов
 	)
+
+	// Скрываем консольное окно
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow:    true,
+		CreationFlags: 0x08000000, // CREATE_NO_WINDOW
+	}
 
 	if !Сonsole_php {
 		cmd.Stdout = nil
@@ -499,6 +511,10 @@ func PHP_Stop() {
 
 	// Дополнительно убиваем все процессы php-cgi.exe
 	cmd := exec.Command("taskkill", "/F", "/IM", "php-cgi.exe")
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow:    true,
+		CreationFlags: 0x08000000,
+	}
 	cmd.Run()
 
 	tools.Logs_file(0, "PHP", "🛑 Все FastCGI процессы остановлены", "logs_php.log", true)

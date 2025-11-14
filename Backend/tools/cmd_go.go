@@ -12,20 +12,68 @@ import (
 )
 
 var (
-	kernel32           = syscall.NewLazyDLL("kernel32.dll")
-	procSetConsoleMode = kernel32.NewProc("SetConsoleMode")
-	procGetConsoleMode = kernel32.NewProc("GetConsoleMode")
-	procCreateMutex    = kernel32.NewProc("CreateMutexW")
-	procCloseHandle    = kernel32.NewProc("CloseHandle")
+	kernel32                     = syscall.NewLazyDLL("kernel32.dll")
+	procSetConsoleMode           = kernel32.NewProc("SetConsoleMode")
+	procGetConsoleMode           = kernel32.NewProc("GetConsoleMode")
+	procCreateMutex              = kernel32.NewProc("CreateMutexW")
+	procCloseHandle              = kernel32.NewProc("CloseHandle")
+	procCreateJobObject          = kernel32.NewProc("CreateJobObjectW")
+	procAssignProcessToJobObject = kernel32.NewProc("AssignProcessToJobObject")
+	procSetInformationJobObject  = kernel32.NewProc("SetInformationJobObject")
 )
 
 const ENABLE_VIRTUAL_TERMINAL_PROCESSING = 0x0004
+const JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE = 0x2000
 
 var mutexHandle syscall.Handle
+var jobHandle syscall.Handle
 
 func init() {
 	enableVirtualTerminal()
+	createJobObject()
+}
 
+func createJobObject() {
+	handle, _, _ := procCreateJobObject.Call(0, 0)
+	if handle == 0 {
+		return
+	}
+
+	jobHandle = syscall.Handle(handle)
+
+	// Устанавливаем флаг автоматического завершения дочерних процессов
+	type JOBOBJECT_EXTENDED_LIMIT_INFORMATION struct {
+		BasicLimitInformation struct {
+			PerProcessUserTimeLimit uint64
+			PerJobUserTimeLimit     uint64
+			LimitFlags              uint32
+			MinimumWorkingSetSize   uintptr
+			MaximumWorkingSetSize   uintptr
+			ActiveProcessLimit      uint32
+			Affinity                uintptr
+			PriorityClass           uint32
+			SchedulingClass         uint32
+		}
+		IoInfo                [48]byte
+		ProcessMemoryLimit    uintptr
+		JobMemoryLimit        uintptr
+		PeakProcessMemoryUsed uintptr
+		PeakJobMemoryUsed     uintptr
+	}
+
+	var limitInfo JOBOBJECT_EXTENDED_LIMIT_INFORMATION
+	limitInfo.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE
+
+	procSetInformationJobObject.Call(
+		uintptr(jobHandle),
+		9, // JobObjectExtendedLimitInformation
+		uintptr(unsafe.Pointer(&limitInfo)),
+		unsafe.Sizeof(limitInfo),
+	)
+
+	// Добавляем текущий процесс в Job Object
+	currentProcess, _ := syscall.GetCurrentProcess()
+	procAssignProcessToJobObject.Call(uintptr(jobHandle), uintptr(currentProcess))
 }
 
 func enableVirtualTerminal() {
@@ -66,6 +114,12 @@ func RunBatScript(script string) (string, error) {
 // Функция для логирования вывода процесса в консоль
 func Logs_console(process *exec.Cmd, check bool) error {
 
+	// Скрываем окно процесса для GUI приложений
+	process.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow:    true,
+		CreationFlags: 0x08000000, // CREATE_NO_WINDOW
+	}
+
 	if check {
 		// Настраиваем pipes для захвата вывода
 		stdout, err := process.StdoutPipe()
@@ -101,24 +155,24 @@ func Logs_console(process *exec.Cmd, check bool) error {
 // CheckSingleInstance проверяет, не запущена ли программа уже через мьютекс
 func CheckSingleInstance() bool {
 	mutexName, _ := syscall.UTF16PtrFromString("Global\\vServer_SingleInstance")
-	
+
 	handle, _, err := procCreateMutex.Call(
 		0,
 		0,
 		uintptr(unsafe.Pointer(mutexName)),
 	)
-	
+
 	if handle == 0 {
 		return false // не удалось создать мьютекс
 	}
-	
+
 	mutexHandle = syscall.Handle(handle)
-	
+
 	// Если GetLastError возвращает ERROR_ALREADY_EXISTS (183), значит мьютекс уже существует
 	if err.(syscall.Errno) == 183 {
 		return false // программа уже запущена
 	}
-	
+
 	return true // успешно создали мьютекс, программа не запущена
 }
 
@@ -127,5 +181,11 @@ func ReleaseMutex() {
 	if mutexHandle != 0 {
 		procCloseHandle.Call(uintptr(mutexHandle))
 		mutexHandle = 0
+	}
+
+	// Закрываем Job Object - это автоматически убьёт все дочерние процессы
+	if jobHandle != 0 {
+		procCloseHandle.Call(uintptr(jobHandle))
+		jobHandle = 0
 	}
 }

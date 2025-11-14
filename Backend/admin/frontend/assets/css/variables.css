@@ -1,0 +1,100 @@
+/* ============================================
+   CSS Custom Properties (Design Tokens)
+   Профессиональная система переменных
+   ============================================ */
+
+:root {
+    /* Colors - Background */
+    --bg-primary: #0b101f;
+    --bg-secondary: #121420;
+    --bg-tertiary: #0d0f1c;
+    
+    /* Colors - Glass Effect */
+    --glass-bg: rgba(20, 20, 40, 0.4);
+    --glass-bg-light: rgba(20, 20, 40, 0.3);
+    --glass-bg-dark: rgba(10, 14, 26, 0.5);
+    --glass-border: rgba(139, 92, 246, 0.15);
+    --glass-border-hover: rgba(139, 92, 246, 0.3);
+    
+    /* Colors - Accent */
+    --accent-blue: #5b21b6;
+    --accent-blue-light: #7c3aed;
+    --accent-purple: #8b5cf6;
+    --accent-purple-light: #a78bfa;
+    --accent-cyan: #06b6d4;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-yellow: #f59e0b;
+    
+    /* Colors - Text */
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.7);
+    --shadow-purple: 0 8px 32px rgba(139, 92, 246, 0.3);
+    --shadow-green: 0 4px 12px rgba(16, 185, 129, 0.3);
+    --shadow-red: 0 4px 12px rgba(239, 68, 68, 0.3);
+    
+    /* Spacing */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 60px;
+    
+    /* Border Radius */
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 10px;
+    --radius-full: 50%;
+    
+    /* Transitions */
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.2s ease;
+    --transition-slow: 0.3s ease;
+    --transition-bounce: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Typography */
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'Consolas', 'Courier New', monospace;
+    
+    /* Font Sizes */
+    --text-xs: 10px;
+    --text-sm: 11px;
+    --text-base: 13px;
+    --text-md: 14px;
+    --text-lg: 16px;
+    --text-xl: 18px;
+    --text-2xl: 20px;
+    --text-3xl: 28px;
+    
+    /* Font Weights */
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+    
+    /* Z-Index Scale */
+    --z-base: 1;
+    --z-dropdown: 100;
+    --z-modal: 9998;
+    --z-notification: 9999;
+    --z-loader: 10000;
+    
+    /* Layout */
+    --header-height: 60px;
+    --sidebar-width: 80px;
+    
+    /* Backdrop Filter */
+    --backdrop-blur: blur(20px) saturate(180%);
+    --backdrop-blur-light: blur(10px);
+}
+

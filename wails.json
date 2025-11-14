@@ -1,0 +1,23 @@
+{
+  "$schema": "https://wails.io/schemas/config.v2.json",
+  "name": "vServer Admin Panel",
+  "outputfilename": "vServer-Admin",
+  "author": {
+    "name": "Суманеев Роман",
+    "email": "info@voxsel.ru"
+  },
+  "info": {
+    "companyName": "vServer",
+    "productName": "vServer Admin Panel",
+    "productVersion": "1.0.0",
+    "copyright": "Copyright © 2025 vServer",
+    "comments": "Панель управления vServer"
+  },
+  "wailsjsdir": "./Backend/admin/frontend/wailsjs",
+  "frontend:dir": "./Backend/admin/frontend",
+  "assetdir": "./Backend/admin/frontend",
+  "reloaddirs": "Backend/admin",
+  "build:dir": ".",
+  "appicon": "appicon.png"
+}
+

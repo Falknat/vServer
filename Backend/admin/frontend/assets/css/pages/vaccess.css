@@ -1,0 +1,264 @@
+/* ============================================
+   vAccess Editor Page
+   Страница редактора правил доступа
+   ============================================ */
+
+.vaccess-page {
+    animation: fadeIn var(--transition-slow);
+}
+
+/* Breadcrumbs */
+.breadcrumbs {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-lg);
+    margin-bottom: var(--space-md);
+    padding: var(--space-md) 20px;
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--glass-border);
+}
+
+.breadcrumbs-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.breadcrumbs-tabs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.breadcrumb-separator {
+    color: var(--text-muted);
+    opacity: 0.3;
+}
+
+/* vAccess Header */
+.vaccess-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: var(--space-md);
+    padding: var(--space-lg);
+    background: rgba(139, 92, 246, 0.03);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+}
+
+.vaccess-title-block {
+    flex: 1;
+}
+
+.vaccess-actions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    min-width: 200px;
+    
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 10px var(--space-md);
+        font-size: var(--text-base);
+    }
+}
+
+.vaccess-title {
+    font-size: var(--text-3xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-sm) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+    
+    i {
+        color: var(--accent-purple-light);
+        font-size: 24px;
+    }
+}
+
+.vaccess-subtitle {
+    font-size: var(--text-md);
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* vAccess Tab Content */
+.vaccess-tab-content {
+    animation: fadeIn var(--transition-slow);
+}
+
+/* vAccess Rules Container */
+.vaccess-rules-container {
+    /* Контейнер без padding чтобы таблица была на всю ширину */
+    width: 100%;
+}
+
+/* vAccess Rules List */
+.vaccess-rules-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-bottom: 20px;
+    max-height: 55vh;
+    overflow-y: auto;
+    padding-right: var(--space-sm);
+}
+
+/* Empty State */
+.vaccess-empty {
+    text-align: center;
+    padding: 80px 40px;
+    color: var(--text-muted);
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: var(--space-lg);
+    opacity: 0.3;
+}
+
+.vaccess-empty h3 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin-bottom: 12px;
+}
+
+.vaccess-empty p {
+    font-size: var(--text-md);
+    margin-bottom: var(--space-lg);
+}
+
+/* vAccess Help */
+.vaccess-help {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+/* Help Parameters */
+.help-params {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+}
+
+.help-param {
+    padding: 20px;
+    background: rgba(139, 92, 246, 0.03);
+    border-radius: var(--radius-lg);
+    border-left: 3px solid var(--accent-purple);
+    
+    strong {
+        display: block;
+        font-size: 15px;
+        color: var(--accent-purple-light);
+        margin-bottom: var(--space-sm);
+    }
+    
+    p {
+        margin: var(--space-sm) 0 0 0;
+        color: var(--text-secondary);
+        line-height: 1.6;
+    }
+    
+    ul {
+        margin: 12px 0 0 20px;
+    }
+    
+    code {
+        padding: 3px 8px;
+        background: rgba(139, 92, 246, 0.15);
+        border-radius: var(--radius-sm);
+        font-size: var(--text-base);
+        color: var(--accent-purple-light);
+    }
+}
+
+.help-warning {
+    color: rgba(251, 191, 36, 0.9) !important;
+    margin-top: var(--space-sm);
+    font-size: var(--text-base);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+/* Help Patterns */
+.help-patterns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-md);
+}
+
+.pattern-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-md);
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: 10px;
+    transition: all var(--transition-base);
+    
+    &:hover {
+        background: rgba(139, 92, 246, 0.1);
+    }
+    
+    code {
+        font-size: var(--text-md);
+        font-weight: var(--font-semibold);
+        color: var(--accent-purple-light);
+    }
+    
+    span {
+        font-size: var(--text-base);
+        color: var(--text-muted);
+    }
+}
+
+/* Help Examples */
+.help-example {
+    margin-bottom: var(--space-xl);
+    
+    &:last-child {
+        margin-bottom: 0;
+    }
+    
+    h4 {
+        font-size: var(--text-lg);
+        font-weight: var(--font-semibold);
+        color: var(--text-primary);
+        margin-bottom: var(--space-md);
+    }
+}
+
+.example-rule {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 12px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    border: 1px solid var(--glass-border);
+    
+    div {
+        font-size: var(--text-md);
+        color: var(--text-secondary);
+    }
+    
+    strong {
+        color: var(--text-muted);
+        margin-right: var(--space-sm);
+    }
+    
+    code {
+        color: var(--accent-purple-light);
+    }
+}
+

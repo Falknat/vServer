@@ -1,0 +1,191 @@
+/* ============================================
+   Cards Component
+   Единая система карточек
+   ============================================ */
+
+/* Service Card */
+.service-card {
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-lg);
+    transition: all var(--transition-bounce);
+    position: relative;
+    overflow: hidden;
+    
+    /* Градиентная линия сверху */
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: linear-gradient(90deg, var(--accent-purple), var(--accent-purple-light), var(--accent-cyan));
+        opacity: 0;
+        transition: opacity var(--transition-slow);
+    }
+    
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-purple);
+        border-color: var(--glass-border-hover);
+        background: rgba(20, 20, 40, 0.5);
+        
+        &::before {
+            opacity: 1;
+        }
+    }
+}
+
+.service-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.service-name {
+    font-size: var(--text-md);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    
+    i {
+        color: var(--accent-purple-light);
+        font-size: var(--text-lg);
+    }
+}
+
+.service-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.info-label {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    font-weight: var(--font-medium);
+}
+
+.info-value {
+    font-size: 12px;
+    color: var(--text-primary);
+    font-weight: var(--font-semibold);
+}
+
+/* Settings Card */
+.settings-card {
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+}
+
+.settings-card-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    
+    i {
+        color: var(--accent-purple-light);
+    }
+}
+
+/* vAccess Rule Card */
+.vaccess-rule-card {
+    background: rgba(10, 14, 26, 0.4);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+}
+
+.rule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.rule-number {
+    font-size: var(--text-md);
+    font-weight: var(--font-bold);
+    color: var(--accent-purple-light);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rule-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    
+    > .form-group:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* Help Cards */
+.help-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-xl);
+    padding: var(--space-xl);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-slow);
+    
+    &:hover {
+        border-color: var(--glass-border-hover);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    
+    h3 {
+        font-size: var(--text-2xl);
+        font-weight: var(--font-semibold);
+        color: var(--accent-purple-light);
+        margin: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        gap: var(--space-lg);
+    }
+    
+    ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    li {
+        padding: 12px 0;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.05);
+        
+        &:last-child {
+            border-bottom: none;
+        }
+    }
+}
+
+.help-examples {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(99, 102, 241, 0.05) 100%);
+}
+

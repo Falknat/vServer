@@ -24,12 +24,11 @@ type Site_www struct {
 }
 
 type Soft_Settings struct {
-	Php_port   int    `json:"php_port"`
-	Php_host   string `json:"php_host"`
-	Mysql_port int    `json:"mysql_port"`
-	Mysql_host string `json:"mysql_host"`
-	Admin_port string `json:"admin_port"`
-	Admin_host string `json:"admin_host"`
+	Php_port      int    `json:"php_port"`
+	Php_host      string `json:"php_host"`
+	Mysql_port    int    `json:"mysql_port"`
+	Mysql_host    string `json:"mysql_host"`
+	Proxy_enabled bool   `json:"proxy_enabled"`
 }
 
 type Proxy_Service struct {

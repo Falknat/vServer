@@ -1,0 +1,103 @@
+/* ============================================
+   Base Styles & Reset
+   Базовые стили приложения
+   ============================================ */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    line-height: 1.6;
+    height: 100vh;
+    overflow: hidden;
+    position: relative;
+    
+    /* Градиентный фон с размытием */
+    &::before {
+        content: '';
+        position: fixed;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        /* background: radial-gradient(circle at 80% 80%, rgba(138, 92, 246, 0.116) 0%, transparent 50%); */
+        pointer-events: none;
+        z-index: 0;
+    }
+}
+
+/* Typography */
+code {
+    background: rgba(139, 92, 246, 0.15);
+    backdrop-filter: var(--backdrop-blur-light);
+    color: var(--accent-purple-light);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: var(--radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-sm);
+    
+    &:hover {
+        background: rgba(139, 92, 246, 0.5);
+    }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to { 
+        transform: rotate(360deg); 
+    }
+}
+
+@keyframes bounce {
+    0%, 100% { 
+        transform: translateY(0); 
+    }
+    50% { 
+        transform: translateY(-20px); 
+    }
+}
+
+/* Utility Classes */
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn var(--transition-slow);
+}
+

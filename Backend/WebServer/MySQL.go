@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
-	"strconv"
+	"syscall"
 	"time"
 	config "vServer/Backend/config"
 	tools "vServer/Backend/tools"
@@ -13,6 +13,11 @@ import (
 var mysqlProcess *exec.Cmd
 var mysql_status bool = false
 var mysql_secure bool = false
+
+// GetMySQLStatus возвращает статус MySQL
+func GetMySQLStatus() bool {
+	return mysql_status
+}
 
 var mysqldPath string
 var configPath string
@@ -86,16 +91,8 @@ func StartMySQLServer(secure bool) {
 	mysql_port = config.ConfigData.Soft_Settings.Mysql_port
 	mysql_ip = config.ConfigData.Soft_Settings.Mysql_host
 
-	if tools.Port_check("MySQL", mysql_ip, strconv.Itoa(mysql_port)) {
-		return
-	}
-
 	if mysql_status {
-		tools.Logs_file(1, "MySQL", "Сервер MySQL уже запущен", "logs_mysql.log", true)
-		return
-	}
-
-	if false {
+		tools.Logs_file(1, "MySQL", "Сервер MySQL уже запущен", "logs_mysql.log", false)
 		return
 	}
 
@@ -105,9 +102,9 @@ func StartMySQLServer(secure bool) {
 
 	// Выбор сообщения
 	if secure {
-		tools.Logs_file(0, "MySQL", "Запуск сервера MySQL в режиме безопасности", "logs_mysql.log", true)
+		tools.Logs_file(0, "MySQL", "Запуск сервера MySQL в режиме безопасности", "logs_mysql.log", false)
 	} else {
-		tools.Logs_file(0, "MySQL", "Запуск сервера MySQL в обычном режиме", "logs_mysql.log", true)
+		tools.Logs_file(0, "MySQL", "Запуск сервера MySQL в обычном режиме", "logs_mysql.log", false)
 	}
 
 	// Общая логика запуска
@@ -115,7 +112,7 @@ func StartMySQLServer(secure bool) {
 	mysqlProcess.Dir = binDirAbs
 	tools.Logs_console(mysqlProcess, console_mysql)
 
-	tools.Logs_file(0, "MySQL", fmt.Sprintf("Сервер MySQL запущен на %s:%d", mysql_ip, mysql_port), "logs_mysql.log", true)
+	tools.Logs_file(0, "MySQL", fmt.Sprintf("Сервер MySQL запущен на %s:%d", mysql_ip, mysql_port), "logs_mysql.log", false)
 
 	mysql_status = true
 
@@ -124,21 +121,29 @@ func StartMySQLServer(secure bool) {
 // StopMySQLServer останавливает MySQL сервер
 func StopMySQLServer() {
 
-	if mysql_status {
-
-		cmd := exec.Command("taskkill", "/F", "/IM", "mysqld.exe")
-
-		err := cmd.Run()
-		tools.CheckError(err)
-
-		tools.Logs_file(0, "MySQL", "Сервер MySQL остановлен", "logs_mysql.log", true)
-		mysql_status = false
-
-	} else {
-
-		tools.Logs_file(1, "MySQL", "Сервер MySQL уже остановлен", "logs_mysql.log", true)
-
+	if !mysql_status {
+		return // Уже остановлен
 	}
+
+	// Сначала пробуем завершить процесс корректно
+	if mysqlProcess != nil && mysqlProcess.Process != nil {
+		mysqlProcess.Process.Kill()
+		mysqlProcess = nil
+	}
+
+	// Дополнительно убиваем все mysqld.exe процессы
+	cmd := exec.Command("taskkill", "/F", "/IM", "mysqld.exe")
+
+	// Скрываем окно taskkill
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow:    true,
+		CreationFlags: 0x08000000,
+	}
+
+	cmd.Run()
+
+	tools.Logs_file(0, "MySQL", "Сервер MySQL остановлен", "logs_mysql.log", false)
+	mysql_status = false
 
 }
 

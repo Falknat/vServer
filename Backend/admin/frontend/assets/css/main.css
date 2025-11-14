@@ -1,0 +1,26 @@
+/* ============================================
+   vServer Admin Panel - Main CSS
+   Профессиональная модульная архитектура
+   ============================================ */
+
+/* 1. Variables & Base */
+@import 'variables.css';
+@import 'base.css';
+
+/* 2. Components */
+@import 'components/buttons.css';
+@import 'components/badges.css';
+@import 'components/cards.css';
+@import 'components/forms.css';
+@import 'components/tables.css';
+@import 'components/modals.css';
+
+/* 3. Layout */
+@import 'layout/header.css';
+@import 'layout/sidebar.css';
+@import 'layout/container.css';
+
+/* 4. Pages */
+@import 'pages/dashboard.css';
+@import 'pages/vaccess.css';
+

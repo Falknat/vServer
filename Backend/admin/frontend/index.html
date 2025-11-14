@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>vServer Admin Panel</title>
+    <link rel="stylesheet" href="assets/css/local_lib/all.min.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+    <div class="window-controls" id="windowControls">
+        <div class="title-bar">
+            <div class="title-bar-left">
+                <div class="app-logo">
+                    <span class="logo-icon">🚀</span>
+                    <span class="logo-text">vServer</span>
+                </div>
+                <div class="server-status" id="serverStatus">
+                    <span class="status-indicator status-online"></span>
+                    <span class="status-text">Сервер запущен</span>
+                </div>
+            </div>
+            <div class="title-bar-right">
+                <button class="server-control-btn" id="serverControlBtn">
+                    <i class="fas fa-power-off"></i>
+                    <span class="btn-text">Остановить</span>
+                </button>
+                <button class="window-btn minimize-btn" id="minimizeBtn" title="Свернуть">
+                    <i class="fas fa-window-minimize"></i>
+                </button>
+                <button class="window-btn maximize-btn" id="maximizeBtn" title="Развернуть">
+                    <i class="far fa-window-maximize"></i>
+                </button>
+                <button class="window-btn close-btn" id="closeBtn" title="Закрыть">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <aside class="sidebar">
+        <nav class="sidebar-nav">
+            <button class="nav-item active" title="Главная">
+                <i class="fas fa-home"></i>
+            </button>
+            <button class="nav-item" title="Статистика">
+                <i class="fas fa-chart-bar"></i>
+            </button>
+            <button class="nav-item" title="Сервисы">
+                <i class="fas fa-server"></i>
+            </button>
+            <button class="nav-item" title="Настройки">
+                <i class="fas fa-cog"></i>
+            </button>
+        </nav>
+    </aside>
+
+    <div class="container">
+
+        <main class="main-content">
+            <section class="section" id="sectionServices">
+                <h2 class="section-title">Статус сервисов</h2>
+                <div class="services-grid" id="servicesGrid">
+                    <div class="service-card">
+                        <div class="service-header">
+                            <h3 class="service-name"><i class="fas fa-globe"></i> HTTP</h3>
+                            <span class="badge badge-pending">Запуск</span>
+                        </div>
+                        <div class="service-info">
+                            <div class="info-row">
+                                <span class="info-label">Порт:</span>
+                                <span class="info-value">80</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <h3 class="service-name"><i class="fas fa-lock"></i> HTTPS</h3>
+                            <span class="badge badge-pending">Запуск</span>
+                        </div>
+                        <div class="service-info">
+                            <div class="info-row">
+                                <span class="info-label">Порт:</span>
+                                <span class="info-value">443</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <h3 class="service-name"><i class="fas fa-database"></i> MySQL</h3>
+                            <span class="badge badge-pending">Запуск</span>
+                        </div>
+                        <div class="service-info">
+                            <div class="info-row">
+                                <span class="info-label">Порт:</span>
+                                <span class="info-value">3306</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <h3 class="service-name"><i class="fab fa-php"></i> PHP</h3>
+                            <span class="badge badge-pending">Запуск</span>
+                        </div>
+                        <div class="service-info">
+                            <div class="info-row">
+                                <span class="info-label">Порты:</span>
+                                <span class="info-value">8000-8003</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="service-card">
+                        <div class="service-header">
+                            <h3 class="service-name"><i class="fas fa-exchange-alt"></i> Proxy</h3>
+                            <span class="badge badge-pending">Запуск</span>
+                        </div>
+                        <div class="service-info">
+                            <div class="info-row">
+                                <span class="info-label">Правил:</span>
+                                <span class="info-value">0 из 1</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="sectionSites">
+                <h2 class="section-title">Список сайтов</h2>
+                <div class="table-container">
+                    <table class="data-table" id="sitesTable">
+                        <thead>
+                            <tr>
+                                <th>Имя</th>
+                                <th>Host</th>
+                                <th>Alias</th>
+                                <th>Статус</th>
+                                <th>Root File</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Локальный сайт</td>
+                                <td><code class="clickable-link" onclick="openTestLink('http://127.0.0.1')">127.0.0.1 <i class="fas fa-external-link-alt"></i></code></td>
+                                <td><code>localhost</code></td>
+                                <td><span class="badge badge-online">active</span></td>
+                                <td><code>index.html</code></td>
+                            <td>
+                                <button class="icon-btn" onclick="openSiteFolder('127.0.0.1')" title="Открыть папку"><i class="fas fa-folder-open"></i></button>
+                                <button class="icon-btn" onclick="editVAccess('127.0.0.1', false)" title="vAccess"><i class="fas fa-shield-alt"></i></button>
+                                <button class="icon-btn" onclick="editTestSite(0)" title="Редактировать"><i class="fas fa-edit"></i></button>
+                            </td>
+                            </tr>
+                            <tr>
+                                <td>Тестовый проект</td>
+                                <td><code class="clickable-link" onclick="openTestLink('http://test.local')">test.local <i class="fas fa-external-link-alt"></i></code></td>
+                                <td><code>*.test.local, test.com</code></td>
+                                <td><span class="badge badge-online">active</span></td>
+                                <td><code>index.php</code></td>
+                                <td>
+                                    <button class="icon-btn" onclick="openSiteFolder('test.local')" title="Открыть папку"><i class="fas fa-folder-open"></i></button>
+                                    <button class="icon-btn" onclick="editVAccess('test.local', false)" title="vAccess"><i class="fas fa-shield-alt"></i></button>
+                                    <button class="icon-btn" onclick="editTestSite(1)" title="Редактировать"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>API сервис</td>
+                                <td><code class="clickable-link" onclick="openTestLink('http://api.example.com')">api.example.com <i class="fas fa-external-link-alt"></i></code></td>
+                                <td><code>*.api.example.com</code></td>
+                                <td><span class="badge badge-offline">inactive</span></td>
+                                <td><code>index.php</code></td>
+                                <td>
+                                    <button class="icon-btn" onclick="openSiteFolder('api.example.com')" title="Открыть папку"><i class="fas fa-folder-open"></i></button>
+                                    <button class="icon-btn" onclick="editVAccess('api.example.com', false)" title="vAccess"><i class="fas fa-shield-alt"></i></button>
+                                    <button class="icon-btn" onclick="editTestSite(2)" title="Редактировать"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="sectionProxy">
+                <h2 class="section-title">Прокси сервисы</h2>
+                <div class="table-container">
+                    <table class="data-table" id="proxyTable">
+                        <thead>
+                            <tr>
+                                <th>Внешний домен</th>
+                                <th>Локальный адрес</th>
+                                <th>HTTPS</th>
+                                <th>Auto HTTPS</th>
+                                <th>Статус</th>
+                                <th>Действия</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code class="clickable-link" onclick="openTestLink('https://git.example.ru')">git.example.ru <i class="fas fa-external-link-alt"></i></code></td>
+                                <td><code>127.0.0.1:3333</code></td>
+                                <td><span class="badge badge-no">HTTP</span></td>
+                                <td><span class="badge badge-yes">Да</span></td>
+                                <td><span class="badge badge-online">active</span></td>
+                            <td>
+                                <button class="icon-btn" onclick="editVAccess('git.example.ru', true)" title="vAccess"><i class="fas fa-shield-alt"></i></button>
+                                <button class="icon-btn" onclick="editTestProxy(0)" title="Редактировать"><i class="fas fa-edit"></i></button>
+                            </td>
+                            </tr>
+                            <tr>
+                                <td><code class="clickable-link" onclick="openTestLink('http://api.example.com')">api.example.com <i class="fas fa-external-link-alt"></i></code></td>
+                                <td><code>127.0.0.1:8080</code></td>
+                                <td><span class="badge badge-yes">HTTPS</span></td>
+                                <td><span class="badge badge-no">Нет</span></td>
+                                <td><span class="badge badge-online">active</span></td>
+                                <td>
+                                    <button class="icon-btn" onclick="editVAccess('api.example.com', true)" title="vAccess"><i class="fas fa-shield-alt"></i></button>
+                                    <button class="icon-btn" onclick="editTestProxy(1)" title="Редактировать"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><code class="clickable-link" onclick="openTestLink('http://test.example.net')">test.example.net <i class="fas fa-external-link-alt"></i></code></td>
+                                <td><code>127.0.0.1:5000</code></td>
+                                <td><span class="badge badge-no">HTTP</span></td>
+                                <td><span class="badge badge-no">Нет</span></td>
+                                <td><span class="badge badge-offline">disabled</span></td>
+                                <td>
+                                    <button class="icon-btn" onclick="editVAccess('test.example.net', true)" title="vAccess"><i class="fas fa-shield-alt"></i></button>
+                                    <button class="icon-btn" onclick="editTestProxy(2)" title="Редактировать"><i class="fas fa-edit"></i></button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="section" id="sectionSettings" style="display: none;">
+                <div class="settings-header">
+                    <h2 class="section-title">Настройки серверов</h2>
+                    <button class="action-btn save-btn" id="saveSettingsBtn">
+                        <i class="fas fa-save"></i>
+                        <span>Сохранить и перезапустить</span>
+                    </button>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3 class="settings-card-title"><i class="fas fa-database"></i> MySQL сервер</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label class="form-label">Host адрес:</label>
+                                <input type="text" class="form-input" id="mysqlHost" placeholder="127.0.0.1">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Порт:</label>
+                                <input type="number" class="form-input" id="mysqlPort" placeholder="3306">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="settings-card-title"><i class="fab fa-php"></i> PHP сервер</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label class="form-label">Host адрес:</label>
+                                <input type="text" class="form-input" id="phpHost" placeholder="localhost">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Порт:</label>
+                                <input type="number" class="form-input" id="phpPort" placeholder="8000">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3 class="settings-card-title"><i class="fas fa-network-wired"></i> Proxy Manager</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label class="form-label">Статус:</label>
+                                <div class="toggle-wrapper">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="proxyEnabled">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label">Proxy Manager</span>
+                                </div>
+                            </div>
+                            <div class="form-info">
+                                ⚡ Применяется моментально без перезапуска серверов. При выключении все прокси правила будут отключены.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="sectionVAccessEditor" style="display: none;">
+                <div class="vaccess-page">
+                    <!-- Хлебные крошки с вкладками -->
+                    <div class="breadcrumbs" id="vAccessBreadcrumbs">
+                        <div class="breadcrumbs-left">
+                            <button class="breadcrumb-item" onclick="backToMain()">
+                                <i class="fas fa-arrow-left"></i> Назад
+                            </button>
+                            <span class="breadcrumb-separator">/</span>
+                            <span class="breadcrumb-item active" id="breadcrumbHost">example.com</span>
+                        </div>
+                        <div class="breadcrumbs-tabs">
+                            <button class="vaccess-tab active" data-tab="rules" onclick="switchVAccessTab('rules')">
+                                <i class="fas fa-list"></i>
+                                <span>Правила доступа</span>
+                            </button>
+                            <button class="vaccess-tab" data-tab="help" onclick="switchVAccessTab('help')">
+                                <i class="fas fa-question-circle"></i>
+                                <span>Инструкция</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Заголовок с кнопками -->
+                    <div class="vaccess-header">
+                        <div class="vaccess-title-block">
+                            <h2 class="vaccess-title">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Правила доступа vAccess</span>
+                            </h2>
+                            <p class="vaccess-subtitle" id="vAccessSubtitle">Управление правилами доступа для сайта</p>
+                        </div>
+                        <div class="vaccess-actions">
+                            <button class="action-btn save-btn" id="saveVAccessBtn">
+                                <i class="fas fa-save"></i>
+                                <span>Сохранить изменения</span>
+                            </button>
+                            <button class="action-btn" onclick="addVAccessRule()">
+                                <i class="fas fa-plus"></i>
+                                <span>Добавить правило</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Контент вкладки "Правила" -->
+                    <div class="vaccess-tab-content" id="vAccessRulesTab">
+                        <div class="vaccess-rules-container">
+                            <table class="vaccess-table">
+                                <thead>
+                                    <tr>
+                                        <th class="col-drag"></th>
+                                        <th class="col-type">Тип</th>
+                                        <th class="col-files">Расширения</th>
+                                        <th class="col-paths">Пути доступа</th>
+                                        <th class="col-ips">IP адреса</th>
+                                        <th class="col-exceptions">Исключения</th>
+                                        <th class="col-error">Ошибка</th>
+                                        <th class="col-actions"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="vAccessTableBody">
+                                    <!-- Правила будут добавлены динамически -->
+                                </tbody>
+                            </table>
+                            <div class="vaccess-empty" id="vAccessEmpty" style="display: none;">
+                                <div class="empty-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <h3>Нет правил доступа</h3>
+                                <p>Добавьте первое правило, чтобы начать управление доступом</p>
+                                <button class="action-btn" onclick="addVAccessRule()">
+                                    <i class="fas fa-plus"></i>
+                                    <span>Создать правило</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Контент вкладки "Инструкция" -->
+                    <div class="vaccess-tab-content" id="vAccessHelpTab" style="display: none;">
+                        <div class="vaccess-help">
+                            <div class="help-card">
+                                <h3><i class="fas fa-info-circle"></i> Принцип работы</h3>
+                                <ul>
+                                    <li>Правила проверяются <strong>сверху вниз</strong> по порядку</li>
+                                    <li>Первое подходящее правило срабатывает и завершает проверку</li>
+                                    <li>Если ни одно правило не сработало - доступ <strong>разрешён</strong></li>
+                                    <li>Перетаскивайте правила за <i class="fas fa-grip-vertical"></i> чтобы изменить порядок</li>
+                                </ul>
+                            </div>
+
+                            <div class="help-card">
+                                <h3><i class="fas fa-sliders-h"></i> Параметры правил</h3>
+                                <div class="help-params">
+                                    <div class="help-param">
+                                        <strong>type:</strong>
+                                        <p><span class="badge badge-yes">Allow</span> (разрешить) или <span class="badge badge-no">Disable</span> (запретить)</p>
+                                    </div>
+                                    <div class="help-param">
+                                        <strong>Расширения файлов:</strong>
+                                        <p>Список расширений через запятую (<code>*.php</code>, <code>*.exe</code>)</p>
+                                    </div>
+                                    <div class="help-param">
+                                        <strong>Пути доступа:</strong>
+                                        <p>Список путей через запятую (<code>/admin/*</code>, <code>/api/*</code>)</p>
+                                    </div>
+                                    <div class="help-param">
+                                        <strong>IP адреса:</strong>
+                                        <p>Список IP адресов через запятую (<code>192.168.1.1</code>, <code>10.0.0.5</code>)</p>
+                                        <p class="help-warning"><i class="fas fa-exclamation-triangle"></i> Используется реальный IP соединения (не заголовки прокси!)</p>
+                                    </div>
+                                    <div class="help-param">
+                                        <strong>Исключения:</strong>
+                                        <p>Пути-исключения через запятую (<code>/bot/*</code>, <code>/public/*</code>). Правило НЕ применяется к этим путям</p>
+                                    </div>
+                                    <div class="help-param">
+                                        <strong>Страница ошибки:</strong>
+                                        <p>Куда перенаправить при блокировке:</p>
+                                        <ul>
+                                            <li><code>404</code> - стандартная страница ошибки</li>
+                                            <li><code>https://site.com</code> - внешний редирект</li>
+                                            <li><code>/error.html</code> - локальная страница</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="help-card">
+                                <h3><i class="fas fa-search"></i> Паттерны</h3>
+                                <div class="help-patterns">
+                                    <div class="pattern-item">
+                                        <code>*.ext</code>
+                                        <span>Любой файл с расширением .ext</span>
+                                    </div>
+                                    <div class="pattern-item">
+                                        <code>no_extension</code>
+                                        <span>Файлы без расширения (например: /api/users, /admin)</span>
+                                    </div>
+                                    <div class="pattern-item">
+                                        <code>/path/*</code>
+                                        <span>Все файлы в папке /path/ и подпапках</span>
+                                    </div>
+                                    <div class="pattern-item">
+                                        <code>/file.php</code>
+                                        <span>Конкретный файл</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="help-card help-examples">
+                                <h3><i class="fas fa-lightbulb"></i> Примеры правил</h3>
+                                
+                                <div class="help-example">
+                                    <h4>1. Запретить выполнение PHP в uploads</h4>
+                                    <div class="example-rule">
+                                        <div><strong>Тип:</strong> <span class="badge badge-no">Disable</span></div>
+                                        <div><strong>Расширения:</strong> <code>*.php</code></div>
+                                        <div><strong>Пути:</strong> <code>/uploads/*</code></div>
+                                        <div><strong>Ошибка:</strong> <code>404</code></div>
+                                    </div>
+                                </div>
+
+                                <div class="help-example">
+                                    <h4>2. Разрешить админку только с определённых IP</h4>
+                                    <div class="example-rule">
+                                        <div><strong>Тип:</strong> <span class="badge badge-yes">Allow</span></div>
+                                        <div><strong>Пути:</strong> <code>/admin/*</code></div>
+                                        <div><strong>IP:</strong> <code>192.168.1.100, 127.0.0.1</code></div>
+                                        <div><strong>Ошибка:</strong> <code>404</code></div>
+                                    </div>
+                                </div>
+
+                                <div class="help-example">
+                                    <h4>3. Блокировать определённые IP для всего сайта</h4>
+                                    <div class="example-rule">
+                                        <div><strong>Тип:</strong> <span class="badge badge-no">Disable</span></div>
+                                        <div><strong>IP:</strong> <code>192.168.1.50, 10.0.0.99</code></div>
+                                        <div><strong>Ошибка:</strong> <code>https://google.com</code></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>vServer Admin Panel © 2025 | Автор: Суманеев Роман</p>
+        </footer>
+    </div>
+
+    <div id="notification" class="notification"></div>
+    
+    <div id="appLoader" class="app-loader">
+        <div class="loader-content">
+            <div class="loader-icon">🚀</div>
+            <div class="loader-text">Запуск vServer...</div>
+            <div class="loader-spinner"></div>
+        </div>
+    </div>
+
+    <div id="modalOverlay" class="modal-overlay">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Редактирование</h3>
+                <button class="modal-close-btn" id="modalCloseBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content" id="modalContent"></div>
+            <div class="modal-footer">
+                <button class="action-btn" id="modalCancelBtn">
+                    <i class="fas fa-times"></i>
+                    <span>Отмена</span>
+                </button>
+                <button class="action-btn save-btn" id="modalSaveBtn">
+                    <i class="fas fa-save"></i>
+                    <span>Сохранить</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="fieldEditorOverlay" class="modal-overlay">
+        <div class="modal-window" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3 class="modal-title" id="fieldEditorTitle">Редактирование поля</h3>
+                <button class="modal-close-btn" onclick="closeFieldEditor()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-content" id="fieldEditorContent"></div>
+        </div>
+    </div>
+
+    <script src="wailsjs/runtime/runtime.js"></script>
+    <script src="wailsjs/go/admin/App.js"></script>
+    <script type="module" src="assets/js/main.js"></script>
+</body>
+</html>
+

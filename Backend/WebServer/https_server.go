@@ -18,6 +18,11 @@ var fallbackCert *tls.Certificate
 var httpsServer *http.Server
 var port_https string = "443"
 
+// GetHTTPSStatus возвращает статус HTTPS сервера
+func GetHTTPSStatus() bool {
+	return httpsServer != nil
+}
+
 // Запуск https сервера
 func StartHTTPS() {
 

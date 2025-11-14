@@ -1,32 +1,31 @@
 {
-    "Site_www": [
-        {
-            "alias": ["localhost"],
-            "host": "127.0.0.1",
-            "name": "Локальный сайт",
-            "status": "active",
-            "root_file": "index.html",
-            "root_file_routing": true
-        }
-    ],
-
     "Proxy_Service": [
         {
+            "AutoHTTPS": true,
             "Enable": false,
             "ExternalDomain": "git.example.ru",
             "LocalAddress": "127.0.0.1",
             "LocalPort": "3333",
-            "ServiceHTTPSuse": false,
-            "AutoHTTPS": true
+            "ServiceHTTPSuse": false
         }
     ],
-
+    "Site_www": [
+        {
+            "alias": [
+                "localhost"
+            ],
+            "host": "127.0.0.1",
+            "name": "Локальный сайт",
+            "root_file": "index.html",
+            "root_file_routing": true,
+            "status": "active"
+        }
+    ],
     "Soft_Settings": {
         "mysql_host": "127.0.0.1",
         "mysql_port": 3306,
         "php_host": "localhost",
         "php_port": 8000,
-        "admin_host": "localhost",
-        "admin_port": "5555"
+        "proxy_enabled": true
     }
 }

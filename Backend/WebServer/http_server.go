@@ -8,6 +8,11 @@ import (
 var httpServer *http.Server
 var port_http string = "80"
 
+// GetHTTPStatus возвращает статус HTTP сервера
+func GetHTTPStatus() bool {
+	return httpServer != nil
+}
+
 // Запуск HTTP сервера
 func StartHTTP() {
 

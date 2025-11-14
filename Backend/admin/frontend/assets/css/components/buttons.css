@@ -1,0 +1,308 @@
+/* ============================================
+   Buttons Component
+   Единая система кнопок
+   ============================================ */
+
+/* Base Button Styles */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    white-space: nowrap;
+    
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+    
+    &:not(:disabled):active {
+        transform: scale(0.95);
+    }
+}
+
+/* Action Button - Основная кнопка действия */
+.action-btn {
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(139, 92, 246, 0.15);
+    backdrop-filter: var(--backdrop-blur-light);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--accent-purple-light);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    
+    &:hover:not(:disabled) {
+        background: rgba(139, 92, 246, 0.25);
+        border-color: rgba(139, 92, 246, 0.5);
+        transform: translateY(-1px);
+    }
+    
+    i {
+        font-size: var(--text-md);
+    }
+}
+
+/* Save Button Variant */
+.save-btn {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+    color: var(--accent-green);
+    
+    &:hover:not(:disabled) {
+        background: rgba(16, 185, 129, 0.25);
+        border-color: rgba(16, 185, 129, 0.5);
+    }
+}
+
+/* Icon Button - Квадратная кнопка с иконкой */
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    background: rgba(139, 92, 246, 0.1);
+    border: 1px solid rgba(139, 92, 246, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--accent-purple-light);
+    font-size: var(--text-md);
+    
+    &:hover:not(:disabled) {
+        background: rgba(139, 92, 246, 0.25);
+        border-color: rgba(139, 92, 246, 0.5);
+        transform: translateY(-1px);
+    }
+}
+
+/* Small Icon Button */
+.icon-btn-small {
+    width: 28px;
+    height: 28px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--radius-sm);
+    color: var(--accent-red);
+    font-size: 12px;
+    
+    &:hover:not(:disabled) {
+        background: rgba(239, 68, 68, 0.2);
+    }
+}
+
+/* Window Control Buttons */
+.window-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm);
+    transition: all var(--transition-base);
+    
+    &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--text-primary);
+    }
+    
+    &:active {
+        transform: scale(0.95);
+    }
+}
+
+.close-btn:hover {
+    background: var(--accent-red);
+    color: white;
+}
+
+/* Server Control Button */
+.server-control-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) 18px;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(239, 68, 68, 0.1));
+    backdrop-filter: var(--backdrop-blur-light);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    border-radius: 20px;
+    color: var(--accent-red);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    box-shadow: var(--shadow-red);
+    
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15));
+        border-color: rgba(239, 68, 68, 0.6);
+        transform: translateY(-1px);
+    }
+    
+    &:active {
+        transform: translateY(0);
+    }
+    
+    i {
+        font-size: var(--text-md);
+    }
+}
+
+.server-control-btn.start-mode {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
+    border-color: rgba(16, 185, 129, 0.4);
+    color: var(--accent-green);
+    box-shadow: var(--shadow-green);
+    
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.15));
+        border-color: rgba(16, 185, 129, 0.6);
+    }
+}
+
+/* Status Toggle Buttons */
+.status-toggle {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.status-btn {
+    flex: 1;
+    padding: 10px var(--space-md);
+    background: rgba(100, 116, 139, 0.1);
+    border: 1px solid rgba(100, 116, 139, 0.3);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    
+    &:hover {
+        background: rgba(100, 116, 139, 0.15);
+    }
+    
+    &.active {
+        background: rgba(16, 185, 129, 0.2);
+        border-color: rgba(16, 185, 129, 0.5);
+        color: var(--accent-green);
+        box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+    }
+    
+    &:last-child.active {
+        background: rgba(239, 68, 68, 0.2);
+        border-color: rgba(239, 68, 68, 0.5);
+        color: var(--accent-red);
+    }
+}
+
+/* Navigation Buttons */
+.nav-item {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-lg);
+    color: var(--text-secondary);
+    font-size: 20px;
+    cursor: pointer;
+    transition: all var(--transition-base);
+    position: relative;
+    
+    &::before {
+        content: '';
+        position: absolute;
+        left: -16px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 0;
+        background: linear-gradient(180deg, var(--accent-purple), var(--accent-purple-light));
+        border-radius: 0 2px 2px 0;
+        transition: height var(--transition-base);
+    }
+    
+    &:hover {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--accent-purple-light);
+    }
+    
+    &.active {
+        background: rgba(139, 92, 246, 0.15);
+        color: var(--accent-purple-light);
+        
+        &::before {
+            height: 24px;
+        }
+    }
+}
+
+/* Breadcrumb Buttons */
+.breadcrumb-item {
+    font-size: var(--text-md);
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    padding: var(--space-sm) var(--space-lg);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    
+    &:hover {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--accent-purple-light);
+    }
+    
+    &.active {
+        color: var(--text-primary);
+        font-weight: var(--font-medium);
+        cursor: default;
+    }
+}
+
+/* Tab Buttons */
+.vaccess-tab {
+    flex: 0 0 auto;
+    padding: 10px 18px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    
+    &:hover {
+        background: rgba(139, 92, 246, 0.1);
+        color: var(--text-primary);
+    }
+    
+    &.active {
+        background: var(--accent-purple);
+        color: white;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+    }
+}
+

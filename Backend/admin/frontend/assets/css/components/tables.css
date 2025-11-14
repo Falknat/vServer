@@ -1,0 +1,236 @@
+/* ============================================
+   Tables Component
+   ЕДИНАЯ система таблиц для всего приложения
+   ============================================ */
+
+/* Table Container */
+.table-container {
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+/* Base Table */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    thead {
+        background: rgba(139, 92, 246, 0.12);
+        backdrop-filter: var(--backdrop-blur-light);
+        
+        tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    }
+    
+    th {
+        padding: 18px 20px;
+        text-align: left;
+        font-size: var(--text-sm);
+        font-weight: var(--font-bold);
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+        
+        &:last-child {
+            width: 120px;
+            text-align: center;
+        }
+    }
+    
+    tbody {
+        tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all var(--transition-base);
+            
+            &:hover {
+                background: rgba(139, 92, 246, 0.08);
+            }
+        }
+    }
+    
+    td {
+        padding: 16px 20px;
+        font-size: var(--text-base);
+        color: var(--text-primary);
+        
+        &:last-child {
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+    }
+}
+
+/* vAccess Table - использует те же стили что и data-table */
+.vaccess-table-container {
+    margin-bottom: 20px;
+    max-height: 55vh;
+    overflow-y: auto;
+}
+
+.vaccess-table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    thead {
+        tr {
+            background: rgba(139, 92, 246, 0.05);
+            display: table-row;
+            width: 100%;
+        }
+        
+        th {
+            padding: 16px;
+            text-align: left;
+            font-size: var(--text-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: none;
+            display: table-cell;
+            box-sizing: content-box;
+            
+        }
+    }
+    
+    tbody {
+        tr {
+            background: rgba(255, 255, 255, 0.02);
+            transition: all var(--transition-slow);
+            cursor: grab;
+            display: table-row;
+            width: 100%;
+            
+            &:hover {
+                background: rgba(139, 92, 246, 0.08);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
+            
+            &:active {
+                cursor: grabbing;
+            }
+            
+            &[draggable="true"] {
+                opacity: 1;
+            }
+        }
+    }
+    
+    td {
+        padding: 20px 16px;
+        font-size: var(--text-md);
+        color: var(--text-primary);
+        border-top: 1px solid rgba(139, 92, 246, 0.05);
+        border-bottom: 1px solid rgba(139, 92, 246, 0.05);
+        cursor: pointer;
+        display: table-cell;
+        box-sizing: content-box;
+        
+    }
+    
+    /* Принудительно растягиваем на всю ширину */
+    thead, tbody {
+        display: table-row-group;
+        width: 100%;
+    }
+}
+
+/* Table Column Sizing - адаптивные размеры */
+.col-drag {
+    width: 3%;
+    min-width: 40px;
+    text-align: center;
+}
+
+.col-type {
+    width: 8%;
+    min-width: 80px;
+}
+
+.col-files {
+    width: 15%;
+    min-width: 120px;
+}
+
+.col-paths {
+    width: 18%;
+    min-width: 150px;
+}
+
+.col-ips {
+    width: 15%;
+    min-width: 120px;
+}
+
+.col-exceptions {
+    width: 15%;
+    min-width: 120px;
+}
+
+.col-error {
+    width: 10%;
+    min-width: 100px;
+}
+
+.col-actions {
+    width: 5%;
+    min-width: 60px;
+    text-align: center;
+}
+
+/* Drag Handle */
+.drag-handle {
+    color: var(--text-muted);
+    opacity: 0.3;
+    transition: all var(--transition-base);
+    cursor: grab;
+    text-align: center;
+    
+    &:hover {
+        opacity: 1;
+        color: var(--accent-purple-light);
+    }
+    
+    &:active {
+        cursor: grabbing;
+    }
+}
+
+/* Empty Field */
+.empty-field {
+    color: var(--text-muted);
+    opacity: 0.4;
+    font-style: italic;
+}
+
+/* Clickable Link in Tables */
+.clickable-link {
+    color: var(--accent-purple-light);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+    
+    &:hover {
+        color: var(--accent-purple);
+        text-decoration: underline;
+    }
+}
+
+/* Responsive Table */
+@media (max-width: 600px) {
+    .table-container {
+        overflow-x: scroll;
+    }
+}
+

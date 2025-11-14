@@ -136,15 +136,21 @@ func findVAccessFiles(requestPath string, host string) []string {
 	// Базовый путь к сайту (НЕ public_www, а уровень выше)
 	basePath := "WebServer/www/" + host
 
+	// Получаем абсолютный базовый путь
+	absBasePath, err := tools.AbsPath(basePath)
+	if err != nil {
+		return configFiles
+	}
+
 	// Проверяем корневой vAccess.conf
-	rootConfigPath := filepath.Join(basePath, "vAccess.conf")
+	rootConfigPath := filepath.Join(absBasePath, "vAccess.conf")
 	if _, err := os.Stat(rootConfigPath); err == nil {
 		configFiles = append(configFiles, rootConfigPath)
 	}
 
 	// Разбиваем путь на части для поиска вложенных конфигов
 	pathParts := strings.Split(strings.Trim(requestPath, "/"), "/")
-	currentPath := basePath
+	currentPath := absBasePath
 
 	for _, part := range pathParts {
 		if part == "" {
@@ -439,7 +445,8 @@ func HandleVAccessError(w http.ResponseWriter, r *http.Request, errorPage string
 	switch {
 	case errorPage == "404":
 		// Стандартная 404 страница
-		http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
+		errorPagePath, _ := tools.AbsPath("WebServer/tools/error_page/index.html")
+		http.ServeFile(w, r, errorPagePath)
 
 	case strings.HasPrefix(errorPage, "http://") || strings.HasPrefix(errorPage, "https://"):
 		// Внешний сайт - редирект
@@ -448,11 +455,13 @@ func HandleVAccessError(w http.ResponseWriter, r *http.Request, errorPage string
 	default:
 		// Локальный путь от public_www
 		localPath := "WebServer/www/" + host + "/public_www" + errorPage
-		if _, err := os.Stat(localPath); err == nil {
-			http.ServeFile(w, r, localPath)
+		absLocalPath, _ := tools.AbsPath(localPath)
+		if _, err := os.Stat(absLocalPath); err == nil {
+			http.ServeFile(w, r, absLocalPath)
 		} else {
 			// Файл не найден - показываем стандартную 404
-			http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
+			errorPagePath, _ := tools.AbsPath("WebServer/tools/error_page/index.html")
+			http.ServeFile(w, r, errorPagePath)
 			tools.Logs_file(1, "vAccess", "❌ Страница ошибки не найдена: "+localPath, "logs_vaccess.log", false)
 		}
 	}
@@ -468,14 +477,21 @@ func CheckProxyVAccess(requestPath string, domain string, r *http.Request) (bool
 	// Путь к конфигурационному файлу прокси
 	configPath := "WebServer/tools/Proxy_vAccess/" + domain + "_vAccess.conf"
 
+	// Получаем абсолютный путь
+	absConfigPath, err := tools.AbsPath(configPath)
+	if err != nil {
+		// При ошибке получения пути - разрешаем доступ
+		return true, ""
+	}
+
 	// Проверяем существование файла
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+	if _, err := os.Stat(absConfigPath); os.IsNotExist(err) {
 		// Нет конфигурационного файла - разрешаем доступ
 		return true, ""
 	}
 
 	// Парсим конфигурационный файл
-	config, err := parseVAccessFile(configPath)
+	config, err := parseVAccessFile(absConfigPath)
 	if err != nil {
 		tools.Logs_file(1, "vAccess-Proxy", "❌ Ошибка парсинга "+configPath+": "+err.Error(), "logs_vaccess_proxy.log", false)
 		return true, "" // При ошибке парсинга разрешаем доступ
@@ -491,7 +507,8 @@ func HandleProxyVAccessError(w http.ResponseWriter, r *http.Request, errorPage s
 	case errorPage == "404":
 		// Стандартная 404 страница
 		w.WriteHeader(http.StatusForbidden)
-		http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
+		errorPagePath, _ := tools.AbsPath("WebServer/tools/error_page/index.html")
+		http.ServeFile(w, r, errorPagePath)
 
 	case strings.HasPrefix(errorPage, "http://") || strings.HasPrefix(errorPage, "https://"):
 		// Внешний сайт - редирект
@@ -500,6 +517,7 @@ func HandleProxyVAccessError(w http.ResponseWriter, r *http.Request, errorPage s
 	default:
 		// Для прокси возвращаем 403 Forbidden
 		w.WriteHeader(http.StatusForbidden)
-		http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
+		errorPagePath, _ := tools.AbsPath("WebServer/tools/error_page/index.html")
+		http.ServeFile(w, r, errorPagePath)
 	}
 }

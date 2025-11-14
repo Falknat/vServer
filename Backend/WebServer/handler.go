@@ -4,12 +4,34 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"sync"
 	"vServer/Backend/config"
 	tools "vServer/Backend/tools"
 )
 
+var (
+	siteStatusCache map[string]bool
+	statusMutex     sync.RWMutex
+)
+
 func StartHandler() {
 	http.HandleFunc("/", handler)
+	updateSiteStatusCache()
+}
+
+func updateSiteStatusCache() {
+	statusMutex.Lock()
+	defer statusMutex.Unlock()
+
+	siteStatusCache = make(map[string]bool)
+	for _, site := range config.ConfigData.Site_www {
+		siteStatusCache[site.Host] = site.Status == "active"
+	}
+}
+
+// UpdateSiteStatusCache - экспортируемая функция для обновления кэша
+func UpdateSiteStatusCache() {
+	updateSiteStatusCache()
 }
 
 // Проверка wildcard паттерна для alias
@@ -175,6 +197,17 @@ func checkVAccessAndHandle(w http.ResponseWriter, r *http.Request, filePath stri
 	return true
 }
 
+// Проверяет включен ли сайт (оптимизировано через кэш)
+func isSiteActive(host string) bool {
+	statusMutex.RLock()
+	defer statusMutex.RUnlock()
+
+	if status, exists := siteStatusCache[host]; exists {
+		return status
+	}
+	return false
+}
+
 // Обработчик запросов
 func handler(w http.ResponseWriter, r *http.Request) {
 
@@ -185,6 +218,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	// Проверяем, обработал ли прокси запрос
 	if StartHandlerProxy(w, r) {
 		return // Если прокси обработал запрос, прерываем выполнение
+	}
+
+	// Проверяем статус сайта
+	if !isSiteActive(host) {
+		http.ServeFile(w, r, "WebServer/tools/error_page/index.html")
+		tools.Logs_file(2, "H503", "🚫 Сайт отключен: "+host, "logs_http.log", false)
+		return
 	}
 
 	// ЕДИНСТВЕННАЯ ПРОВЕРКА vAccess - простая проверка запрошенного пути
