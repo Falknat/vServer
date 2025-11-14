@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net"
 	"time"
@@ -74,6 +75,11 @@ func Error_check(err error, message string) bool {
 	return true
 }
 
-
-
-
+// DecodeBase64 декодирует строку из base64
+func DecodeBase64(encoded string) ([]byte, error) {
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		return nil, fmt.Errorf("ошибка декодирования base64: %w", err)
+	}
+	return decoded, nil
+}

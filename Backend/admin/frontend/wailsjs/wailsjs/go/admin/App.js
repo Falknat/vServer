@@ -6,6 +6,14 @@ export function CheckServicesReady() {
   return window['go']['admin']['App']['CheckServicesReady']();
 }
 
+export function CreateNewSite(arg1) {
+  return window['go']['admin']['App']['CreateNewSite'](arg1);
+}
+
+export function DeleteSite(arg1) {
+  return window['go']['admin']['App']['DeleteSite'](arg1);
+}
+
 export function DisableProxyService() {
   return window['go']['admin']['App']['DisableProxyService']();
 }
@@ -40,6 +48,10 @@ export function OpenSiteFolder(arg1) {
 
 export function ReloadConfig() {
   return window['go']['admin']['App']['ReloadConfig']();
+}
+
+export function ReloadSSLCertificates() {
+  return window['go']['admin']['App']['ReloadSSLCertificates']();
 }
 
 export function RestartAllServices() {
@@ -96,4 +108,8 @@ export function StopServer() {
 
 export function UpdateSiteCache() {
   return window['go']['admin']['App']['UpdateSiteCache']();
+}
+
+export function UploadCertificate(arg1, arg2, arg3) {
+  return window['go']['admin']['App']['UploadCertificate'](arg1, arg2, arg3);
 }

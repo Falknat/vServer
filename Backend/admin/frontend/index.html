@@ -129,7 +129,13 @@
             </section>
 
             <section class="section" id="sectionSites">
-                <h2 class="section-title">Список сайтов</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 class="section-title" style="margin-bottom: 0;">Список сайтов</h2>
+                    <button class="action-btn" id="addSiteBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Добавить сайт</span>
+                    </button>
+                </div>
                 <div class="table-container">
                     <table class="data-table" id="sitesTable">
                         <thead>
@@ -477,6 +483,160 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="sectionAddSite" style="display: none;">
+                <div class="vaccess-page">
+                    <!-- Хлебные крошки -->
+                    <div class="breadcrumbs">
+                        <div class="breadcrumbs-left">
+                            <button class="breadcrumb-item" onclick="backToMainFromAddSite()">
+                                <i class="fas fa-arrow-left"></i> Назад
+                            </button>
+                            <span class="breadcrumb-separator">/</span>
+                            <span class="breadcrumb-item active">Добавить новый сайт</span>
+                        </div>
+                    </div>
+
+                    <!-- Заголовок -->
+                    <div class="vaccess-header">
+                        <div class="vaccess-title-block">
+                            <h2 class="vaccess-title">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Создание нового сайта</span>
+                            </h2>
+                            <p class="vaccess-subtitle">Заполните информацию о сайте и при необходимости загрузите SSL сертификаты</p>
+                        </div>
+                        <div class="vaccess-actions">
+                            <button class="action-btn save-btn" id="createSiteBtn">
+                                <i class="fas fa-check"></i>
+                                <span>Создать сайт</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Форма создания сайта -->
+                    <div class="vaccess-tab-content">
+                        <div class="site-creator-form">
+                            
+                            <!-- Единая форма -->
+                            <div class="form-section">
+                                <div class="settings-form">
+                                    
+                                    <!-- Основная информация -->
+                                    <h3 class="form-subsection-title"><i class="fas fa-info-circle"></i> Основная информация</h3>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Название сайта: <span style="color: #e74c3c;">*</span></label>
+                                        <input type="text" class="form-input" id="newSiteName" placeholder="Мой новый сайт">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Host (домен): <span style="color: #e74c3c;">*</span></label>
+                                        <input type="text" class="form-input" id="newSiteHost" placeholder="example.com">
+                                        <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                            <i class="fas fa-info-circle"></i> Введите домен без протокола (например: example.com или 192.168.1.100)
+                                        </small>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Alias (псевдонимы):</label>
+                                        <input type="text" class="form-input" id="newSiteAliasInput" placeholder="*.example.com, www.example.com, alias.com">
+                                        <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                            <i class="fas fa-info-circle"></i> Введите псевдонимы через запятую
+                                        </small>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Root файл: <span style="color: #e74c3c;">*</span></label>
+                                            <select class="form-input" id="newSiteRootFile">
+                                                <option value="index.html">index.html</option>
+                                                <option value="index.php">index.php</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">Статус:</label>
+                                            <select class="form-input" id="newSiteStatus">
+                                                <option value="active">Active (Активен)</option>
+                                                <option value="inactive">Inactive (Отключен)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Root file routing:</label>
+                                        <div class="toggle-wrapper">
+                                            <label class="toggle-switch">
+                                                <input type="checkbox" id="newSiteRouting" checked>
+                                                <span class="toggle-slider"></span>
+                                            </label>
+                                            <span class="toggle-label">Включён</span>
+                                        </div>
+                                        <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                            <i class="fas fa-info-circle"></i> Если включено, все запросы к несуществующим файлам будут перенаправляться на root файл
+                                        </small>
+                                    </div>
+
+                                    <!-- SSL Сертификаты -->
+                                    <h3 class="form-subsection-title"><i class="fas fa-lock"></i> SSL Сертификаты (опционально)</h3>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Режим сертификата:</label>
+                                        <select class="form-input" id="certMode" onchange="toggleCertUpload()">
+                                            <option value="none">Без сертификата (fallback)</option>
+                                            <option value="upload">Загрузить файлы сертификата</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="certUploadBlock" style="display: none;">
+                                        <div class="form-group">
+                                            <label class="form-label">Certificate (*.crt): <span style="color: #e74c3c;">*</span></label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" class="file-input" id="certFile" accept=".crt,.pem" onchange="handleCertFileSelect(this, 'certificate')">
+                                                <label for="certFile" class="file-upload-btn">
+                                                    <i class="fas fa-file-upload"></i>
+                                                    <span id="certFileName">Выберите файл...</span>
+                                                </label>
+                                            </div>
+                                            <div id="certFileStatus" style="margin-top: 8px;"></div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Private Key (*.key): <span style="color: #e74c3c;">*</span></label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" class="file-input" id="keyFile" accept=".key,.pem" onchange="handleCertFileSelect(this, 'privatekey')">
+                                                <label for="keyFile" class="file-upload-btn">
+                                                    <i class="fas fa-file-upload"></i>
+                                                    <span id="keyFileName">Выберите файл...</span>
+                                                </label>
+                                            </div>
+                                            <div id="keyFileStatus" style="margin-top: 8px;"></div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">CA Bundle (*.crt):</label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" class="file-input" id="caFile" accept=".crt,.pem" onchange="handleCertFileSelect(this, 'cabundle')">
+                                                <label for="caFile" class="file-upload-btn">
+                                                    <i class="fas fa-file-upload"></i>
+                                                    <span id="caFileName">Выберите файл...</span>
+                                                </label>
+                                            </div>
+                                            <div id="caFileStatus" style="margin-top: 8px;"></div>
+                                            <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                                <i class="fas fa-info-circle"></i> CA Bundle опционален, но рекомендуется для полной цепочки сертификации
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>

@@ -16,7 +16,8 @@ export class Navigation {
             sites: $('sectionSites'),
             proxy: $('sectionProxy'),
             settings: $('sectionSettings'),
-            vaccess: $('sectionVAccessEditor')
+            vaccess: $('sectionVAccessEditor'),
+            addSite: $('sectionAddSite')
         };
         this.init();
     }

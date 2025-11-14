@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
-	tools "vServer/Backend/tools"
 )
 
 func GetVAccessPath(host string, isProxy bool) string {
@@ -18,8 +18,13 @@ func GetVAccessPath(host string, isProxy bool) string {
 func GetVAccessConfig(host string, isProxy bool) (*VAccessConfig, error) {
 	filePath := GetVAccessPath(host, isProxy)
 
+	// Получаем абсолютный путь БЕЗ проверки существования
+	absPath, err := filepath.Abs(filePath)
+	if err != nil {
+		return &VAccessConfig{Rules: []VAccessRule{}}, nil
+	}
+
 	// Проверяем существование файла
-	absPath, _ := tools.AbsPath(filePath)
 	if _, err := os.Stat(absPath); os.IsNotExist(err) {
 		// Файл не существует - возвращаем пустую конфигурацию
 		return &VAccessConfig{Rules: []VAccessRule{}}, nil
@@ -104,11 +109,14 @@ func SaveVAccessConfig(host string, isProxy bool, config *VAccessConfig) error {
 		dir = fmt.Sprintf("WebServer/www/%s", host)
 	}
 
-	absDir, _ := tools.AbsPath(dir)
+	absDir, err := filepath.Abs(dir)
+	if err != nil {
+		return err
+	}
 	os.MkdirAll(absDir, 0755)
 
 	// Получаем абсолютный путь к файлу
-	absPath, err := tools.AbsPath(filePath)
+	absPath, err := filepath.Abs(filePath)
 	if err != nil {
 		return err
 	}

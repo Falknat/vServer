@@ -7,6 +7,10 @@ import {vaccess} from '../models';
 
 export function CheckServicesReady():Promise<boolean>;
 
+export function CreateNewSite(arg1:string):Promise<string>;
+
+export function DeleteSite(arg1:string):Promise<string>;
+
 export function DisableProxyService():Promise<string>;
 
 export function EnableProxyService():Promise<string>;
@@ -24,6 +28,8 @@ export function GetVAccessRules(arg1:string,arg2:boolean):Promise<vaccess.VAcces
 export function OpenSiteFolder(arg1:string):Promise<string>;
 
 export function ReloadConfig():Promise<string>;
+
+export function ReloadSSLCertificates():Promise<string>;
 
 export function RestartAllServices():Promise<string>;
 
@@ -52,3 +58,5 @@ export function StopPHPService():Promise<string>;
 export function StopServer():Promise<string>;
 
 export function UpdateSiteCache():Promise<string>;
+
+export function UploadCertificate(arg1:string,arg2:string,arg3:string):Promise<string>;

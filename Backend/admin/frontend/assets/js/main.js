@@ -12,7 +12,10 @@ import { ServicesManager } from './components/services.js';
 import { SitesManager } from './components/sites.js';
 import { ProxyManager } from './components/proxy.js';
 import { VAccessManager } from './components/vaccess.js';
+import { SiteCreator } from './components/site-creator.js';
+import { api } from './api/wails.js';
 import { configAPI } from './api/config.js';
+import { initCustomSelects } from './ui/custom-select.js';
 import { $ } from './utils/dom.js';
 
 /**
@@ -26,6 +29,7 @@ class App {
         this.sitesManager = new SitesManager();
         this.proxyManager = new ProxyManager();
         this.vAccessManager = new VAccessManager();
+        this.siteCreator = new SiteCreator();
         
         this.isWails = isWailsAvailable();
         
@@ -69,6 +73,9 @@ class App {
         // Привязываем кнопки
         this.setupButtons();
 
+        // Инициализируем кастомные select'ы
+        initCustomSelects();
+
         log('Приложение запущено');
     }
 
@@ -96,6 +103,14 @@ class App {
      * Привязать кнопки
      */
     setupButtons() {
+        // Кнопка добавления сайта
+        const addSiteBtn = $('addSiteBtn');
+        if (addSiteBtn) {
+            addSiteBtn.addEventListener('click', () => {
+                this.siteCreator.open();
+            });
+        }
+
         // Кнопка сохранения настроек
         const saveSettingsBtn = $('saveSettingsBtn');
         if (saveSettingsBtn) {
@@ -128,6 +143,23 @@ class App {
      * Настроить глобальные обработчики
      */
     setupGlobalHandlers() {
+        // Глобальная ссылка на sitesManager
+        window.sitesManager = this.sitesManager;
+        window.siteCreator = this.siteCreator;
+
+        // Для SiteCreator
+        window.backToMainFromAddSite = () => {
+            this.siteCreator.backToMain();
+        };
+
+        window.toggleCertUpload = () => {
+            this.siteCreator.toggleCertUpload();
+        };
+
+        window.handleCertFileSelect = (input, certType) => {
+            this.siteCreator.handleCertFile(input, certType);
+        };
+
         // Для vAccess
         window.editVAccess = (host, isProxy) => {
             this.vAccessManager.open(host, isProxy);
@@ -247,6 +279,10 @@ class App {
 
         window.openSiteFolder = async (host) => {
             await this.sitesManager.handleAction('open-folder', { getAttribute: () => host });
+        };
+
+        window.deleteSiteConfirm = async () => {
+            await this.deleteSiteConfirm();
         };
     }
 
@@ -382,6 +418,9 @@ class App {
         modal.open('Редактировать сайт', content);
         window.currentEditType = 'site';
         window.currentEditIndex = index;
+        
+        // Добавляем кнопку удаления в футер модального окна
+        this.addDeleteButtonToModal();
     }
 
     /**
@@ -446,6 +485,9 @@ class App {
         modal.open('Редактировать прокси', content);
         window.currentEditType = 'proxy';
         window.currentEditIndex = index;
+        
+        // Убираем кнопку удаления (для прокси не нужна)
+        this.removeDeleteButtonFromModal();
     }
 
     /**
@@ -572,6 +614,94 @@ class App {
             notification.success('Изменения сохранены и применены!', 1000);
             await this.proxyManager.load();
             modal.close();
+        }
+    }
+
+    /**
+     * Добавить кнопку удаления в модальное окно
+     */
+    addDeleteButtonToModal() {
+        const footer = document.querySelector('.modal-footer');
+        if (!footer) return;
+
+        // Удаляем старую кнопку удаления если есть
+        const oldDeleteBtn = footer.querySelector('#modalDeleteBtn');
+        if (oldDeleteBtn) oldDeleteBtn.remove();
+
+        // Создаём кнопку удаления
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'action-btn delete-btn';
+        deleteBtn.id = 'modalDeleteBtn';
+        deleteBtn.innerHTML = `
+            <i class="fas fa-trash"></i>
+            <span>Удалить сайт</span>
+        `;
+        deleteBtn.onclick = () => this.deleteSiteConfirm();
+
+        // Вставляем перед кнопкой "Отмена"
+        const cancelBtn = footer.querySelector('#modalCancelBtn');
+        if (cancelBtn) {
+            footer.insertBefore(deleteBtn, cancelBtn);
+        }
+    }
+
+    /**
+     * Удалить кнопку удаления из модального окна
+     */
+    removeDeleteButtonFromModal() {
+        const deleteBtn = document.querySelector('#modalDeleteBtn');
+        if (deleteBtn) deleteBtn.remove();
+    }
+
+    /**
+     * Подтверждение удаления сайта
+     */
+    async deleteSiteConfirm() {
+        const index = window.currentEditIndex;
+        const site = this.sitesManager.sitesData[index];
+        if (!site) return;
+
+        // Подтверждение
+        const confirmed = confirm(
+            `⚠️ ВНИМАНИЕ!\n\n` +
+            `Вы действительно хотите удалить сайт "${site.name}" (${site.host})?\n\n` +
+            `Будут удалены:\n` +
+            `• Папка сайта: WebServer/www/${site.host}/\n` +
+            `• SSL сертификаты (если есть)\n` +
+            `• Запись в конфигурации\n\n` +
+            `Это действие НЕОБРАТИМО!`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            notification.show('Удаление сайта...', 'info', 1000);
+
+            const result = await api.deleteSite(site.host);
+
+            if (result.startsWith('Error')) {
+                notification.error(result, 3000);
+                return;
+            }
+
+            notification.success('✅ Сайт успешно удалён!', 1500);
+
+            // Перезапускаем HTTP/HTTPS
+            notification.show('Перезапуск серверов...', 'success', 800);
+            await configAPI.stopHTTPService();
+            await configAPI.stopHTTPSService();
+            await sleep(500);
+            await configAPI.startHTTPService();
+            await configAPI.startHTTPSService();
+
+            notification.success('🚀 Серверы перезапущены!', 1000);
+
+            // Закрываем модальное окно и обновляем список
+            modal.close();
+            await this.sitesManager.load();
+
+        } catch (error) {
+            notification.error('Ошибка: ' + error.message, 3000);
         }
     }
 }

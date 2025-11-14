@@ -62,6 +62,19 @@
     }
 }
 
+/* Delete Button Variant */
+.delete-btn {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: var(--accent-red);
+    
+    &:hover:not(:disabled) {
+        background: rgba(239, 68, 68, 0.25);
+        border-color: rgba(239, 68, 68, 0.5);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+    }
+}
+
 /* Icon Button - Квадратная кнопка с иконкой */
 .icon-btn {
     width: 32px;

@@ -42,28 +42,15 @@ func matchWildcardAlias(pattern, host string) bool {
 	}
 
 	// Поддержка wildcard: *.example.com, example.*, *example*, *
-	// Заменяем * на регулярное выражение
-	pattern = strings.ReplaceAll(pattern, ".", "\\.")
-	pattern = strings.ReplaceAll(pattern, "*", ".*")
-	pattern = "^" + pattern + "$"
+	// Паттерн *.example.com -> должен совпадать с sub.example.com
 
-	// Простая проверка без regexp (более быстрая)
-	return matchSimplePattern(pattern, host)
-}
-
-// Простая проверка паттерна (без использования regexp для скорости)
-func matchSimplePattern(pattern, host string) bool {
-	// Убираем ^ и $ добавленные выше
-	pattern = strings.TrimPrefix(pattern, "^")
-	pattern = strings.TrimSuffix(pattern, "$")
-
-	// Если паттерн = .* (любой хост)
-	if pattern == ".*" {
+	// Если паттерн = * (любой хост)
+	if pattern == "*" {
 		return true
 	}
 
-	// Разбиваем паттерн на части по .*
-	parts := strings.Split(pattern, ".*")
+	// Разбиваем паттерн на части по звёздочке
+	parts := strings.Split(pattern, "*")
 
 	// Проверяем каждую часть
 	currentPos := 0
@@ -79,14 +66,14 @@ func matchSimplePattern(pattern, host string) bool {
 		}
 
 		// Для первой части проверяем что она в начале (если паттерн не начинается с *)
-		if i == 0 && !strings.HasPrefix(pattern, ".*") {
+		if i == 0 && !strings.HasPrefix(pattern, "*") {
 			if idx != 0 {
 				return false
 			}
 		}
 
 		// Для последней части проверяем что она в конце (если паттерн не кончается на *)
-		if i == len(parts)-1 && !strings.HasSuffix(pattern, ".*") {
+		if i == len(parts)-1 && !strings.HasSuffix(pattern, "*") {
 			if currentPos+idx+len(part) != len(host) {
 				return false
 			}
@@ -98,40 +85,41 @@ func matchSimplePattern(pattern, host string) bool {
 	return true
 }
 
-func Alias_check(r *http.Request) (alias_found bool, host string) {
+func Alias_Run(r *http.Request) (rhost string) {
+	requestHost := r.Host
 
-	alias_found = false
+	// Убираем порт если есть (например :80 или :443)
+	if colonIndex := strings.Index(requestHost, ":"); colonIndex != -1 {
+		requestHost = requestHost[:colonIndex]
+	}
 
+	// Приоритет 1: Проверяем точное совпадение с site.Host
 	for _, site := range config.ConfigData.Site_www {
+		if site.Host == requestHost {
+			return site.Host
+		}
+	}
 
+	// Приоритет 2: Проверяем точные alias (без wildcard)
+	for _, site := range config.ConfigData.Site_www {
 		for _, alias := range site.Alias {
-
-			// Поддержка wildcard паттернов
-			if matchWildcardAlias(alias, r.Host) {
-				alias_found = true
-				return alias_found, site.Host
-			} else {
-				alias_found = false
+			if !strings.Contains(alias, "*") && alias == requestHost {
+				return site.Host
 			}
 		}
 	}
 
-	return alias_found, ""
-
-}
-
-func Alias_Run(r *http.Request) (rhost string) {
-
-	var host string
-	host = r.Host
-
-	alias_check, alias := Alias_check(r)
-
-	if alias_check {
-		host = alias
+	// Приоритет 3: Проверяем wildcard alias
+	for _, site := range config.ConfigData.Site_www {
+		for _, alias := range site.Alias {
+			if strings.Contains(alias, "*") && matchWildcardAlias(alias, requestHost) {
+				return site.Host
+			}
+		}
 	}
 
-	return host
+	// Не нашли совпадений - возвращаем как есть
+	return requestHost
 }
 
 // Получает список root_file для сайта из конфигурации

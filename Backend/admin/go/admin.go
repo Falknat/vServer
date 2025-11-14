@@ -318,3 +318,49 @@ func (a *App) UpdateSiteCache() string {
 	webserver.UpdateSiteStatusCache()
 	return "Cache updated"
 }
+
+func (a *App) CreateNewSite(siteJSON string) string {
+	var siteData sites.SiteInfo
+	err := json.Unmarshal([]byte(siteJSON), &siteData)
+	if err != nil {
+		return "Error: Invalid JSON - " + err.Error()
+	}
+
+	err = sites.CreateNewSite(siteData)
+	if err != nil {
+		return "Error: " + err.Error()
+	}
+
+	config.LoadConfig()
+	return "Site created successfully"
+}
+
+func (a *App) UploadCertificate(host, certType, certDataBase64 string) string {
+	certData, err := tools.DecodeBase64(certDataBase64)
+	if err != nil {
+		return "Error: Invalid base64 data - " + err.Error()
+	}
+
+	err = sites.UploadSiteCertificate(host, certType, certData)
+	if err != nil {
+		return "Error: " + err.Error()
+	}
+
+	webserver.ReloadCertificates()
+	return "Certificate uploaded successfully"
+}
+
+func (a *App) ReloadSSLCertificates() string {
+	webserver.ReloadCertificates()
+	return "SSL certificates reloaded"
+}
+
+func (a *App) DeleteSite(host string) string {
+	err := sites.DeleteSite(host)
+	if err != nil {
+		return "Error: " + err.Error()
+	}
+
+	config.LoadConfig()
+	return "Site deleted successfully"
+}

@@ -91,9 +91,13 @@
 .modal-footer {
     display: flex;
     justify-content: flex-end;
-    gap: var(--space-lg);
+    gap: 8px;
     padding: 20px var(--space-lg);
     border-top: 1px solid var(--glass-border);
+}
+
+.modal-footer .action-btn {
+    margin: 0;
 }
 
 /* Notification Modal */

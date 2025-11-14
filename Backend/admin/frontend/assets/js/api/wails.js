@@ -136,6 +136,58 @@ class WailsAPI {
             log(`Ошибка открытия папки: ${error.message}`, 'error');
         }
     }
+
+    /**
+     * Создать новый сайт
+     */
+    async createNewSite(siteJSON) {
+        if (!this.checkAvailability()) return 'Error: API недоступен';
+        try {
+            return await window.go.admin.App.CreateNewSite(siteJSON);
+        } catch (error) {
+            log(`Ошибка создания сайта: ${error.message}`, 'error');
+            return `Error: ${error.message}`;
+        }
+    }
+
+    /**
+     * Загрузить сертификат для сайта
+     */
+    async uploadCertificate(host, certType, certDataBase64) {
+        if (!this.checkAvailability()) return 'Error: API недоступен';
+        try {
+            return await window.go.admin.App.UploadCertificate(host, certType, certDataBase64);
+        } catch (error) {
+            log(`Ошибка загрузки сертификата: ${error.message}`, 'error');
+            return `Error: ${error.message}`;
+        }
+    }
+
+    /**
+     * Перезагрузить SSL сертификаты
+     */
+    async reloadSSLCertificates() {
+        if (!this.checkAvailability()) return 'Error: API недоступен';
+        try {
+            return await window.go.admin.App.ReloadSSLCertificates();
+        } catch (error) {
+            log(`Ошибка перезагрузки сертификатов: ${error.message}`, 'error');
+            return `Error: ${error.message}`;
+        }
+    }
+
+    /**
+     * Удалить сайт
+     */
+    async deleteSite(host) {
+        if (!this.checkAvailability()) return 'Error: API недоступен';
+        try {
+            return await window.go.admin.App.DeleteSite(host);
+        } catch (error) {
+            log(`Ошибка удаления сайта: ${error.message}`, 'error');
+            return `Error: ${error.message}`;
+        }
+    }
 }
 
 // Экспортируем единственный экземпляр

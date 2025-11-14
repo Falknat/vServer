@@ -61,7 +61,7 @@ Write-Success "Зависимости установлены"
 Write-ProgressBar 50
 Write-Host ""
 
-Write-Step 3 4 "Проверка Wails CLI..."
+Write-Step 3 5 "Проверка Wails CLI..."
 $null = wails version 2>&1
 if ($LASTEXITCODE -ne 0) {
     Write-Info "Установка Wails CLI..."
@@ -70,10 +70,17 @@ if ($LASTEXITCODE -ne 0) {
 } else {
     Write-Success "Найден"
 }
-Write-ProgressBar 75
+Write-ProgressBar 60
 Write-Host ""
 
-Write-Step 4 4 "Сборка приложения..."
+Write-Step 4 5 "Генерация биндингов..."
+Write-Info "Создание TypeScript/JS биндингов для Go методов..."
+wails generate module 2>&1 | Out-Null
+Write-Success "Биндинги сгенерированы"
+Write-ProgressBar 80
+Write-Host ""
+
+Write-Step 5 5 "Сборка приложения..."
 Write-Info "Компиляция (может занять ~10 сек)..."
 
 wails build -f admin.go 2>&1 | Out-Null
