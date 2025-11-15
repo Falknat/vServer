@@ -7,3 +7,7 @@ WebServer/tools/logs/*
 WebServer/soft/*
 !WebServer/soft/soft.rar
 .cursorrules
+windows/
+bin/
+Backend/admin/frontend/wailsjs/
+vServer_Admin_Panel-res.syso
