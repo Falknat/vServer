@@ -1,5 +1,5 @@
 # Исключения
-myapp.exe
+vSerf.exe
 .vscode/
 WebServer/cert/*
 !WebServer/cert/no_cert/

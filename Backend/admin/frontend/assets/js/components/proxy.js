@@ -7,9 +7,7 @@ import { api } from '../api/wails.js';
 import { isWailsAvailable } from '../utils/helpers.js';
 import { $ } from '../utils/dom.js';
 
-/**
- * Класс для управления прокси
- */
+// Класс для управления прокси
 export class ProxyManager {
     constructor() {
         this.proxiesData = [];
@@ -44,9 +42,7 @@ export class ProxyManager {
         ];
     }
 
-    /**
-     * Загрузить список прокси
-     */
+    // Загрузить список прокси
     async load() {
         if (isWailsAvailable()) {
             this.proxiesData = await api.getProxyList();
@@ -57,9 +53,7 @@ export class ProxyManager {
         this.render();
     }
 
-    /**
-     * Отрисовать список прокси
-     */
+    // Отрисовать список прокси
     render() {
         const tbody = $('proxyTable')?.querySelector('tbody');
         if (!tbody) return;
@@ -92,9 +86,7 @@ export class ProxyManager {
         this.attachEventListeners();
     }
 
-    /**
-     * Добавить обработчики событий
-     */
+    // Добавить обработчики событий
     attachEventListeners() {
         // Кликабельные ссылки
         const links = document.querySelectorAll('.clickable-link[data-url]');
@@ -115,9 +107,7 @@ export class ProxyManager {
         });
     }
 
-    /**
-     * Обработчик действий
-     */
+    // Обработчик действий
     handleAction(action, btn) {
         const host = btn.getAttribute('data-host');
         const index = parseInt(btn.getAttribute('data-index'));
@@ -137,9 +127,7 @@ export class ProxyManager {
         }
     }
 
-    /**
-     * Открыть ссылку
-     */
+    // Открыть ссылку
     openLink(url) {
         if (window.runtime?.BrowserOpenURL) {
             window.runtime.BrowserOpenURL(url);

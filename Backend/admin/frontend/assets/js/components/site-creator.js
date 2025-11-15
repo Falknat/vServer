@@ -10,9 +10,7 @@ import { notification } from '../ui/notification.js';
 import { isWailsAvailable } from '../utils/helpers.js';
 import { initCustomSelects } from '../ui/custom-select.js';
 
-/**
- * Класс для создания новых сайтов
- */
+// Класс для создания новых сайтов
 export class SiteCreator {
     constructor() {
         this.aliases = [];
@@ -23,9 +21,7 @@ export class SiteCreator {
         };
     }
 
-    /**
-     * Открыть страницу создания сайта
-     */
+    // Открыть страницу создания сайта
     open() {
         // Скрываем все секции
         this.hideAllSections();
@@ -43,9 +39,7 @@ export class SiteCreator {
         setTimeout(() => initCustomSelects(), 100);
     }
 
-    /**
-     * Скрыть все секции
-     */
+    // Скрыть все секции
     hideAllSections() {
         hide($('sectionServices'));
         hide($('sectionSites'));
@@ -55,9 +49,7 @@ export class SiteCreator {
         hide($('sectionAddSite'));
     }
 
-    /**
-     * Вернуться на главную
-     */
+    // Вернуться на главную
     backToMain() {
         this.hideAllSections();
         show($('sectionServices'));
@@ -65,9 +57,7 @@ export class SiteCreator {
         show($('sectionProxy'));
     }
 
-    /**
-     * Очистить форму
-     */
+    // Очистить форму
     resetForm() {
         $('newSiteName').value = '';
         $('newSiteHost').value = '';
@@ -107,9 +97,7 @@ export class SiteCreator {
         labels.forEach(label => label.classList.remove('file-uploaded'));
     }
 
-    /**
-     * Привязать обработчики событий
-     */
+    // Привязать обработчики событий
     attachEventListeners() {
         const createBtn = $('createSiteBtn');
         if (createBtn) {
@@ -120,9 +108,7 @@ export class SiteCreator {
         this.setupDragAndDrop();
     }
 
-    /**
-     * Настроить Drag & Drop для файлов
-     */
+    // Настроить Drag & Drop для файлов
     setupDragAndDrop() {
         const fileWrappers = [
             { wrapper: document.querySelector('label[for="certFile"]')?.parentElement, input: $('certFile'), type: 'certificate' },
@@ -171,9 +157,7 @@ export class SiteCreator {
         });
     }
 
-    /**
-     * Парсить aliases из строки (через запятую)
-     */
+    // Парсить aliases из строки (через запятую)
     parseAliases() {
         const input = $('newSiteAliasInput');
         const value = input?.value.trim();
@@ -190,9 +174,7 @@ export class SiteCreator {
             .filter(alias => alias.length > 0);
     }
 
-    /**
-     * Переключить видимость блока загрузки сертификатов
-     */
+    // Переключить видимость блока загрузки сертификатов
     toggleCertUpload() {
         const mode = $('certMode')?.value;
         const block = $('certUploadBlock');
@@ -204,9 +186,7 @@ export class SiteCreator {
         }
     }
 
-    /**
-     * Обработать выбор файла сертификата
-     */
+    // Обработать выбор файла сертификата
     handleCertFile(input, certType) {
         const file = input.files[0];
         const statusId = certType === 'certificate' ? 'certFileStatus' :
@@ -257,9 +237,7 @@ export class SiteCreator {
         reader.readAsText(file);
     }
 
-    /**
-     * Валидация формы
-     */
+    // Валидация формы
     validateForm() {
         const name = $('newSiteName')?.value.trim();
         const host = $('newSiteHost')?.value.trim();
@@ -296,9 +274,7 @@ export class SiteCreator {
         return true;
     }
 
-    /**
-     * Создать сайт
-     */
+    // Создать сайт
     async createSite() {
         if (!this.validateForm()) {
             return;

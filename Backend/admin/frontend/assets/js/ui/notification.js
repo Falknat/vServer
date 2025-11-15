@@ -5,21 +5,14 @@
 
 import { $, addClass, removeClass } from '../utils/dom.js';
 
-/**
- * Класс для управления уведомлениями
- */
+// Класс для управления уведомлениями
 export class NotificationManager {
     constructor() {
         this.container = $('notification');
         this.loader = $('appLoader');
     }
 
-    /**
-     * Показать уведомление
-     * @param {string} message - Текст сообщения
-     * @param {string} type - Тип (success, error)
-     * @param {number} duration - Длительность показа (мс)
-     */
+    // Показать уведомление
     show(message, type = 'success', duration = 1000) {
         if (!this.container) return;
 
@@ -41,27 +34,17 @@ export class NotificationManager {
         }, duration);
     }
 
-    /**
-     * Показать успешное уведомление
-     * @param {string} message - Текст сообщения
-     * @param {number} duration - Длительность
-     */
+    // Показать успешное уведомление
     success(message, duration = 1000) {
         this.show(message, 'success', duration);
     }
 
-    /**
-     * Показать уведомление об ошибке
-     * @param {string} message - Текст сообщения
-     * @param {number} duration - Длительность
-     */
+    // Показать уведомление об ошибке
     error(message, duration = 2000) {
         this.show(message, 'error', duration);
     }
 
-    /**
-     * Скрыть загрузчик приложения
-     */
+    // Скрыть загрузчик приложения
     hideLoader() {
         if (!this.loader) return;
         

@@ -8,9 +8,7 @@ import { $, $$, addClass, removeClass } from '../utils/dom.js';
 import { notification } from '../ui/notification.js';
 import { sleep, isWailsAvailable } from '../utils/helpers.js';
 
-/**
- * Класс для управления сервисами
- */
+// Класс для управления сервисами
 export class ServicesManager {
     constructor() {
         this.serverRunning = true;
@@ -40,9 +38,7 @@ export class ServicesManager {
         }
     }
 
-    /**
-     * Переключить состояние сервера
-     */
+    // Переключить состояние сервера
     async toggleServer() {
         if (this.serverRunning) {
             await this.stopServer();
@@ -51,9 +47,7 @@ export class ServicesManager {
         }
     }
 
-    /**
-     * Запустить сервер
-     */
+    // Запустить сервер
     async startServer() {
         this.isOperating = true;
         this.controlBtn.disabled = true;
@@ -80,9 +74,7 @@ export class ServicesManager {
         this.controlBtn.disabled = false;
     }
 
-    /**
-     * Остановить сервер
-     */
+    // Остановить сервер
     async stopServer() {
         this.isOperating = true;
         this.controlBtn.disabled = true;
@@ -100,9 +92,7 @@ export class ServicesManager {
         this.controlBtn.disabled = false;
     }
 
-    /**
-     * Установить статус сервера
-     */
+    // Установить статус сервера
     setServerStatus(isOnline, text) {
         this.serverRunning = isOnline;
         
@@ -117,9 +107,7 @@ export class ServicesManager {
         this.statusText.textContent = text;
     }
 
-    /**
-     * Установить всем сервисам статус pending
-     */
+    // Установить всем сервисам статус pending
     setAllServicesPending(text) {
         const badges = $$('.service-card .badge');
         badges.forEach(badge => {
@@ -128,9 +116,7 @@ export class ServicesManager {
         });
     }
 
-    /**
-     * Отрисовать статусы сервисов
-     */
+    // Отрисовать статусы сервисов
     renderServices(data) {
         const services = [data.http, data.https, data.mysql, data.php, data.proxy];
         const cards = $$('.service-card');
@@ -166,9 +152,7 @@ export class ServicesManager {
         });
     }
 
-    /**
-     * Загрузить статусы сервисов
-     */
+    // Загрузить статусы сервисов
     async loadStatus() {
         if (isWailsAvailable()) {
             const data = await api.getAllServicesStatus();
