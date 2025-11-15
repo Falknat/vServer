@@ -5,9 +5,7 @@
 
 import { $, addClass } from '../utils/dom.js';
 
-/**
- * Класс для управления окном
- */
+// Класс для управления окном
 export class WindowControls {
     constructor() {
         this.minimizeBtn = $('minimizeBtn');

@@ -5,9 +5,7 @@
 
 import { $, addClass, removeClass } from '../utils/dom.js';
 
-/**
- * Класс для управления модальными окнами
- */
+// Класс для управления модальными окнами
 export class Modal {
     constructor() {
         this.overlay = $('modalOverlay');
@@ -46,39 +44,26 @@ export class Modal {
         }
     }
 
-    /**
-     * Открыть модальное окно
-     * @param {string} title - Заголовок
-     * @param {string} htmlContent - HTML контент
-     */
+    // Открыть модальное окно
     open(title, htmlContent) {
         if (this.title) this.title.textContent = title;
         if (this.content) this.content.innerHTML = htmlContent;
         if (this.overlay) addClass(this.overlay, 'show');
     }
 
-    /**
-     * Закрыть модальное окно
-     */
+    // Закрыть модальное окно
     close() {
         if (this.overlay) removeClass(this.overlay, 'show');
     }
 
-    /**
-     * Установить обработчик сохранения
-     * @param {Function} callback - Функция обратного вызова
-     */
+    // Установить обработчик сохранения
     onSave(callback) {
         if (this.saveBtn) {
             this.saveBtn.onclick = callback;
         }
     }
 
-    /**
-     * Открыть редактор поля
-     * @param {string} title - Заголовок
-     * @param {string} htmlContent - HTML контент
-     */
+    // Открыть редактор поля
     openFieldEditor(title, htmlContent) {
         const fieldTitle = $('fieldEditorTitle');
         const fieldContent = $('fieldEditorContent');
@@ -88,9 +73,7 @@ export class Modal {
         if (this.fieldEditorOverlay) addClass(this.fieldEditorOverlay, 'show');
     }
 
-    /**
-     * Закрыть редактор поля
-     */
+    // Закрыть редактор поля
     closeFieldEditor() {
         if (this.fieldEditorOverlay) removeClass(this.fieldEditorOverlay, 'show');
     }

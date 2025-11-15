@@ -7,9 +7,7 @@ import { api } from '../api/wails.js';
 import { isWailsAvailable } from '../utils/helpers.js';
 import { $ } from '../utils/dom.js';
 
-/**
- * Класс для управления сайтами
- */
+// Класс для управления сайтами
 export class SitesManager {
     constructor() {
         this.sitesData = [];
@@ -41,9 +39,7 @@ export class SitesManager {
         ];
     }
 
-    /**
-     * Загрузить список сайтов
-     */
+    // Загрузить список сайтов
     async load() {
         if (isWailsAvailable()) {
             this.sitesData = await api.getSitesList();
@@ -54,9 +50,7 @@ export class SitesManager {
         this.render();
     }
 
-    /**
-     * Отрисовать список сайтов
-     */
+    // Отрисовать список сайтов
     render() {
         const tbody = $('sitesTable')?.querySelector('tbody');
         if (!tbody) return;
@@ -88,9 +82,7 @@ export class SitesManager {
         this.attachEventListeners();
     }
 
-    /**
-     * Добавить обработчики событий
-     */
+    // Добавить обработчики событий
     attachEventListeners() {
         // Кликабельные ссылки
         const links = document.querySelectorAll('.clickable-link[data-url]');
@@ -111,9 +103,7 @@ export class SitesManager {
         });
     }
 
-    /**
-     * Обработчик действий
-     */
+    // Обработчик действий
     async handleAction(action, btn) {
         const host = btn.getAttribute('data-host');
         const index = parseInt(btn.getAttribute('data-index'));
@@ -136,9 +126,7 @@ export class SitesManager {
         }
     }
 
-    /**
-     * Открыть ссылку
-     */
+    // Открыть ссылку
     openLink(url) {
         if (window.runtime?.BrowserOpenURL) {
             window.runtime.BrowserOpenURL(url);

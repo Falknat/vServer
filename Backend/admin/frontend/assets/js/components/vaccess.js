@@ -9,9 +9,7 @@ import { notification } from '../ui/notification.js';
 import { modal } from '../ui/modal.js';
 import { isWailsAvailable } from '../utils/helpers.js';
 
-/**
- * Класс для управления vAccess правилами
- */
+// Класс для управления vAccess правилами
 export class VAccessManager {
     constructor() {
         this.vAccessHost = '';
@@ -22,9 +20,7 @@ export class VAccessManager {
         this.editingField = null;
     }
 
-    /**
-     * Открыть редактор vAccess
-     */
+    // Открыть редактор vAccess
     async open(host, isProxy) {
         this.vAccessHost = host;
         this.vAccessIsProxy = isProxy;
@@ -77,9 +73,7 @@ export class VAccessManager {
         }
     }
 
-    /**
-     * Скрыть все секции
-     */
+    // Скрыть все секции
     hideAllSections() {
         hide($('sectionServices'));
         hide($('sectionSites'));
@@ -88,9 +82,7 @@ export class VAccessManager {
         hide($('sectionVAccessEditor'));
     }
 
-    /**
-     * Вернуться на главную
-     */
+    // Вернуться на главную
     backToMain() {
         this.hideAllSections();
         show($('sectionServices'));
@@ -98,9 +90,7 @@ export class VAccessManager {
         show($('sectionProxy'));
     }
 
-    /**
-     * Переключить вкладку
-     */
+    // Переключить вкладку
     switchTab(tab) {
         const tabs = document.querySelectorAll('.vaccess-tab[data-tab]');
         tabs.forEach(t => {
@@ -120,9 +110,7 @@ export class VAccessManager {
         }
     }
 
-    /**
-     * Сохранить изменения
-     */
+    // Сохранить изменения
     async save() {
         if (isWailsAvailable()) {
             const config = { rules: this.vAccessRules };
@@ -140,9 +128,7 @@ export class VAccessManager {
         }
     }
 
-    /**
-     * Отрисовать список правил
-     */
+    // Отрисовать список правил
     renderRulesList() {
         const tbody = $('vAccessTableBody');
         const emptyState = $('vAccessEmpty');
@@ -191,9 +177,7 @@ export class VAccessManager {
         this.attachRulesEventListeners();
     }
 
-    /**
-     * Добавить обработчики событий для правил
-     */
+    // Добавить обработчики событий для правил
     attachRulesEventListeners() {
         // Drag & Drop
         const rows = document.querySelectorAll('#vAccessTableBody tr[draggable]');
@@ -223,9 +207,7 @@ export class VAccessManager {
         });
     }
 
-    /**
-     * Добавить новое правило
-     */
+    // Добавить новое правило
     addRule() {
         this.vAccessRules.push({
             type: 'Disable',
@@ -240,17 +222,13 @@ export class VAccessManager {
         this.renderRulesList();
     }
 
-    /**
-     * Удалить правило
-     */
+    // Удалить правило
     removeRule(index) {
         this.vAccessRules.splice(index, 1);
         this.renderRulesList();
     }
 
-    /**
-     * Редактировать поле правила
-     */
+    // Редактировать поле правила
     editRuleField(index, field) {
         const rule = this.vAccessRules[index];
 
@@ -271,9 +249,7 @@ export class VAccessManager {
         }
     }
 
-    /**
-     * Показать редактор поля
-     */
+    // Показать редактор поля
     showFieldEditor(index, field) {
         const rule = this.vAccessRules[index];
         const fieldNames = {
@@ -328,9 +304,7 @@ export class VAccessManager {
         }, 100);
     }
 
-    /**
-     * Добавить значение в поле
-     */
+    // Добавить значение в поле
     addFieldValue() {
         const input = $('fieldInput');
         const value = input?.value.trim();
@@ -346,9 +320,7 @@ export class VAccessManager {
         }
     }
 
-    /**
-     * Удалить значение из поля
-     */
+    // Удалить значение из поля
     removeFieldValue(value) {
         if (this.editingField) {
             const { index, field } = this.editingField;
@@ -361,9 +333,7 @@ export class VAccessManager {
         }
     }
 
-    /**
-     * Закрыть редактор поля
-     */
+    // Закрыть редактор поля
     closeFieldEditor() {
         modal.closeFieldEditor();
         this.renderRulesList();

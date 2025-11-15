@@ -5,9 +5,7 @@
 
 import { $ } from '../utils/dom.js';
 
-/**
- * Инициализация всех кастомных select'ов на странице
- */
+// Инициализация всех кастомных select'ов на странице
 export function initCustomSelects() {
     const selects = document.querySelectorAll('select.form-input');
     selects.forEach(select => {
@@ -17,9 +15,7 @@ export function initCustomSelects() {
     });
 }
 
-/**
- * Создать кастомный select из нативного
- */
+// Создать кастомный select из нативного
 function createCustomSelect(selectElement) {
     // Помечаем как обработанный
     selectElement.dataset.customized = 'true';
@@ -88,9 +84,7 @@ function createCustomSelect(selectElement) {
     });
 }
 
-/**
- * Открыть/закрыть dropdown
- */
+// Открыть/закрыть dropdown
 function toggleDropdown(wrapper) {
     const isOpen = wrapper.classList.contains('open');
     
@@ -104,16 +98,12 @@ function toggleDropdown(wrapper) {
     }
 }
 
-/**
- * Закрыть dropdown
- */
+// Закрыть dropdown
 function closeDropdown(wrapper) {
     wrapper.classList.remove('open');
 }
 
-/**
- * Выбрать опцию
- */
+// Выбрать опцию
 function selectOption(selectElement, wrapper, optionElement, index) {
     // Обновляем оригинальный select
     selectElement.selectedIndex = index;

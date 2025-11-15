@@ -73,8 +73,16 @@ func Logs_file(type_log int, service string, message string, log_file string, co
 	colored_text := time.Now().Format("2006-01-02 15:04:05") + type_log_str + service_str + message
 	text := RemoveAnsiCodes(colored_text) + "\n"
 
+	// Создаём папку logs если её нет
+	logsDir := "WebServer/tools/logs"
+	if _, err := os.Stat(logsDir); os.IsNotExist(err) {
+		if err := os.MkdirAll(logsDir, 0755); err != nil {
+			log.Fatal(err)
+		}
+	}
+
 	// Открываем файл для дозаписи, создаём если нет, права на запись.
-	file, err := os.OpenFile("WebServer/tools/logs/"+log_files, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile(logsDir+"/"+log_files, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}

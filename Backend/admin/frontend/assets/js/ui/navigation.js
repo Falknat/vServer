@@ -5,9 +5,7 @@
 
 import { $, $$, hide, show, removeClass, addClass } from '../utils/dom.js';
 
-/**
- * Класс для управления навигацией
- */
+// Класс для управления навигацией
 export class Navigation {
     constructor() {
         this.navItems = $$('.nav-item');
