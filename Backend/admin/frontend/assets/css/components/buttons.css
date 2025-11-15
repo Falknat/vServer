@@ -227,7 +227,7 @@
     height: 48px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     background: transparent;
     border: none;
     border-radius: var(--radius-lg);
@@ -236,6 +236,9 @@
     cursor: pointer;
     transition: all var(--transition-base);
     position: relative;
+    padding: 0;
+    gap: 0;
+    overflow: hidden;
     
     &::before {
         content: '';
@@ -250,6 +253,28 @@
         transition: height var(--transition-base);
     }
     
+    i {
+        flex-shrink: 0;
+        width: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all var(--transition-base);
+    }
+    
+    .nav-item-label {
+        opacity: 0;
+        width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        font-size: var(--text-base);
+        font-weight: var(--font-medium);
+        font-family: var(--font-sans);
+        color: var(--text-secondary);
+        transition: all var(--transition-slow);
+        margin-left: 0;
+    }
+    
     &:hover {
         background: rgba(139, 92, 246, 0.1);
         color: var(--accent-purple-light);
@@ -262,6 +287,28 @@
         &::before {
             height: 24px;
         }
+        
+        .nav-item-label {
+            color: var(--accent-purple-light);
+        }
+    }
+}
+
+/* Показываем подписи при наведении на sidebar */
+.sidebar:hover .nav-item {
+    width: 100%;
+    justify-content: flex-start;
+    padding-left: 0;
+    
+    .nav-item-label {
+        opacity: 1;
+        width: auto;
+        margin-left: var(--space-sm);
+        transition: opacity var(--transition-slow), width var(--transition-slow), margin-left var(--transition-slow);
+    }
+    
+    &:hover .nav-item-label {
+        color: var(--accent-purple-light);
     }
 }
 
