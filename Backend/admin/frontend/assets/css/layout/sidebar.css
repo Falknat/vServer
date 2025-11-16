@@ -16,6 +16,12 @@
     display: flex;
     flex-direction: column;
     padding: 20px 0;
+    transition: width var(--transition-slow);
+    overflow: hidden;
+}
+
+.sidebar:hover {
+    width: 220px;
 }
 
 .sidebar-nav {
