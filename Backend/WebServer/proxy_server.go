@@ -1,6 +1,7 @@
 package webserver
 
 import (
+	"bytes"
 	"crypto/tls"
 	"io"
 	"log"
@@ -71,9 +72,19 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 			protocol = "https"
 		}
 
+		// Читаем тело запроса в буфер для корректной передачи POST данных
+		var bodyBuffer bytes.Buffer
+		if r.Body != nil {
+			if _, err := io.Copy(&bodyBuffer, r.Body); err != nil {
+				http.Error(w, "Ошибка чтения тела запроса", http.StatusInternalServerError)
+				return valid
+			}
+			r.Body.Close()
+		}
+
 		// Проксирование на локальный адрес
 		proxyURL := protocol + "://" + proxyConfig.LocalAddress + ":" + proxyConfig.LocalPort + r.URL.RequestURI()
-		proxyReq, err := http.NewRequest(r.Method, proxyURL, r.Body)
+		proxyReq, err := http.NewRequest(r.Method, proxyURL, &bodyBuffer)
 		if err != nil {
 			http.Error(w, "Ошибка создания прокси-запроса", http.StatusInternalServerError)
 			return valid
@@ -95,8 +106,19 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 			}
 		}
 
-		// Прозрачная передача - никаких дополнительных заголовков
-		// Все заголовки уже скопированы выше "как есть"
+		// Добавляем заголовки для передачи реального IP клиента
+		clientIP := r.RemoteAddr
+		if colonIndex := strings.LastIndex(clientIP, ":"); colonIndex != -1 {
+			clientIP = clientIP[:colonIndex]
+		}
+		proxyReq.Header.Set("X-Real-IP", clientIP)
+		proxyReq.Header.Set("X-Forwarded-For", clientIP)
+		proxyReq.Header.Set("X-Forwarded-Proto", protocol)
+
+		// Устанавливаем правильный Content-Length для POST/PUT запросов
+		if bodyBuffer.Len() > 0 {
+			proxyReq.ContentLength = int64(bodyBuffer.Len())
+		}
 
 		// Выполняем прокси-запрос
 		client := &http.Client{

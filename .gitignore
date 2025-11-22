@@ -6,4 +6,5 @@ WebServer/cert/*
 WebServer/tools/logs/*
 WebServer/soft/*
 !WebServer/soft/soft.rar
+Backend/admin/frontend/wailsjs*
 .cursorrules
