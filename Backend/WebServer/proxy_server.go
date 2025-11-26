@@ -154,9 +154,34 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 		// Устанавливаем статус код
 		w.WriteHeader(resp.StatusCode)
 
-		// Копируем тело ответа
-		if _, err := io.Copy(w, resp.Body); err != nil {
-			log.Printf("Ошибка копирования тела ответа: %v", err)
+		// Копируем тело ответа с поддержкой streaming (SSE, chunked responses)
+		// Используем буферизированное копирование с принудительной отправкой данных
+		flusher, canFlush := w.(http.Flusher)
+		
+		// Буфер для чанков (32KB - оптимальный размер для баланса производительности)
+		buffer := make([]byte, 32*1024)
+		
+		for {
+			n, err := resp.Body.Read(buffer)
+			if n > 0 {
+				// Записываем прочитанные данные
+				if _, writeErr := w.Write(buffer[:n]); writeErr != nil {
+					log.Printf("Ошибка записи тела ответа: %v", writeErr)
+					break
+				}
+				
+				// Принудительно отправляем данные клиенту (критично для SSE)
+				if canFlush {
+					flusher.Flush()
+				}
+			}
+			
+			if err != nil {
+				if err != io.EOF {
+					log.Printf("Ошибка чтения тела ответа: %v", err)
+				}
+				break
+			}
 		}
 
 		return valid
