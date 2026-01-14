@@ -103,12 +103,27 @@ func Cert_start() {
 }
 
 func checkHostCert(r *http.Request) bool {
+	host := r.Host
 
-	if _, err := os.Stat(certDir + r.Host); err != nil {
-		return false
+	// Убираем порт если есть
+	if colonIndex := strings.Index(host, ":"); colonIndex != -1 {
+		host = host[:colonIndex]
 	}
 
-	return true
+	// Проверяем точное совпадение
+	if _, err := os.Stat(certDir + host); err == nil {
+		return true
+	}
+
+	// Проверяем родительский домен
+	parentDomain := getParentDomain(host)
+	if parentDomain != "" {
+		if _, err := os.Stat(certDir + parentDomain); err == nil {
+			return true
+		}
+	}
+
+	return false
 }
 
 func loadCertificates(certDir string) map[string]*tls.Certificate {
