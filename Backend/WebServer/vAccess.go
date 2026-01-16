@@ -2,6 +2,7 @@ package webserver
 
 import (
 	"bufio"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -281,16 +282,32 @@ func getClientIP(r *http.Request) string {
 	return ip
 }
 
-// Проверка соответствия IP адреса правилу
+// Проверка соответствия IP адреса правилу (поддержка CIDR подсетей)
 func matchIPAddress(ruleIPs []string, clientIP string) bool {
 	if len(ruleIPs) == 0 {
 		return true // Если IP не указаны, то проверка пройдена
 	}
 
+	// Парсим IP клиента
+	parsedClientIP := net.ParseIP(clientIP)
+
 	for _, ruleIP := range ruleIPs {
 		ruleIP = strings.TrimSpace(ruleIP)
-		if ruleIP == clientIP {
-			return true
+
+		// Проверяем, является ли правило CIDR (содержит /)
+		if strings.Contains(ruleIP, "/") {
+			_, subnet, err := net.ParseCIDR(ruleIP)
+			if err != nil {
+				continue // Некорректный CIDR — пропускаем
+			}
+			if parsedClientIP != nil && subnet.Contains(parsedClientIP) {
+				return true
+			}
+		} else {
+			// Точное совпадение IP
+			if ruleIP == clientIP {
+				return true
+			}
 		}
 	}
 
