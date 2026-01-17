@@ -3,6 +3,7 @@ package admin
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"os"
 	"os/exec"
 	"time"
@@ -10,6 +11,7 @@ import (
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 
 	webserver "vServer/Backend/WebServer"
+	"vServer/Backend/WebServer/acme"
 	"vServer/Backend/admin/go/proxy"
 	"vServer/Backend/admin/go/services"
 	"vServer/Backend/admin/go/sites"
@@ -61,6 +63,15 @@ func (a *App) Startup(ctx context.Context) {
 	webserver.Cert_start()
 	time.Sleep(50 * time.Millisecond)
 
+	// Инициализируем ACME менеджер (true = production, false = staging)
+	if err := acme.Init(true); err != nil {
+		tools.Logs_file(1, "ACME", "❌ Ошибка инициализации ACME: "+err.Error(), "logs_acme.log", true)
+	} else {
+		// Запускаем фоновую проверку сертификатов каждые 24 часа
+		acme.StartBackgroundRenewal(24 * time.Hour)
+	}
+	time.Sleep(50 * time.Millisecond)
+
 	// Запускаем серверы
 	go webserver.StartHTTPS()
 	time.Sleep(50 * time.Millisecond)
@@ -74,6 +85,18 @@ func (a *App) Startup(ctx context.Context) {
 
 	// Запускаем MySQL асинхронно
 	go webserver.StartMySQLServer(false)
+
+	// Автоматическое получение SSL сертификатов для доменов с AutoCreateSSL=true
+	if config.ConfigData.Soft_Settings.ACME_enabled {
+		go func() {
+			time.Sleep(2 * time.Second) // Ждём пока HTTP сервер полностью запустится
+			results := acme.ObtainAllCertificates()
+			if len(results) > 0 {
+				// Перезагружаем сертификаты после получения
+				webserver.ReloadCertificates()
+			}
+		}()
+	}
 
 	// Запускаем мониторинг статусов
 	go a.monitorServices()
@@ -363,4 +386,40 @@ func (a *App) DeleteSite(host string) string {
 
 	config.LoadConfig()
 	return "Site deleted successfully"
+}
+
+// ObtainSSLCertificate получает SSL сертификат для домена через Let's Encrypt
+func (a *App) ObtainSSLCertificate(domain string) string {
+	result := acme.ObtainCertificate(domain)
+	
+	if result.Success {
+		// Перезагружаем сертификаты после получения
+		webserver.ReloadCertificates()
+		return "SSL certificate obtained successfully for " + domain
+	}
+	
+	return "Error: " + result.Error
+}
+
+// ObtainAllSSLCertificates получает сертификаты для всех доменов с AutoCreateSSL
+func (a *App) ObtainAllSSLCertificates() string {
+	results := acme.ObtainAllCertificates()
+	
+	successCount := 0
+	errorCount := 0
+	
+	for _, r := range results {
+		if r.Success {
+			successCount++
+		} else {
+			errorCount++
+		}
+	}
+	
+	if len(results) > 0 {
+		// Перезагружаем сертификаты после получения
+		webserver.ReloadCertificates()
+	}
+	
+	return fmt.Sprintf("Completed: %d success, %d errors", successCount, errorCount)
 }

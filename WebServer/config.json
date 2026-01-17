@@ -1,6 +1,7 @@
 {
     "Proxy_Service": [
         {
+            "AutoCreateSSL": false,
             "AutoHTTPS": true,
             "Enable": false,
             "ExternalDomain": "git.example.ru",
@@ -11,6 +12,7 @@
     ],
     "Site_www": [
         {
+            "AutoCreateSSL": false,
             "alias": [
                 "localhost"
             ],
@@ -22,6 +24,7 @@
         }
     ],
     "Soft_Settings": {
+        "ACME_enabled": false,
         "mysql_host": "127.0.0.1",
         "mysql_port": 3306,
         "php_host": "localhost",

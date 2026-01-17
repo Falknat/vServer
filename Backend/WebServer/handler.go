@@ -7,6 +7,7 @@ import (
 	"sync"
 	"vServer/Backend/config"
 	tools "vServer/Backend/tools"
+	"vServer/Backend/WebServer/acme"
 )
 
 var (
@@ -198,6 +199,13 @@ func isSiteActive(host string) bool {
 
 // Обработчик запросов
 func handler(w http.ResponseWriter, r *http.Request) {
+
+	// ACME HTTP-01 Challenge (для Let's Encrypt)
+	if strings.HasPrefix(r.URL.Path, "/.well-known/acme-challenge/") {
+		if acme.DefaultManager != nil && acme.DefaultManager.HandleChallenge(w, r) {
+			return
+		}
+	}
 
 	host := Alias_Run(r)           // Получаем хост из запроса
 	https_check := !(r.TLS == nil) // Проверяем, по HTTPS ли запрос

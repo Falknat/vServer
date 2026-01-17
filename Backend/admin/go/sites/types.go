@@ -7,5 +7,6 @@ type SiteInfo struct {
 	Status            string   `json:"status"`
 	RootFile          string   `json:"root_file"`
 	RootFileRouting   bool     `json:"root_file_routing"`
+	AutoCreateSSL     bool     `json:"AutoCreateSSL"`
 }
 
