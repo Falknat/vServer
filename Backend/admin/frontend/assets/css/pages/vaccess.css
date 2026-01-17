@@ -262,3 +262,207 @@
     }
 }
 
+/* ============================================
+   Cert Manager
+   ============================================ */
+
+.cert-manager-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.cert-card {
+    background: rgba(139, 92, 246, 0.03);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    padding: var(--space-lg);
+    transition: all var(--transition-base);
+}
+
+.cert-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-md);
+    padding-bottom: var(--space-md);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.cert-card-title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    
+    i {
+        font-size: 24px;
+        color: var(--accent-green);
+    }
+    
+    h3 {
+        margin: 0;
+        font-size: var(--text-xl);
+        font-weight: var(--font-semibold);
+        color: var(--text-primary);
+    }
+}
+
+.cert-card-title.expired i {
+    color: var(--accent-red);
+}
+
+.cert-card-actions {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.cert-info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-md);
+}
+
+.cert-info-item {
+    padding: var(--space-md);
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: var(--radius-md);
+    
+    .cert-info-label {
+        font-size: var(--text-sm);
+        color: var(--text-muted);
+        margin-bottom: var(--space-xs);
+    }
+    
+    .cert-info-value {
+        font-size: var(--text-md);
+        color: var(--text-primary);
+        font-weight: var(--font-medium);
+    }
+    
+    .cert-info-value.valid {
+        color: var(--accent-green);
+    }
+    
+    .cert-info-value.expired {
+        color: var(--accent-red);
+    }
+}
+
+.cert-domains-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    margin-top: var(--space-md);
+}
+
+.cert-domain-tag {
+    padding: 4px 12px;
+    background: rgba(139, 92, 246, 0.15);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    color: var(--accent-purple-light);
+    font-family: var(--font-mono);
+}
+
+.cert-empty {
+    text-align: center;
+    padding: 60px 40px;
+    color: var(--text-muted);
+    
+    i {
+        font-size: 48px;
+        margin-bottom: var(--space-lg);
+        opacity: 0.3;
+    }
+    
+    h3 {
+        font-size: var(--text-xl);
+        font-weight: var(--font-semibold);
+        color: var(--text-primary);
+        margin-bottom: var(--space-sm);
+    }
+    
+    p {
+        font-size: var(--text-md);
+    }
+}
+
+/* Wildcard Info Block */
+.cert-wildcard-info {
+    padding: var(--space-md);
+    background: rgba(139, 92, 246, 0.05);
+    border-radius: var(--radius-lg);
+}
+
+.cert-wildcard-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-xs);
+    font-size: var(--text-md);
+    font-weight: var(--font-medium);
+    color: var(--accent-purple-light);
+    
+    i {
+        color: var(--accent-purple-light);
+    }
+}
+
+.cert-wildcard-info > p {
+    margin: 0 0 var(--space-sm) 0;
+    color: var(--text-muted);
+    font-size: var(--text-sm);
+}
+
+.cert-wildcard-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+}
+
+.cert-wildcard-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding: var(--space-xs) var(--space-sm);
+    background: rgba(139, 92, 246, 0.08);
+    border-radius: var(--radius-sm);
+}
+
+.cert-wildcard-item.expired {
+    opacity: 0.7;
+}
+
+.cert-wildcard-domain {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+    color: var(--text-primary);
+}
+
+.cert-wildcard-status {
+    font-size: var(--text-sm);
+    color: var(--accent-green);
+}
+
+.cert-wildcard-item.expired .cert-wildcard-status {
+    color: var(--accent-red);
+}
+
+.cert-wildcard-issuer {
+    font-size: var(--text-sm);
+    color: var(--text-muted);
+}
+
+/* Card Variants */
+.cert-card-wildcard {
+    /* без особых стилей */
+}
+
+.cert-card-local {
+    opacity: 0.6;
+}
+
+.cert-card-empty {
+    border-style: dashed;
+}
+

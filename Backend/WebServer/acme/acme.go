@@ -488,3 +488,80 @@ func getCertDaysLeft(domain string) int {
 func getCurrentTimestamp() int64 {
 	return time.Now().Unix()
 }
+
+// GetCertInfo получает информацию о сертификате для домена
+func GetCertInfo(domain string) CertInfo {
+	certPath := filepath.Join("WebServer/cert", domain, "certificate.crt")
+	
+	info := CertInfo{
+		Domain:  domain,
+		HasCert: false,
+	}
+	
+	// Проверяем существует ли сертификат
+	data, err := os.ReadFile(certPath)
+	if err != nil {
+		return info
+	}
+	
+	block, _ := pem.Decode(data)
+	if block == nil {
+		return info
+	}
+	
+	cert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return info
+	}
+	
+	info.HasCert = true
+	info.Issuer = cert.Issuer.CommonName
+	info.NotBefore = cert.NotBefore.Format("2006-01-02 15:04:05")
+	info.NotAfter = cert.NotAfter.Format("2006-01-02 15:04:05")
+	info.DaysLeft = int(time.Until(cert.NotAfter).Hours() / 24)
+	info.IsExpired = time.Now().After(cert.NotAfter)
+	info.DNSNames = cert.DNSNames
+	
+	return info
+}
+
+// DeleteCertificate удаляет сертификат для домена
+func DeleteCertificate(domain string) error {
+	certDir := filepath.Join("WebServer/cert", domain)
+	
+	// Проверяем существует ли директория
+	if _, err := os.Stat(certDir); os.IsNotExist(err) {
+		return fmt.Errorf("сертификат для %s не найден", domain)
+	}
+	
+	// Удаляем директорию с сертификатами
+	err := os.RemoveAll(certDir)
+	if err != nil {
+		return fmt.Errorf("ошибка удаления сертификата: %w", err)
+	}
+	
+	tools.Logs_file(0, "ACME", "🗑️ Сертификат удалён для: "+domain, "logs_acme.log", true)
+	return nil
+}
+
+// GetAllCertsInfo получает информацию о всех сертификатах
+func GetAllCertsInfo() []CertInfo {
+	certs := make([]CertInfo, 0)
+	certBaseDir := "WebServer/cert"
+	
+	entries, err := os.ReadDir(certBaseDir)
+	if err != nil {
+		return certs
+	}
+	
+	for _, entry := range entries {
+		if entry.IsDir() && entry.Name() != "no_cert" && entry.Name() != ".acme" {
+			info := GetCertInfo(entry.Name())
+			if info.HasCert {
+				certs = append(certs, info)
+			}
+		}
+	}
+	
+	return certs
+}

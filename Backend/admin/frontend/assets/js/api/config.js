@@ -49,6 +49,24 @@ class ConfigAPI {
         }
     }
 
+    // Включить ACME Service
+    async enableACMEService() {
+        if (!this.available) return;
+        try {
+            await window.go.admin.App.EnableACMEService();
+        } catch (error) {
+        }
+    }
+
+    // Отключить ACME Service
+    async disableACMEService() {
+        if (!this.available) return;
+        try {
+            await window.go.admin.App.DisableACMEService();
+        } catch (error) {
+        }
+    }
+
     // Перезапустить все сервисы
     async restartAllServices() {
         if (!this.available) return;

@@ -24,6 +24,11 @@
     gap: var(--space-md);
 }
 
+/* Form Row (3 columns) */
+.form-row.form-row-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
 /* Form Label */
 .form-label {
     font-size: 12px;

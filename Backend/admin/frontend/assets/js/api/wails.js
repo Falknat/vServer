@@ -145,6 +145,46 @@ class WailsAPI {
             return `Error: ${error.message}`;
         }
     }
+
+    // Получить информацию о сертификате для домена
+    async getCertInfo(domain) {
+        if (!this.checkAvailability()) return { has_cert: false };
+        try {
+            return await window.go.admin.App.GetCertInfo(domain);
+        } catch (error) {
+            return { has_cert: false };
+        }
+    }
+
+    // Получить информацию о всех сертификатах
+    async getAllCertsInfo() {
+        if (!this.checkAvailability()) return [];
+        try {
+            return await window.go.admin.App.GetAllCertsInfo();
+        } catch (error) {
+            return [];
+        }
+    }
+
+    // Удалить сертификат
+    async deleteCertificate(domain) {
+        if (!this.checkAvailability()) return 'Error: API недоступен';
+        try {
+            return await window.go.admin.App.DeleteCertificate(domain);
+        } catch (error) {
+            return `Error: ${error.message}`;
+        }
+    }
+
+    // Получить SSL сертификат через Let's Encrypt
+    async obtainSSLCertificate(domain) {
+        if (!this.checkAvailability()) return 'Error: API недоступен';
+        try {
+            return await window.go.admin.App.ObtainSSLCertificate(domain);
+        } catch (error) {
+            return `Error: ${error.message}`;
+        }
+    }
 }
 
 // Экспортируем единственный экземпляр

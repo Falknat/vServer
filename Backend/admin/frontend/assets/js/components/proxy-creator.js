@@ -1,6 +1,6 @@
 /* ============================================
-   Site Creator Component
-   Управление созданием новых сайтов
+   Proxy Creator Component
+   Управление созданием новых прокси сервисов
    ============================================ */
 
 import { api } from '../api/wails.js';
@@ -10,10 +10,8 @@ import { notification } from '../ui/notification.js';
 import { isWailsAvailable } from '../utils/helpers.js';
 import { initCustomSelects } from '../ui/custom-select.js';
 
-// Класс для создания новых сайтов
-export class SiteCreator {
+export class ProxyCreator {
     constructor() {
-        this.aliases = [];
         this.certificates = {
             certificate: null,
             privatekey: null,
@@ -21,25 +19,14 @@ export class SiteCreator {
         };
     }
 
-    // Открыть страницу создания сайта
     open() {
-        // Скрываем все секции
         this.hideAllSections();
-        
-        // Показываем страницу создания
-        show($('sectionAddSite'));
-        
-        // Очищаем форму
+        show($('sectionAddProxy'));
         this.resetForm();
-        
-        // Привязываем обработчики
         this.attachEventListeners();
-        
-        // Инициализируем кастомные select'ы
         setTimeout(() => initCustomSelects(), 100);
     }
 
-    // Скрыть все секции
     hideAllSections() {
         hide($('sectionServices'));
         hide($('sectionSites'));
@@ -50,7 +37,6 @@ export class SiteCreator {
         hide($('sectionAddProxy'));
     }
 
-    // Вернуться на главную
     backToMain() {
         this.hideAllSections();
         show($('sectionServices'));
@@ -58,69 +44,58 @@ export class SiteCreator {
         show($('sectionProxy'));
     }
 
-    // Очистить форму
     resetForm() {
-        $('newSiteName').value = '';
-        $('newSiteHost').value = '';
-        $('newSiteAliasInput').value = '';
-        $('newSiteRootFile').value = 'index.html';
-        $('newSiteStatus').value = 'active';
-        $('newSiteRouting').checked = true;
-        $('certMode').value = 'none';
+        $('newProxyDomain').value = '';
+        $('newProxyLocalAddr').value = '127.0.0.1';
+        $('newProxyLocalPort').value = '';
+        $('newProxyStatus').value = 'enable';
+        $('newProxyServiceHTTPS').checked = false;
+        $('newProxyAutoHTTPS').checked = true;
+        $('proxyCertMode').value = 'none';
         
-        this.aliases = [];
         this.certificates = {
             certificate: null,
             privatekey: null,
             cabundle: null
         };
         
-        // Скрываем блок загрузки сертификатов
-        hide($('certUploadBlock'));
+        hide($('proxyCertUploadBlock'));
         
-        // Очищаем статусы файлов
-        $('certFileStatus').innerHTML = '';
-        $('keyFileStatus').innerHTML = '';
-        $('caFileStatus').innerHTML = '';
+        $('proxyCertFileStatus').innerHTML = '';
+        $('proxyKeyFileStatus').innerHTML = '';
+        $('proxyCaFileStatus').innerHTML = '';
         
-        // Очищаем labels файлов
-        if ($('certFileName')) $('certFileName').textContent = 'Выберите файл...';
-        if ($('keyFileName')) $('keyFileName').textContent = 'Выберите файл...';
-        if ($('caFileName')) $('caFileName').textContent = 'Выберите файл...';
+        if ($('proxyCertFileName')) $('proxyCertFileName').textContent = 'Выберите файл...';
+        if ($('proxyKeyFileName')) $('proxyKeyFileName').textContent = 'Выберите файл...';
+        if ($('proxyCaFileName')) $('proxyCaFileName').textContent = 'Выберите файл...';
         
-        // Очищаем input файлов
-        if ($('certFile')) $('certFile').value = '';
-        if ($('keyFile')) $('keyFile').value = '';
-        if ($('caFile')) $('caFile').value = '';
+        if ($('proxyCertFile')) $('proxyCertFile').value = '';
+        if ($('proxyKeyFile')) $('proxyKeyFile').value = '';
+        if ($('proxyCaFile')) $('proxyCaFile').value = '';
         
-        // Убираем класс uploaded
-        const labels = document.querySelectorAll('.file-upload-btn');
+        const labels = document.querySelectorAll('#sectionAddProxy .file-upload-btn');
         labels.forEach(label => label.classList.remove('file-uploaded'));
     }
 
-    // Привязать обработчики событий
     attachEventListeners() {
-        const createBtn = $('createSiteBtn');
+        const createBtn = $('createProxyBtn');
         if (createBtn) {
-            createBtn.onclick = async () => await this.createSite();
+            createBtn.onclick = async () => await this.createProxy();
         }
         
-        // Drag & Drop для файлов сертификатов
         this.setupDragAndDrop();
     }
 
-    // Настроить Drag & Drop для файлов
     setupDragAndDrop() {
         const fileWrappers = [
-            { wrapper: document.querySelector('label[for="certFile"]')?.parentElement, input: $('certFile'), type: 'certificate' },
-            { wrapper: document.querySelector('label[for="keyFile"]')?.parentElement, input: $('keyFile'), type: 'privatekey' },
-            { wrapper: document.querySelector('label[for="caFile"]')?.parentElement, input: $('caFile'), type: 'cabundle' }
+            { wrapper: document.querySelector('label[for="proxyCertFile"]')?.parentElement, input: $('proxyCertFile'), type: 'certificate' },
+            { wrapper: document.querySelector('label[for="proxyKeyFile"]')?.parentElement, input: $('proxyKeyFile'), type: 'privatekey' },
+            { wrapper: document.querySelector('label[for="proxyCaFile"]')?.parentElement, input: $('proxyCaFile'), type: 'cabundle' }
         ];
 
         fileWrappers.forEach(({ wrapper, input, type }) => {
             if (!wrapper || !input) return;
 
-            // Предотвращаем стандартное поведение
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
                 wrapper.addEventListener(eventName, (e) => {
                     e.preventDefault();
@@ -128,7 +103,6 @@ export class SiteCreator {
                 });
             });
 
-            // Подсветка при наведении файла
             ['dragenter', 'dragover'].forEach(eventName => {
                 wrapper.addEventListener(eventName, () => {
                     wrapper.classList.add('drag-over');
@@ -141,16 +115,13 @@ export class SiteCreator {
                 });
             });
 
-            // Обработка dropped файла
             wrapper.addEventListener('drop', (e) => {
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
-                    // Создаём объект DataTransfer и присваиваем файлы input'у
                     const dataTransfer = new DataTransfer();
                     dataTransfer.items.add(files[0]);
                     input.files = dataTransfer.files;
                     
-                    // Триггерим событие change
                     const event = new Event('change', { bubbles: true });
                     input.dispatchEvent(event);
                 }
@@ -158,27 +129,9 @@ export class SiteCreator {
         });
     }
 
-    // Парсить aliases из строки (через запятую)
-    parseAliases() {
-        const input = $('newSiteAliasInput');
-        const value = input?.value.trim();
-        
-        if (!value) {
-            this.aliases = [];
-            return;
-        }
-        
-        // Разделяем по запятой и очищаем
-        this.aliases = value
-            .split(',')
-            .map(alias => alias.trim())
-            .filter(alias => alias.length > 0);
-    }
-
-    // Переключить видимость блока загрузки сертификатов
     toggleCertUpload() {
-        const mode = $('certMode')?.value;
-        const block = $('certUploadBlock');
+        const mode = $('proxyCertMode')?.value;
+        const block = $('proxyCertUploadBlock');
         
         if (mode === 'upload') {
             show(block);
@@ -187,17 +140,16 @@ export class SiteCreator {
         }
     }
 
-    // Обработать выбор файла сертификата
     handleCertFile(input, certType) {
         const file = input.files[0];
-        const statusId = certType === 'certificate' ? 'certFileStatus' :
-                        certType === 'privatekey' ? 'keyFileStatus' : 'caFileStatus';
-        const labelId = certType === 'certificate' ? 'certFileName' :
-                       certType === 'privatekey' ? 'keyFileName' : 'caFileName';
+        const statusId = certType === 'certificate' ? 'proxyCertFileStatus' :
+                        certType === 'privatekey' ? 'proxyKeyFileStatus' : 'proxyCaFileStatus';
+        const labelId = certType === 'certificate' ? 'proxyCertFileName' :
+                       certType === 'privatekey' ? 'proxyKeyFileName' : 'proxyCaFileName';
         
         const statusDiv = $(statusId);
         const labelSpan = $(labelId);
-        const labelBtn = input.nextElementSibling; // label элемент
+        const labelBtn = input.nextElementSibling;
         
         if (!file) {
             this.certificates[certType] = null;
@@ -207,7 +159,6 @@ export class SiteCreator {
             return;
         }
 
-        // Проверяем размер файла (макс 1MB)
         if (file.size > 1024 * 1024) {
             statusDiv.innerHTML = '<span style="color: #e74c3c;"><i class="fas fa-times-circle"></i> Файл слишком большой (макс 1MB)</span>';
             this.certificates[certType] = null;
@@ -217,15 +168,12 @@ export class SiteCreator {
             return;
         }
 
-        // Обновляем UI
         if (labelSpan) labelSpan.textContent = file.name;
         if (labelBtn) labelBtn.classList.add('file-uploaded');
 
-        // Читаем файл
         const reader = new FileReader();
         reader.onload = (e) => {
             const content = e.target.result;
-            // Сохраняем как base64
             this.certificates[certType] = btoa(content);
             statusDiv.innerHTML = `<span style="color: #2ecc71;"><i class="fas fa-check-circle"></i> Загружен успешно</span>`;
         };
@@ -238,29 +186,27 @@ export class SiteCreator {
         reader.readAsText(file);
     }
 
-    // Валидация формы
     validateForm() {
-        const name = $('newSiteName')?.value.trim();
-        const host = $('newSiteHost')?.value.trim();
-        const rootFile = $('newSiteRootFile')?.value;
-        const certMode = $('certMode')?.value;
+        const domain = $('newProxyDomain')?.value.trim();
+        const localAddr = $('newProxyLocalAddr')?.value.trim();
+        const localPort = $('newProxyLocalPort')?.value.trim();
+        const certMode = $('proxyCertMode')?.value;
 
-        if (!name) {
-            notification.error('❌ Укажите название сайта');
+        if (!domain) {
+            notification.error('❌ Укажите внешний домен');
             return false;
         }
 
-        if (!host) {
-            notification.error('❌ Укажите host (домен)');
+        if (!localAddr) {
+            notification.error('❌ Укажите локальный адрес');
             return false;
         }
 
-        if (!rootFile) {
-            notification.error('❌ Укажите root файл');
+        if (!localPort) {
+            notification.error('❌ Укажите локальный порт');
             return false;
         }
 
-        // Проверка сертификатов если режим загрузки
         if (certMode === 'upload') {
             if (!this.certificates.certificate) {
                 notification.error('❌ Загрузите файл certificate.crt');
@@ -275,8 +221,7 @@ export class SiteCreator {
         return true;
     }
 
-    // Создать сайт
-    async createSite() {
+    async createProxy() {
         if (!this.validateForm()) {
             return;
         }
@@ -286,64 +231,60 @@ export class SiteCreator {
             return;
         }
 
-        const createBtn = $('createSiteBtn');
+        const createBtn = $('createProxyBtn');
         const originalText = createBtn.querySelector('span').textContent;
 
         try {
             createBtn.disabled = true;
             createBtn.querySelector('span').textContent = 'Создание...';
 
-            // Парсим aliases из поля ввода
-            this.parseAliases();
+            const certMode = $('proxyCertMode').value;
 
-            // Определяем режим сертификата
-            const certMode = $('certMode').value;
-
-            // Собираем данные сайта
-            const siteData = {
-                name: $('newSiteName').value.trim(),
-                host: $('newSiteHost').value.trim(),
-                alias: this.aliases,
-                status: $('newSiteStatus').value,
-                root_file: $('newSiteRootFile').value,
-                root_file_routing: $('newSiteRouting').checked,
+            const proxyData = {
+                Enable: $('newProxyStatus').value === 'enable',
+                ExternalDomain: $('newProxyDomain').value.trim(),
+                LocalAddress: $('newProxyLocalAddr').value.trim(),
+                LocalPort: $('newProxyLocalPort').value.trim(),
+                ServiceHTTPSuse: $('newProxyServiceHTTPS').checked,
+                AutoHTTPS: $('newProxyAutoHTTPS').checked,
                 AutoCreateSSL: certMode === 'auto'
             };
 
-            // Создаём сайт
-            const siteJSON = JSON.stringify(siteData);
-            const result = await api.createNewSite(siteJSON);
+            const config = await configAPI.getConfig();
+            
+            if (!config.Proxy_Service) {
+                config.Proxy_Service = [];
+            }
+            
+            config.Proxy_Service.push(proxyData);
+
+            const result = await configAPI.saveConfig(JSON.stringify(config, null, 4));
 
             if (result.startsWith('Error')) {
                 notification.error(result, 3000);
                 return;
             }
 
-            notification.success('✅ Сайт успешно создан!', 1500);
+            notification.success('✅ Прокси сервис создан!', 1500);
 
-            // Загружаем сертификаты если нужно
             if (certMode === 'upload') {
                 createBtn.querySelector('span').textContent = 'Загрузка сертификатов...';
                 
-                // Загружаем certificate
                 if (this.certificates.certificate) {
-                    await api.uploadCertificate(siteData.host, 'certificate', this.certificates.certificate);
+                    await api.uploadCertificate(proxyData.ExternalDomain, 'certificate', this.certificates.certificate);
                 }
                 
-                // Загружаем private key
                 if (this.certificates.privatekey) {
-                    await api.uploadCertificate(siteData.host, 'privatekey', this.certificates.privatekey);
+                    await api.uploadCertificate(proxyData.ExternalDomain, 'privatekey', this.certificates.privatekey);
                 }
                 
-                // Загружаем ca bundle если есть
                 if (this.certificates.cabundle) {
-                    await api.uploadCertificate(siteData.host, 'cabundle', this.certificates.cabundle);
+                    await api.uploadCertificate(proxyData.ExternalDomain, 'cabundle', this.certificates.cabundle);
                 }
                 
                 notification.success('🔒 Сертификаты загружены!', 1500);
             }
 
-            // Перезапускаем HTTP/HTTPS
             createBtn.querySelector('span').textContent = 'Перезапуск серверов...';
             await configAPI.stopHTTPService();
             await configAPI.stopHTTPSService();
@@ -351,14 +292,12 @@ export class SiteCreator {
             await configAPI.startHTTPService();
             await configAPI.startHTTPSService();
 
-            notification.success('🚀 Серверы перезапущены! Сайт готов к работе!', 2000);
+            notification.success('🚀 Серверы перезапущены! Прокси готов к работе!', 2000);
 
-            // Возвращаемся на главную
             setTimeout(() => {
                 this.backToMain();
-                // Перезагружаем список сайтов
-                if (window.sitesManager) {
-                    window.sitesManager.load();
+                if (window.proxyManager) {
+                    window.proxyManager.load();
                 }
             }, 1000);
 
@@ -370,4 +309,3 @@ export class SiteCreator {
         }
     }
 }
-

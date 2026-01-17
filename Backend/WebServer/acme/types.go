@@ -25,12 +25,14 @@ type Manager struct {
 
 // CertInfo информация о сертификате
 type CertInfo struct {
-	Domain      string `json:"domain"`
-	Issuer      string `json:"issuer"`
-	NotBefore   string `json:"not_before"`
-	NotAfter    string `json:"not_after"`
-	DaysLeft    int    `json:"days_left"`
-	AutoCreated bool   `json:"auto_created"`
+	Domain      string   `json:"domain"`
+	Issuer      string   `json:"issuer"`
+	NotBefore   string   `json:"not_before"`
+	NotAfter    string   `json:"not_after"`
+	DaysLeft    int      `json:"days_left"`
+	IsExpired   bool     `json:"is_expired"`
+	HasCert     bool     `json:"has_cert"`
+	DNSNames    []string `json:"dns_names"`
 }
 
 // ObtainResult результат получения сертификата

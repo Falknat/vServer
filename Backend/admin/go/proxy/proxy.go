@@ -20,6 +20,7 @@ func GetProxyList() []ProxyInfo {
 			LocalPort:       proxyConfig.LocalPort,
 			ServiceHTTPSuse: proxyConfig.ServiceHTTPSuse,
 			AutoHTTPS:       proxyConfig.AutoHTTPS,
+			AutoCreateSSL:   proxyConfig.AutoCreateSSL,
 			Status:          status,
 		}
 		proxies = append(proxies, proxyInfo)

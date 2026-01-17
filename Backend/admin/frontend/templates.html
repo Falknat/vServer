@@ -28,16 +28,26 @@
             </div>
             <div class="tags-container" id="aliasTagsContainer"></div>
         </div>
+        <div class="form-group">
+            <label class="form-label">Root файл:</label>
+            <input type="text" class="form-input" id="editRootFile">
+        </div>
         <div class="form-row">
-            <div class="form-group">
-                <label class="form-label">Root файл:</label>
-                <input type="text" class="form-input" id="editRootFile">
-            </div>
             <div class="form-group">
                 <label class="form-label">Роутинг:</label>
                 <div class="toggle-wrapper">
                     <label class="toggle-switch">
                         <input type="checkbox" id="editRouting">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">Включён</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Авто SSL:</label>
+                <div class="toggle-wrapper">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="editAutoCreateSSL">
                         <span class="toggle-slider"></span>
                     </label>
                     <span class="toggle-label">Включён</span>
@@ -75,7 +85,7 @@
                 <input type="text" class="form-input" id="editLocalPort">
             </div>
         </div>
-        <div class="form-row">
+        <div class="form-row form-row-3">
             <div class="form-group">
                 <label class="form-label">HTTPS к сервису:</label>
                 <div class="toggle-wrapper">
@@ -91,6 +101,16 @@
                 <div class="toggle-wrapper">
                     <label class="toggle-switch">
                         <input type="checkbox" id="editAutoHTTPS">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span class="toggle-label">Включён</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Авто SSL:</label>
+                <div class="toggle-wrapper">
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="editProxyAutoCreateSSL">
                         <span class="toggle-slider"></span>
                     </label>
                     <span class="toggle-label">Включён</span>

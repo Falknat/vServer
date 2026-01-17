@@ -71,7 +71,6 @@
     &:hover:not(:disabled) {
         background: rgba(239, 68, 68, 0.25);
         border-color: rgba(239, 68, 68, 0.5);
-        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
     }
 }
 
@@ -152,7 +151,6 @@
     font-weight: var(--font-semibold);
     cursor: pointer;
     transition: all var(--transition-base);
-    box-shadow: var(--shadow-red);
     
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.15));
@@ -173,7 +171,6 @@
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.1));
     border-color: rgba(16, 185, 129, 0.4);
     color: var(--accent-green);
-    box-shadow: var(--shadow-green);
     
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.15));
@@ -211,7 +208,6 @@
         background: rgba(16, 185, 129, 0.2);
         border-color: rgba(16, 185, 129, 0.5);
         color: var(--accent-green);
-        box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
     }
     
     &:last-child.active {
@@ -315,7 +311,6 @@
     &.active {
         background: var(--accent-purple);
         color: white;
-        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
     }
 }
 

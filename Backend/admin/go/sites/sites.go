@@ -15,6 +15,7 @@ func GetSitesList() []SiteInfo {
 			Status:          site.Status,
 			RootFile:        site.Root_file,
 			RootFileRouting: site.Root_file_routing,
+			AutoCreateSSL:   site.AutoCreateSSL,
 		}
 		sites = append(sites, siteInfo)
 	}

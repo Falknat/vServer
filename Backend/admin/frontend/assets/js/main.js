@@ -13,6 +13,7 @@ import { SitesManager } from './components/sites.js';
 import { ProxyManager } from './components/proxy.js';
 import { VAccessManager } from './components/vaccess.js';
 import { SiteCreator } from './components/site-creator.js';
+import { ProxyCreator } from './components/proxy-creator.js';
 import { api } from './api/wails.js';
 import { configAPI } from './api/config.js';
 import { initCustomSelects } from './ui/custom-select.js';
@@ -28,6 +29,7 @@ class App {
         this.proxyManager = new ProxyManager();
         this.vAccessManager = new VAccessManager();
         this.siteCreator = new SiteCreator();
+        this.proxyCreator = new ProxyCreator();
         
         this.isWails = isWailsAvailable();
     }
@@ -109,6 +111,14 @@ class App {
             });
         }
 
+        // Кнопка добавления прокси
+        const addProxyBtn = $('addProxyBtn');
+        if (addProxyBtn) {
+            addProxyBtn.addEventListener('click', () => {
+                this.proxyCreator.open();
+            });
+        }
+
         // Кнопка сохранения настроек
         const saveSettingsBtn = $('saveSettingsBtn');
         if (saveSettingsBtn) {
@@ -135,6 +145,22 @@ class App {
                 }
             });
         }
+
+        // Моментальное переключение ACME без перезапуска
+        const acmeCheckbox = $('acmeEnabled');
+        if (acmeCheckbox) {
+            acmeCheckbox.addEventListener('change', async (e) => {
+                const isEnabled = e.target.checked;
+                
+                if (isEnabled) {
+                    await configAPI.enableACMEService();
+                    notification.success('Cert Manager включен', 1000);
+                } else {
+                    await configAPI.disableACMEService();
+                    notification.success('Cert Manager отключен', 1000);
+                }
+            });
+        }
     }
 
     // Настроить глобальные обработчики
@@ -143,15 +169,29 @@ class App {
             // Ссылки на менеджеры
             sitesManager: this.sitesManager,
             siteCreator: this.siteCreator,
+            proxyCreator: this.proxyCreator,
+            proxyManager: this.proxyManager,
             
             // SiteCreator
             backToMainFromAddSite: () => this.siteCreator.backToMain(),
             toggleCertUpload: () => this.siteCreator.toggleCertUpload(),
             handleCertFileSelect: (input, certType) => this.siteCreator.handleCertFile(input, certType),
             
+            // ProxyCreator
+            backToMainFromAddProxy: () => this.proxyCreator.backToMain(),
+            toggleProxyCertUpload: () => this.proxyCreator.toggleCertUpload(),
+            handleProxyCertFileSelect: (input, certType) => this.proxyCreator.handleCertFile(input, certType),
+            
             // vAccess
             editVAccess: (host, isProxy) => this.vAccessManager.open(host, isProxy),
             backToMain: () => this.vAccessManager.backToMain(),
+            
+            // CertManager
+            openCertManager: (host, isProxy, aliases) => this.openCertManager(host, isProxy, aliases),
+            backFromCertManager: () => this.backFromCertManager(),
+            deleteCertificate: async (domain) => await this.deleteCertificate(domain),
+            renewCertificate: async (domain) => await this.renewCertificate(domain),
+            issueCertificate: async (domain) => await this.issueCertificate(domain),
             switchVAccessTab: (tab) => this.vAccessManager.switchTab(tab),
             saveVAccessChanges: async () => await this.vAccessManager.save(),
             addVAccessRule: () => this.vAccessManager.addRule(),
@@ -209,6 +249,7 @@ class App {
             $('phpHost').value = 'localhost';
             $('phpPort').value = 8000;
             $('proxyEnabled').checked = true;
+            $('acmeEnabled').checked = true;
             return;
         }
 
@@ -220,6 +261,7 @@ class App {
         $('phpHost').value = config.Soft_Settings?.php_host || 'localhost';
         $('phpPort').value = config.Soft_Settings?.php_port || 8000;
         $('proxyEnabled').checked = config.Soft_Settings?.proxy_enabled !== false;
+        $('acmeEnabled').checked = config.Soft_Settings?.ACME_enabled !== false;
     }
 
     // Сохранить настройки конфигурации
@@ -294,6 +336,9 @@ class App {
             if (editRootFile) editRootFile.value = site.root_file;
             if (editRouting) editRouting.checked = site.root_file_routing;
 
+            const editAutoCreateSSL = $('editAutoCreateSSL');
+            if (editAutoCreateSSL) editAutoCreateSSL.checked = site.auto_create_ssl || false;
+
             // Добавляем alias теги
             const aliasContainer = $('aliasTagsContainer');
             if (aliasContainer) {
@@ -347,6 +392,9 @@ class App {
             if (editLocalPort) editLocalPort.value = proxy.local_port;
             if (editServiceHTTPS) editServiceHTTPS.checked = proxy.service_https_use;
             if (editAutoHTTPS) editAutoHTTPS.checked = proxy.auto_https;
+
+            const editProxyAutoCreateSSL = $('editProxyAutoCreateSSL');
+            if (editProxyAutoCreateSSL) editProxyAutoCreateSSL.checked = proxy.auto_create_ssl || false;
 
             // Привязываем обработчик кнопок статуса
             document.querySelectorAll('.status-btn').forEach(btn => {
@@ -425,7 +473,8 @@ class App {
             alias: aliases,
             status: statusBtn ? statusBtn.dataset.value : 'active',
             root_file: $('editRootFile').value,
-            root_file_routing: $('editRouting').checked
+            root_file_routing: $('editRouting').checked,
+            AutoCreateSSL: $('editAutoCreateSSL')?.checked || false
         };
 
         const result = await configAPI.saveConfig(JSON.stringify(config, null, 4));
@@ -453,7 +502,8 @@ class App {
             LocalAddress: $('editLocalAddr').value,
             LocalPort: $('editLocalPort').value,
             ServiceHTTPSuse: $('editServiceHTTPS').checked,
-            AutoHTTPS: $('editAutoHTTPS').checked
+            AutoHTTPS: $('editAutoHTTPS').checked,
+            AutoCreateSSL: $('editProxyAutoCreateSSL')?.checked || false
         };
 
         const result = await configAPI.saveConfig(JSON.stringify(config, null, 4));
@@ -537,6 +587,404 @@ class App {
             modal.close();
             await this.sitesManager.load();
 
+        } catch (error) {
+            notification.error('Ошибка: ' + error.message, 3000);
+        }
+    }
+
+    // ====== Cert Manager ======
+    
+    certManagerHost = null;
+    certManagerIsProxy = false;
+    certManagerAliases = [];
+
+    async openCertManager(host, isProxy = false, aliases = []) {
+        this.certManagerHost = host;
+        this.certManagerIsProxy = isProxy;
+        this.certManagerAliases = aliases.filter(a => !a.includes('*'));
+        
+        // Обновляем заголовки
+        $('certManagerBreadcrumb').textContent = `Сертификаты: ${host}`;
+        const titleSpan = $('certManagerTitle').querySelector('span');
+        if (titleSpan) titleSpan.textContent = host;
+        $('certManagerSubtitle').textContent = isProxy ? 'Прокси сервис' : 'Веб-сайт';
+        
+        // Скрываем все секции, показываем CertManager
+        this.hideAllSectionsForCertManager();
+        $('sectionCertManager').style.display = 'block';
+        
+        // Загружаем сертификаты
+        await this.loadCertManagerContent(host, this.certManagerAliases);
+    }
+
+    hideAllSectionsForCertManager() {
+        const sections = ['sectionServices', 'sectionSites', 'sectionProxy', 'sectionSettings', 'sectionVAccessEditor', 'sectionAddSite', 'sectionCertManager'];
+        sections.forEach(id => {
+            const el = $(id);
+            if (el) el.style.display = 'none';
+        });
+    }
+
+    // Тестовые данные для сертификатов (браузерный режим)
+    mockCertsData = [
+        {
+            domain: 'voxsel.ru',
+            issuer: 'R13',
+            not_before: '2026-01-07',
+            not_after: '2026-04-07',
+            days_left: 79,
+            is_expired: false,
+            has_cert: true,
+            dns_names: ['*.voxsel.com', '*.voxsel.ru', 'voxsel.com', 'voxsel.ru']
+        },
+        {
+            domain: 'finance.voxsel.ru',
+            issuer: 'E8',
+            not_before: '2026-01-17',
+            not_after: '2026-04-17',
+            days_left: 89,
+            is_expired: false,
+            has_cert: true,
+            dns_names: ['finance.voxsel.ru']
+        },
+        {
+            domain: 'test.local',
+            issuer: "Let's Encrypt",
+            not_before: '2025-01-01',
+            not_after: '2025-03-31',
+            days_left: 73,
+            is_expired: false,
+            has_cert: true,
+            dns_names: ['test.local', '*.test.local', 'test.com']
+        },
+        {
+            domain: 'api.example.com',
+            issuer: "Let's Encrypt",
+            not_before: '2024-10-01',
+            not_after: '2024-12-30',
+            days_left: -18,
+            is_expired: true,
+            has_cert: true,
+            dns_names: ['api.example.com', '*.api.example.com']
+        }
+    ];
+
+    async loadCertManagerContent(host, aliases = []) {
+        const container = $('certManagerContent');
+        container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--text-muted);"><i class="fas fa-spinner fa-spin"></i> Загрузка...</div>';
+        
+        try {
+            // Получаем сертификаты (реальные или mock)
+            let allCerts;
+            if (this.isWails) {
+                allCerts = await api.getAllCertsInfo();
+            } else {
+                allCerts = this.mockCertsData;
+            }
+            
+            // Все домены для отображения (host + алиасы без wildcard)
+            const allDomains = [host, ...aliases.filter(a => !a.includes('*'))];
+            
+            // Функция проверки wildcard покрытия
+            const isWildcardCovering = (domain, cert) => {
+                const parts = domain.split('.');
+                if (parts.length < 2) return false;
+                const wildcardPattern = '*.' + parts.slice(1).join('.');
+                return cert.domain === wildcardPattern || 
+                       cert.domain.startsWith('*.') && domain.endsWith(cert.domain.slice(1)) ||
+                       cert.dns_names?.some(dns => dns === wildcardPattern || (dns.startsWith('*.') && domain.endsWith(dns.slice(1))));
+            };
+            
+            // Функция проверки прямого сертификата
+            const hasDirectCert = (domain, cert) => {
+                return cert.domain === domain || cert.dns_names?.includes(domain);
+            };
+            
+            // Собираем информацию по каждому домену
+            const domainInfos = allDomains.map(domain => {
+                const directCert = allCerts.find(cert => hasDirectCert(domain, cert));
+                const wildcardCert = allCerts.find(cert => isWildcardCovering(domain, cert));
+                return { domain, directCert, wildcardCert, isLocal: this.isLocalDomain(domain) };
+            });
+            
+            let html = '';
+            
+            // Карточки для каждого домена
+            domainInfos.forEach(info => {
+                if (info.isLocal) {
+                    // Локальный домен - только информация
+                    html += `
+                        <div class="cert-card cert-card-local">
+                            <div class="cert-card-header">
+                                <div class="cert-card-title">
+                                    <i class="fas fa-home" style="opacity: 0.4"></i>
+                                    <h3>${info.domain}</h3>
+                                </div>
+                            </div>
+                            <div class="cert-info-grid">
+                                <div class="cert-info-item">
+                                    <div class="cert-info-label">Статус</div>
+                                    <div class="cert-info-value" style="opacity: 0.6">Локальный домен</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (info.directCert) {
+                    // Есть прямой сертификат
+                    html += this.renderCertCard(info.directCert, info.domain);
+                } else if (info.wildcardCert) {
+                    // Покрыт wildcard - показываем с возможностью выпустить прямой
+                    html += this.renderDomainWithWildcard(info.domain, info.wildcardCert);
+                } else {
+                    // Нет сертификата - предлагаем выпустить
+                    html += this.renderNoCertCard(info.domain);
+                }
+            });
+            
+            if (!html) {
+                html = `
+                    <div class="cert-empty">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Нет доменов для отображения</h3>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = html;
+            
+        } catch (error) {
+            container.innerHTML = `<div class="cert-empty"><p>Ошибка загрузки: ${error.message}</p></div>`;
+        }
+    }
+
+    renderCertCard(cert, displayDomain = null) {
+        const isExpired = cert.is_expired;
+        const statusClass = isExpired ? 'expired' : 'valid';
+        const statusText = isExpired ? 'Истёк' : `Активен (${cert.days_left} дн.)`;
+        const iconClass = isExpired ? 'expired' : '';
+        const title = displayDomain || cert.domain;
+        
+        const dnsNames = cert.dns_names || [cert.domain];
+        const domainTags = dnsNames.map(d => `<span class="cert-domain-tag">${d}</span>`).join('');
+        
+        return `
+            <div class="cert-card">
+                <div class="cert-card-header">
+                    <div class="cert-card-title ${iconClass}">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>${title}</h3>
+                    </div>
+                    <div class="cert-card-actions">
+                        <button class="action-btn" onclick="renewCertificate('${title}')">
+                            <i class="fas fa-sync-alt"></i> Перевыпустить
+                        </button>
+                        <button class="action-btn delete-btn" onclick="deleteCertificate('${cert.domain}')">
+                            <i class="fas fa-trash"></i> Удалить
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="cert-info-grid">
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">Статус</div>
+                        <div class="cert-info-value ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">Издатель</div>
+                        <div class="cert-info-value">${cert.issuer || 'Неизвестно'}</div>
+                    </div>
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">Выдан</div>
+                        <div class="cert-info-value">${cert.not_before || '-'}</div>
+                    </div>
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">Истекает</div>
+                        <div class="cert-info-value ${statusClass}">${cert.not_after || '-'}</div>
+                    </div>
+                </div>
+                
+                <div class="cert-domains-list">
+                    ${domainTags}
+                </div>
+            </div>
+        `;
+    }
+
+    isLocalDomain(host) {
+        const localPatterns = [
+            'localhost',
+            '127.0.0.1',
+            '0.0.0.0',
+            '::1',
+            '.local',
+            '.localhost',
+            '.test',
+            '.example',
+            '.invalid'
+        ];
+        
+        const hostLower = host.toLowerCase();
+        return localPatterns.some(pattern => {
+            if (pattern.startsWith('.')) {
+                return hostLower.endsWith(pattern) || hostLower === pattern.slice(1);
+            }
+            return hostLower === pattern;
+        });
+    }
+
+    renderNoCertCard(host) {
+        return `
+            <div class="cert-card cert-card-empty">
+                <div class="cert-card-header">
+                    <div class="cert-card-title">
+                        <i class="fas fa-shield-alt" style="opacity: 0.4"></i>
+                        <h3>${host}</h3>
+                    </div>
+                    <div class="cert-card-actions">
+                        <button class="action-btn btn-success" onclick="issueCertificate('${host}')">
+                            <i class="fas fa-plus"></i> Выпустить сертификат
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="cert-info-grid">
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">Статус</div>
+                        <div class="cert-info-value" style="opacity: 0.6">Нет сертификата</div>
+                    </div>
+                </div>
+                
+                <div class="cert-domains-list">
+                    <span class="cert-domain-tag">${host}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderDomainWithWildcard(domain, wildcardCert) {
+        const isExpired = wildcardCert.is_expired;
+        const statusClass = isExpired ? 'expired' : 'valid';
+        const statusText = isExpired ? `Покрыт wildcard (истёк)` : `Покрыт wildcard (${wildcardCert.days_left} дн.)`;
+        
+        return `
+            <div class="cert-card cert-card-wildcard">
+                <div class="cert-card-header">
+                    <div class="cert-card-title ${isExpired ? 'expired' : ''}">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>${domain}</h3>
+                    </div>
+                    <div class="cert-card-actions">
+                        <button class="action-btn btn-success" onclick="issueCertificate('${domain}')">
+                            <i class="fas fa-plus"></i> Выпустить прямой
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="cert-info-grid">
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">Статус</div>
+                        <div class="cert-info-value ${statusClass}">${statusText}</div>
+                    </div>
+                    <div class="cert-info-item">
+                        <div class="cert-info-label">Wildcard</div>
+                        <div class="cert-info-value">${wildcardCert.domain}</div>
+                    </div>
+                </div>
+                
+                <div class="cert-domains-list">
+                    <span class="cert-domain-tag">${domain}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    async issueCertificate(domain) {
+        const confirmed = confirm(`Выпустить сертификат для "${domain}"?\n\nБудет запрошен сертификат Let's Encrypt.`);
+        if (!confirmed) return;
+        
+        try {
+            notification.show('Запрос сертификата...', 'info', 2000);
+            
+            if (this.isWails) {
+                await api.obtainSSLCertificate(domain);
+            } else {
+                // Mock для браузерного режима
+                await new Promise(r => setTimeout(r, 1500));
+            }
+            
+            notification.success('Сертификат успешно выпущен!', 2000);
+            
+            // Перезагружаем контент
+            await this.loadCertManagerContent(this.certManagerHost);
+            
+            // Обновляем списки сайтов и прокси
+            await this.sitesManager.load();
+            await this.proxyManager.load();
+            
+        } catch (error) {
+            notification.error('Ошибка: ' + error.message, 3000);
+        }
+    }
+
+    backFromCertManager() {
+        this.hideAllSectionsForCertManager();
+        
+        // Показываем секции Dashboard
+        const dashboard = ['sectionServices', 'sectionSites', 'sectionProxy'];
+        dashboard.forEach(id => {
+            const el = $(id);
+            if (el) el.style.display = 'block';
+        });
+        
+        // Убираем active у всех nav-item и ставим на dashboard
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        const dashboardBtn = document.querySelector('.nav-item[data-page="dashboard"]');
+        if (dashboardBtn) dashboardBtn.classList.add('active');
+    }
+
+    async deleteCertificate(domain) {
+        const confirmed = confirm(`Удалить сертификат для "${domain}"?\n\nЭто действие необратимо.`);
+        if (!confirmed) return;
+        
+        try {
+            await api.deleteCertificate(domain);
+            notification.success('Сертификат удалён', 1500);
+            
+            // Перезагружаем контент
+            await this.loadCertManagerContent(this.certManagerHost);
+            
+            // Обновляем списки сайтов и прокси
+            await this.sitesManager.load();
+            await this.proxyManager.load();
+            
+        } catch (error) {
+            notification.error('Ошибка: ' + error.message, 3000);
+        }
+    }
+
+    async renewCertificate(domain) {
+        const confirmed = confirm(`Перевыпустить сертификат для "${domain}"?\n\nТекущий сертификат будет заменён новым.`);
+        if (!confirmed) return;
+        
+        try {
+            notification.show('Запрос сертификата...', 'info', 2000);
+            
+            if (this.isWails) {
+                await api.obtainSSLCertificate(domain);
+            } else {
+                // Mock для браузерного режима
+                await new Promise(r => setTimeout(r, 1500));
+            }
+            
+            notification.success('Сертификат успешно перевыпущен!', 2000);
+            
+            // Перезагружаем контент
+            await this.loadCertManagerContent(this.certManagerHost);
+            
+            // Обновляем списки сайтов и прокси
+            await this.sitesManager.load();
+            await this.proxyManager.load();
+            
         } catch (error) {
             notification.error('Ошибка: ' + error.message, 3000);
         }

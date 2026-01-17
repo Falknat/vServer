@@ -295,6 +295,26 @@ func (a *App) DisableProxyService() string {
 	return "Proxy disabled"
 }
 
+func (a *App) EnableACMEService() string {
+	config.ConfigData.Soft_Settings.ACME_enabled = true
+
+	// Сохраняем в файл
+	configJSON, _ := json.MarshalIndent(config.ConfigData, "", "    ")
+	os.WriteFile(config.ConfigPath, configJSON, 0644)
+
+	return "ACME enabled"
+}
+
+func (a *App) DisableACMEService() string {
+	config.ConfigData.Soft_Settings.ACME_enabled = false
+
+	// Сохраняем в файл
+	configJSON, _ := json.MarshalIndent(config.ConfigData, "", "    ")
+	os.WriteFile(config.ConfigPath, configJSON, 0644)
+
+	return "ACME disabled"
+}
+
 func (a *App) OpenSiteFolder(host string) string {
 	folderPath := "WebServer/www/" + host
 
@@ -422,4 +442,26 @@ func (a *App) ObtainAllSSLCertificates() string {
 	}
 	
 	return fmt.Sprintf("Completed: %d success, %d errors", successCount, errorCount)
+}
+
+// GetCertInfo получает информацию о сертификате для домена
+func (a *App) GetCertInfo(domain string) acme.CertInfo {
+	return acme.GetCertInfo(domain)
+}
+
+// GetAllCertsInfo получает информацию о всех сертификатах
+func (a *App) GetAllCertsInfo() []acme.CertInfo {
+	return acme.GetAllCertsInfo()
+}
+
+// DeleteCertificate удаляет сертификат для домена
+func (a *App) DeleteCertificate(domain string) string {
+	err := acme.DeleteCertificate(domain)
+	if err != nil {
+		return "Error: " + err.Error()
+	}
+	
+	// Перезагружаем сертификаты после удаления
+	webserver.ReloadCertificates()
+	return "Certificate deleted successfully"
 }

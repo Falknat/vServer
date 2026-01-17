@@ -20,21 +20,18 @@
     background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(16, 185, 129, 0.15));
     color: var(--accent-green);
     border: 1px solid rgba(16, 185, 129, 0.4);
-    box-shadow: 0 0 12px rgba(16, 185, 129, 0.3);
 }
 
 .badge-offline {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.25), rgba(239, 68, 68, 0.15));
     color: var(--accent-red);
     border: 1px solid rgba(239, 68, 68, 0.4);
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.3);
 }
 
 .badge-pending {
     background: linear-gradient(135deg, rgba(245, 158, 11, 0.25), rgba(245, 158, 11, 0.15));
     color: var(--accent-yellow);
     border: 1px solid rgba(245, 158, 11, 0.4);
-    box-shadow: 0 0 12px rgba(245, 158, 11, 0.3);
 }
 
 /* Yes/No Badges */
@@ -55,7 +52,6 @@
     width: 7px;
     height: 7px;
     border-radius: var(--radius-full);
-    box-shadow: 0 0 8px currentColor;
 }
 
 .status-online {
@@ -83,5 +79,29 @@
     &:hover {
         background: rgba(139, 92, 246, 0.25);
     }
+}
+
+/* Certificate Icons */
+.cert-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+}
+
+.cert-valid {
+    background: rgba(16, 185, 129, 0.2);
+    color: var(--accent-green);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.cert-expired {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--accent-red);
+    border: 1px solid rgba(239, 68, 68, 0.4);
 }
 

@@ -40,16 +40,10 @@
 
     <aside class="sidebar">
         <nav class="sidebar-nav">
-            <button class="nav-item active" title="Главная">
+            <button class="nav-item active" data-page="dashboard" title="Главная">
                 <i class="fas fa-home"></i>
             </button>
-            <button class="nav-item" title="Статистика">
-                <i class="fas fa-chart-bar"></i>
-            </button>
-            <button class="nav-item" title="Сервисы">
-                <i class="fas fa-server"></i>
-            </button>
-            <button class="nav-item" title="Настройки">
+            <button class="nav-item" data-page="settings" title="Настройки">
                 <i class="fas fa-cog"></i>
             </button>
         </nav>
@@ -191,7 +185,13 @@
             </section>
 
             <section class="section" id="sectionProxy">
-                <h2 class="section-title">Прокси сервисы</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2 class="section-title" style="margin-bottom: 0;">Прокси сервисы</h2>
+                    <button class="action-btn" id="addProxyBtn">
+                        <i class="fas fa-plus"></i>
+                        <span>Добавить прокси</span>
+                    </button>
+                </div>
                 <div class="table-container">
                     <table class="data-table" id="proxyTable">
                         <thead>
@@ -296,6 +296,25 @@
                             </div>
                             <div class="form-info">
                                 ⚡ Применяется моментально без перезапуска серверов. При выключении все прокси правила будут отключены.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="settings-card-title"><i class="fas fa-certificate"></i> Cert Manager</h3>
+                        <div class="settings-form">
+                            <div class="form-group">
+                                <label class="form-label">Статус:</label>
+                                <div class="toggle-wrapper">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="acmeEnabled">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label">Cert Manager</span>
+                                </div>
+                            </div>
+                            <div class="form-info">
+                                🔐 Автоматическое получение SSL сертификатов от Let's Encrypt для доменов с включённым "Авто SSL".
                             </div>
                         </div>
                     </div>
@@ -589,6 +608,7 @@
                                         <label class="form-label">Режим сертификата:</label>
                                         <select class="form-input" id="certMode" onchange="toggleCertUpload()">
                                             <option value="none">Без сертификата (fallback)</option>
+                                            <option value="auto">Автоматическое создание сертификата</option>
                                             <option value="upload">Загрузить файлы сертификата</option>
                                         </select>
                                     </div>
@@ -637,6 +657,199 @@
                                 </div>
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="sectionAddProxy" style="display: none;">
+                <div class="vaccess-page">
+                    <!-- Хлебные крошки -->
+                    <div class="breadcrumbs">
+                        <div class="breadcrumbs-left">
+                            <button class="breadcrumb-item" onclick="backToMainFromAddProxy()">
+                                <i class="fas fa-arrow-left"></i> Назад
+                            </button>
+                            <span class="breadcrumb-separator">/</span>
+                            <span class="breadcrumb-item active">Добавить прокси сервис</span>
+                        </div>
+                    </div>
+
+                    <!-- Заголовок -->
+                    <div class="vaccess-header">
+                        <div class="vaccess-title-block">
+                            <h2 class="vaccess-title">
+                                <i class="fas fa-plus-circle"></i>
+                                <span>Создание прокси сервиса</span>
+                            </h2>
+                            <p class="vaccess-subtitle">Настройте проксирование внешнего домена на локальный сервис</p>
+                        </div>
+                        <div class="vaccess-actions">
+                            <button class="action-btn save-btn" id="createProxyBtn">
+                                <i class="fas fa-check"></i>
+                                <span>Создать прокси</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Форма создания прокси -->
+                    <div class="vaccess-tab-content">
+                        <div class="site-creator-form">
+                            
+                            <!-- Единая форма -->
+                            <div class="form-section">
+                                <div class="settings-form">
+                                    
+                                    <!-- Основная информация -->
+                                    <h3 class="form-subsection-title"><i class="fas fa-info-circle"></i> Основная информация</h3>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Внешний домен: <span style="color: #e74c3c;">*</span></label>
+                                        <input type="text" class="form-input" id="newProxyDomain" placeholder="example.com">
+                                        <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                            <i class="fas fa-info-circle"></i> Домен, на который будут приходить запросы (например: git.example.ru)
+                                        </small>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">Локальный адрес: <span style="color: #e74c3c;">*</span></label>
+                                            <input type="text" class="form-input" id="newProxyLocalAddr" placeholder="127.0.0.1" value="127.0.0.1">
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">Локальный порт: <span style="color: #e74c3c;">*</span></label>
+                                            <input type="text" class="form-input" id="newProxyLocalPort" placeholder="3000">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="form-label">Статус:</label>
+                                        <select class="form-input" id="newProxyStatus">
+                                            <option value="enable">Включён</option>
+                                            <option value="disable">Отключён</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label">HTTPS к сервису:</label>
+                                            <div class="toggle-wrapper">
+                                                <label class="toggle-switch">
+                                                    <input type="checkbox" id="newProxyServiceHTTPS">
+                                                    <span class="toggle-slider"></span>
+                                                </label>
+                                                <span class="toggle-label">Включён</span>
+                                            </div>
+                                            <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                                <i class="fas fa-info-circle"></i> Использовать HTTPS при подключении к локальному сервису
+                                            </small>
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label class="form-label">Авто HTTPS:</label>
+                                            <div class="toggle-wrapper">
+                                                <label class="toggle-switch">
+                                                    <input type="checkbox" id="newProxyAutoHTTPS" checked>
+                                                    <span class="toggle-slider"></span>
+                                                </label>
+                                                <span class="toggle-label">Включён</span>
+                                            </div>
+                                            <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                                <i class="fas fa-info-circle"></i> Автоматически перенаправлять HTTP запросы на HTTPS
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                    <!-- SSL Сертификаты -->
+                                    <h3 class="form-subsection-title"><i class="fas fa-lock"></i> SSL Сертификаты (опционально)</h3>
+                                    
+                                    <div class="form-group">
+                                        <label class="form-label">Режим сертификата:</label>
+                                        <select class="form-input" id="proxyCertMode" onchange="toggleProxyCertUpload()">
+                                            <option value="none">Без сертификата (fallback)</option>
+                                            <option value="auto">Автоматическое создание сертификата</option>
+                                            <option value="upload">Загрузить файлы сертификата</option>
+                                        </select>
+                                    </div>
+
+                                    <div id="proxyCertUploadBlock" style="display: none;">
+                                        <div class="form-group">
+                                            <label class="form-label">Certificate (*.crt): <span style="color: #e74c3c;">*</span></label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" class="file-input" id="proxyCertFile" accept=".crt,.pem" onchange="handleProxyCertFileSelect(this, 'certificate')">
+                                                <label for="proxyCertFile" class="file-upload-btn">
+                                                    <i class="fas fa-file-upload"></i>
+                                                    <span id="proxyCertFileName">Выберите файл...</span>
+                                                </label>
+                                            </div>
+                                            <div id="proxyCertFileStatus" style="margin-top: 8px;"></div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">Private Key (*.key): <span style="color: #e74c3c;">*</span></label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" class="file-input" id="proxyKeyFile" accept=".key,.pem" onchange="handleProxyCertFileSelect(this, 'privatekey')">
+                                                <label for="proxyKeyFile" class="file-upload-btn">
+                                                    <i class="fas fa-file-upload"></i>
+                                                    <span id="proxyKeyFileName">Выберите файл...</span>
+                                                </label>
+                                            </div>
+                                            <div id="proxyKeyFileStatus" style="margin-top: 8px;"></div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="form-label">CA Bundle (*.crt):</label>
+                                            <div class="file-upload-wrapper">
+                                                <input type="file" class="file-input" id="proxyCaFile" accept=".crt,.pem" onchange="handleProxyCertFileSelect(this, 'cabundle')">
+                                                <label for="proxyCaFile" class="file-upload-btn">
+                                                    <i class="fas fa-file-upload"></i>
+                                                    <span id="proxyCaFileName">Выберите файл...</span>
+                                                </label>
+                                            </div>
+                                            <div id="proxyCaFileStatus" style="margin-top: 8px;"></div>
+                                            <small style="color: #95a5a6; display: block; margin-top: 5px;">
+                                                <i class="fas fa-info-circle"></i> CA Bundle опционален, но рекомендуется для полной цепочки сертификации
+                                            </small>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="sectionCertManager" style="display: none;">
+                <div class="vaccess-page">
+                    <!-- Хлебные крошки -->
+                    <div class="breadcrumbs">
+                        <div class="breadcrumbs-left">
+                            <button class="breadcrumb-item" onclick="backFromCertManager()">
+                                <i class="fas fa-arrow-left"></i> Назад
+                            </button>
+                            <span class="breadcrumb-separator">/</span>
+                            <span class="breadcrumb-item active" id="certManagerBreadcrumb">Сертификаты</span>
+                        </div>
+                    </div>
+
+                    <!-- Заголовок -->
+                    <div class="vaccess-header">
+                        <div class="vaccess-title-block">
+                            <h2 class="vaccess-title" id="certManagerTitle">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Управление сертификатами</span>
+                            </h2>
+                            <p class="vaccess-subtitle" id="certManagerSubtitle">Просмотр и управление SSL сертификатами для домена</p>
+                        </div>
+                    </div>
+
+                    <!-- Контент -->
+                    <div class="vaccess-tab-content">
+                        <div class="cert-manager-content" id="certManagerContent">
+                            <!-- Сертификаты будут загружены сюда -->
                         </div>
                     </div>
                 </div>
