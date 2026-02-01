@@ -217,6 +217,7 @@ class App {
             removeAliasTag: (btn) => btn.parentElement.remove(),
             saveModalData: async () => await this.saveModalData(),
             deleteSiteConfirm: async () => await this.deleteSiteConfirm(),
+            deleteProxyConfirm: async () => await this.deleteProxyConfirm(),
             
             // Тестовые функции
             editTestSite: (i) => {
@@ -402,7 +403,7 @@ class App {
             });
         }, 50);
 
-        this.removeDeleteButtonFromModal();
+        this.addDeleteButtonToModal();
     }
 
     // Установить статус в модальном окне
@@ -527,15 +528,20 @@ class App {
         const oldDeleteBtn = footer.querySelector('#modalDeleteBtn');
         if (oldDeleteBtn) oldDeleteBtn.remove();
 
+        // Определяем текст и обработчик в зависимости от типа редактирования
+        const isProxy = window.currentEditType === 'proxy';
+        const buttonText = isProxy ? 'Удалить прокси' : 'Удалить сайт';
+        const onClickHandler = isProxy ? () => this.deleteProxyConfirm() : () => this.deleteSiteConfirm();
+
         // Создаём кнопку удаления
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'action-btn delete-btn';
         deleteBtn.id = 'modalDeleteBtn';
         deleteBtn.innerHTML = `
             <i class="fas fa-trash"></i>
-            <span>Удалить сайт</span>
+            <span>${buttonText}</span>
         `;
-        deleteBtn.onclick = () => this.deleteSiteConfirm();
+        deleteBtn.onclick = onClickHandler;
 
         // Вставляем перед кнопкой "Отмена"
         const cancelBtn = footer.querySelector('#modalCancelBtn');
@@ -586,6 +592,49 @@ class App {
             // Закрываем модальное окно и обновляем список
             modal.close();
             await this.sitesManager.load();
+
+        } catch (error) {
+            notification.error('Ошибка: ' + error.message, 3000);
+        }
+    }
+
+    // Подтверждение удаления прокси
+    async deleteProxyConfirm() {
+        const index = window.currentEditIndex;
+        const proxy = this.proxyManager.proxiesData[index];
+        if (!proxy) return;
+
+        const confirmed = confirm(
+            `⚠️ ВНИМАНИЕ!\n\n` +
+            `Вы действительно хотите удалить прокси "${proxy.external_domain}"?\n\n` +
+            `Будет удалена запись в конфигурации.\n\n` +
+            `Это действие НЕОБРАТИМО!`
+        );
+
+        if (!confirmed) return;
+
+        try {
+            notification.show('Удаление прокси...', 'info', 1000);
+
+            const config = await configAPI.getConfig();
+            
+            if (config.Proxy_Service && config.Proxy_Service.length > index) {
+                config.Proxy_Service.splice(index, 1);
+            }
+
+            const result = await configAPI.saveConfig(JSON.stringify(config, null, 4));
+
+            if (result.startsWith('Error')) {
+                notification.error(result, 3000);
+                return;
+            }
+
+            notification.success('✅ Прокси успешно удалён!', 1500);
+            await this.restartHttpServices();
+            notification.success('🚀 Серверы перезапущены!', 1000);
+
+            modal.close();
+            await this.proxyManager.load();
 
         } catch (error) {
             notification.error('Ошибка: ' + error.message, 3000);
