@@ -1,8 +1,7 @@
-﻿# vServer Admin Panel Builder
+# vServer Admin Panel Builder
 $ErrorActionPreference = 'SilentlyContinue'
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# Очищаем консоль
 Clear-Host
 Start-Sleep -Milliseconds 100
 
@@ -38,78 +37,127 @@ function Write-ProgressBar {
     Write-Host "     [$bar] $Percent%" -ForegroundColor Cyan
 }
 
+function Check-And-Install {
+    param($Name, $Command, $WingetId)
+
+    $found = Get-Command $Command -ErrorAction SilentlyContinue
+
+    if (-not $found) {
+        Write-Err "$Name not found!"
+        $answer = Read-Host "     ? Install $Name via winget? (y/n)"
+        if ($answer -eq 'y' -or $answer -eq 'Y') {
+            Write-Info "Installing $Name..."
+            winget install --id $WingetId --accept-source-agreements --accept-package-agreements 2>&1 | Out-Null
+            if ($LASTEXITCODE -eq 0) {
+                Write-Success "$Name installed! Restart terminal and run script again."
+            } else {
+                Write-Err "Failed to install. Install manually: winget install $WingetId"
+            }
+            Write-Host ""
+            exit 1
+        } else {
+            Write-Err "Cannot continue without $Name"
+            Write-Host ""
+            exit 1
+        }
+    } else {
+        Write-Success "$Name found"
+    }
+}
+
 Write-Host ""
 Write-Host "=================================================" -ForegroundColor Magenta
 Write-Host "    vServer Admin Panel Builder" -ForegroundColor Cyan
 Write-Host "=================================================" -ForegroundColor Magenta
 Write-Host ""
 
-Write-Step 1 4 "Проверка go.mod..."
+# Step 0: Check dependencies
+Write-Step 1 6 "Checking dependencies..."
+Check-And-Install "Go" "go" "GoLang.Go"
+Check-And-Install "Node.js" "node" "OpenJS.NodeJS.LTS"
+Check-And-Install "npm" "npm" "OpenJS.NodeJS.LTS"
+Write-ProgressBar 10
+Write-Host ""
+
+# Step 1: go.mod
+Write-Step 2 6 "Checking go.mod..."
 if (-not (Test-Path "go.mod")) {
-    Write-Info "Создание go.mod..."
+    Write-Info "Creating go.mod..."
     go mod init vServer 2>&1 | Out-Null
-    Write-Success "Создан"
+    Write-Success "Created"
 } else {
-    Write-Success "Найден"
+    Write-Success "Found"
 }
-Write-ProgressBar 25
+Write-ProgressBar 20
 Write-Host ""
 
-Write-Step 2 4 "Установка зависимостей..."
+# Step 2: Go dependencies
+Write-Step 3 6 "Installing Go dependencies..."
 go mod tidy 2>&1 | Out-Null
-Write-Success "Зависимости установлены"
-Write-ProgressBar 50
+Write-Success "Dependencies installed"
+Write-ProgressBar 40
 Write-Host ""
 
-Write-Step 3 5 "Проверка Wails CLI..."
+# Step 3: Wails CLI
+Write-Step 4 6 "Checking Wails CLI..."
 $null = wails version 2>&1
 if ($LASTEXITCODE -ne 0) {
-    Write-Info "Установка Wails CLI..."
+    Write-Info "Installing Wails CLI..."
     go install github.com/wailsapp/wails/v2/cmd/wails@latest 2>&1 | Out-Null
-    Write-Success "Установлен"
+    Write-Success "Installed"
 } else {
-    Write-Success "Найден"
+    Write-Success "Found"
 }
-Write-ProgressBar 60
+Write-ProgressBar 55
 Write-Host ""
 
-Write-Step 4 5 "Генерация биндингов..."
-Write-Info "Создание TypeScript/JS биндингов для Go методов..."
-wails generate module 2>&1 | Out-Null
-Write-Success "Биндинги сгенерированы"
-Write-ProgressBar 80
+# Step 4: Vue frontend
+Write-Step 5 6 "Building Vue frontend..."
+Push-Location "front_vue"
+Write-Info "npm install..."
+npm install 2>&1 | Out-Null
+Write-Info "npm run build..."
+npm run build 2>&1 | Out-Null
+Pop-Location
+Write-Success "Frontend built"
+Write-ProgressBar 75
 Write-Host ""
 
-Write-Step 5 5 "Сборка приложения..."
-Write-Info "Компиляция (может занять ~10 сек)..."
+# Step 5: Wails build
+Write-Step 6 6 "Building application..."
+Write-Info "Compiling (may take ~30 sec)..."
+wails build 2>&1 | Out-Null
 
-wails build -f admin.go 2>&1 | Out-Null
+$exePath = $null
+if (Test-Path "build\bin\vServer-Admin.exe") {
+    $exePath = "build\bin\vServer-Admin.exe"
+}
+if ((-not $exePath) -and (Test-Path "bin\vServer-Admin.exe")) {
+    $exePath = "bin\vServer-Admin.exe"
+}
 
-if (Test-Path "bin\vServer-Admin.exe") {
-    Write-Success "Скомпилировано"
+if ($exePath) {
+    Write-Success "Compiled"
     Write-ProgressBar 100
     Write-Host ""
-    
-    Write-Host "Финализация..." -ForegroundColor Cyan
-    Move-Item -Path "bin\vServer-Admin.exe" -Destination "vSerf.exe" -Force 2>$null
-    Write-Success "Файл перемещён: vSerf.exe"
-    
-    if (Test-Path "bin") { Remove-Item -Path "bin" -Recurse -Force 2>$null }
-    if (Test-Path "windows") { Remove-Item -Path "windows" -Recurse -Force 2>$null }
-    Write-Success "Временные файлы удалены"
+    Write-Host "Finalizing..." -ForegroundColor Cyan
+    Move-Item -Path $exePath -Destination "vSerf.exe" -Force -ErrorAction SilentlyContinue
+    Write-Success "File moved: vSerf.exe"
+    if (Test-Path "build") { Remove-Item -Path "build" -Recurse -Force -ErrorAction SilentlyContinue }
+    if (Test-Path "bin") { Remove-Item -Path "bin" -Recurse -Force -ErrorAction SilentlyContinue }
+    if (Test-Path "windows") { Remove-Item -Path "windows" -Recurse -Force -ErrorAction SilentlyContinue }
+    Write-Success "Temp files removed"
     Write-Host ""
-    
     Write-Host "=================================================" -ForegroundColor Green
-    Write-Host "  УСПЕШНО СОБРАНО!" -ForegroundColor Green
-    Write-Host "  Файл: " -ForegroundColor Green -NoNewline
+    Write-Host "  BUILD SUCCESS!" -ForegroundColor Green
+    Write-Host "  File: " -ForegroundColor Green -NoNewline
     Write-Host "vSerf.exe" -ForegroundColor Cyan
     Write-Host "=================================================" -ForegroundColor Green
 } else {
-    Write-Err "Ошибка компиляции"
+    Write-Err "Compilation error"
     Write-Host ""
-    
     Write-Host "=================================================" -ForegroundColor Red
-    Write-Host "  ОШИБКА СБОРКИ!" -ForegroundColor Red
+    Write-Host "  BUILD FAILED!" -ForegroundColor Red
     Write-Host "=================================================" -ForegroundColor Red
 }
 

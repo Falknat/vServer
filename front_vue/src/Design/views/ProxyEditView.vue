@@ -10,6 +10,7 @@ const props = defineProps({
 })
 
 const form = reactive({
+  name: '',
   domain: '',
   localAddr: '127.0.0.1',
   localPort: '',
@@ -19,12 +20,15 @@ const form = reactive({
   autoSSL: false,
 })
 
+import { api } from '@core/api/index.js'
+
 const saving = ref(false)
 
 onMounted(async () => {
   if (!proxiesStore.loaded) await proxiesStore.load()
   const proxy = proxiesStore.list.find(p => p.ExternalDomain === props.domain)
   if (proxy) {
+    form.name = proxy.Name || ''
     form.domain = proxy.ExternalDomain
     form.localAddr = proxy.LocalAddress
     form.localPort = proxy.LocalPort
@@ -37,9 +41,29 @@ onMounted(async () => {
 
 const saveProxy = async () => {
   saving.value = true
-  success(t('notify.dataSaved'))
+  const config = await api.getConfig()
+  const idx = config.Proxy_Service.findIndex(p => p.ExternalDomain === props.domain)
+  if (idx >= 0) {
+    config.Proxy_Service[idx].Name = form.name
+    config.Proxy_Service[idx].ExternalDomain = form.domain
+    config.Proxy_Service[idx].LocalAddress = form.localAddr
+    config.Proxy_Service[idx].LocalPort = form.localPort
+    config.Proxy_Service[idx].Enable = form.enabled
+    config.Proxy_Service[idx].ServiceHTTPSuse = form.serviceHttps
+    config.Proxy_Service[idx].AutoHTTPS = form.serviceHttps
+    config.Proxy_Service[idx].AutoCreateSSL = form.autoSSL
+    const result = await api.saveConfig(JSON.stringify(config))
+    if (!String(result).startsWith('Error')) {
+      await proxiesStore.load()
+      success(t('notify.dataSaved'))
+      router.push('/')
+    } else {
+      error(result)
+    }
+  } else {
+    error('Proxy not found in config')
+  }
   saving.value = false
-  router.push('/')
 }
 
 const confirmDelete = () => {
@@ -47,9 +71,14 @@ const confirmDelete = () => {
     title: t('proxies.deleteTitle'),
     message: t('proxies.deleteConfirm', { domain: form.domain }),
     onConfirm: async () => {
-      success(t('notify.proxyDeleted'))
+      const result = await proxiesStore.remove(form.domain)
+      if (result && !String(result).startsWith('Error')) {
+        success(t('notify.proxyDeleted'))
+        router.push('/')
+      } else {
+        error(String(result))
+      }
       modal.close()
-      router.push('/')
     },
   })
 }
@@ -82,6 +111,10 @@ const confirmDelete = () => {
           </div>
         </div>
 
+        <!-- Имя и домен -->
+        <VInput v-model="form.name" :label="t('sites.formName')" />
+        <VInput v-model="form.domain" :label="t('proxies.externalDomain')" required />
+
         <!-- Адрес и порт -->
         <div class="form-row">
           <VInput v-model="form.localAddr" :label="t('proxies.formLocalAddr')" required />
@@ -89,14 +122,10 @@ const confirmDelete = () => {
         </div>
 
         <!-- Toggles -->
-        <div class="form-row form-row-3">
+        <div class="form-row">
           <div class="form-group">
-            <label class="form-label">{{ t('proxies.formServiceHttps') }}:</label>
+            <label class="form-label">HTTPS:</label>
             <VToggle v-model="form.serviceHttps" :label="t('common.enabled')" />
-          </div>
-          <div class="form-group">
-            <label class="form-label">{{ t('proxies.formAutoHttps') }}:</label>
-            <VToggle v-model="form.autoHttps" :label="t('common.enabled')" />
           </div>
           <div class="form-group">
             <label class="form-label">Auto SSL:</label>

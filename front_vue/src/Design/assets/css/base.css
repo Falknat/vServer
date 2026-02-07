@@ -77,3 +77,12 @@ input, select, textarea, button {
     font-family: inherit;
     font-size: inherit;
 }
+
+.icon-spin {
+    animation: icon-spin-anim 1s linear infinite;
+}
+
+@keyframes icon-spin-anim {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}

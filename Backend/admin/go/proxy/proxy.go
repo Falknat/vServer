@@ -14,6 +14,7 @@ func GetProxyList() []ProxyInfo {
 		}
 
 		proxyInfo := ProxyInfo{
+			Name:            proxyConfig.Name,
 			Enable:          proxyConfig.Enable,
 			ExternalDomain:  proxyConfig.ExternalDomain,
 			LocalAddress:    proxyConfig.LocalAddress,

@@ -2,7 +2,7 @@
   "app": {
     "title": "vServer Admin Panel",
     "logo": "vServer",
-    "footer": "vServer Admin Panel © 2025 | Author: Sumaneev Roman",
+    "footerAuthor": "Author: Sumaneev Roman",
     "loading": "Starting vServer..."
   },
   "nav": {
@@ -18,7 +18,10 @@
     "running": "Server is running",
     "stopped": "Server is stopped",
     "start": "Start",
-    "stop": "Stop"
+    "stop": "Stop",
+    "starting": "Starting...",
+    "stopping": "Stopping...",
+    "wait": "Please wait..."
   },
   "services": {
     "title": "Services Status",
@@ -174,10 +177,11 @@
   },
   "notify": {
     "settingsSaved": "Settings saved and services restarted!",
-    "settingsTestMode": "Settings saved (test mode)",
-    "dataSaved": "Data saved (test mode)",
+    "settingsSaved": "Settings saved",
+    "dataSaved": "Data saved",
     "siteCreated": "Site created successfully!",
     "siteDeleted": "Site deleted successfully!",
+    "proxyCreated": "Proxy created successfully!",
     "proxyDeleted": "Proxy deleted successfully!",
     "changesSaved": "Changes saved and applied!",
     "serversRestarted": "Servers restarted!",

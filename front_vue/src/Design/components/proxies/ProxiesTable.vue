@@ -4,6 +4,14 @@ const router = useRouter()
 const proxiesStore = useProxiesStore()
 const certsStore = useCertsStore()
 
+const openUrl = (host) => {
+  if (window.runtime?.BrowserOpenURL) {
+    window.runtime.BrowserOpenURL('http://' + host)
+  } else {
+    window.open('http://' + host, '_blank')
+  }
+}
+
 const findCertForDomain = (domain) => {
   const direct = certsStore.list.find(c => c.domain === domain && c.has_cert)
   if (direct) return direct
@@ -43,10 +51,10 @@ const findCertForDomain = (domain) => {
       <table class="data-table">
         <thead>
           <tr>
+            <th>{{ t('sites.name') }}</th>
             <th>{{ t('proxies.externalDomain') }}</th>
             <th>{{ t('proxies.localAddress') }}</th>
-            <th>{{ t('proxies.httpsCol') }}</th>
-            <th>{{ t('proxies.autoHttps') }}</th>
+            <th>HTTPS</th>
             <th>{{ t('proxies.status') }}</th>
             <th>{{ t('proxies.actions') }}</th>
           </tr>
@@ -54,20 +62,18 @@ const findCertForDomain = (domain) => {
         <tbody>
           <tr v-for="proxy in proxiesStore.list" :key="proxy.ExternalDomain">
             <td>
-              <span class="cert-icon" :class="findCertForDomain(proxy.ExternalDomain) ? (findCertForDomain(proxy.ExternalDomain).is_expired ? 'cert-expired' : 'cert-valid') : 'cert-none'" :title="findCertForDomain(proxy.ExternalDomain) ? (findCertForDomain(proxy.ExternalDomain).is_expired ? 'SSL истёк' : `SSL (${findCertForDomain(proxy.ExternalDomain).days_left} дн.)`) : 'Нет сертификата'">
+              <span class="cert-icon" :class="findCertForDomain(proxy.ExternalDomain) ? (findCertForDomain(proxy.ExternalDomain).is_expired ? 'cert-expired' : 'cert-valid') : 'cert-none'">
                 <i class="fas fa-shield-alt"></i>
               </span>
-              <code class="clickable-link">{{ proxy.ExternalDomain }} <i class="fas fa-external-link-alt"></i></code>
+              {{ proxy.Name || '—' }}
+            </td>
+            <td>
+              <code class="clickable-link" @click="openUrl(proxy.ExternalDomain)">{{ proxy.ExternalDomain }} <i class="fas fa-external-link-alt"></i></code>
             </td>
             <td><code>{{ proxy.LocalAddress }}:{{ proxy.LocalPort }}</code></td>
             <td>
               <VBadge :variant="proxy.ServiceHTTPSuse ? 'yes' : 'no'">
                 {{ proxy.ServiceHTTPSuse ? 'HTTPS' : 'HTTP' }}
-              </VBadge>
-            </td>
-            <td>
-              <VBadge :variant="proxy.AutoHTTPS ? 'yes' : 'no'">
-                {{ proxy.AutoHTTPS ? t('common.yes') : t('common.no') }}
               </VBadge>
             </td>
             <td>

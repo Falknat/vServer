@@ -6,6 +6,22 @@ const certsStore = useCertsStore()
 const { success, error } = useNotification()
 const modal = useModal()
 
+const openingFolder = ref('')
+
+const openUrl = (host) => {
+  if (window.runtime?.BrowserOpenURL) {
+    window.runtime.BrowserOpenURL('http://' + host)
+  } else {
+    window.open('http://' + host, '_blank')
+  }
+}
+
+const openFolder = async (host) => {
+  openingFolder.value = host
+  await sitesStore.openFolder(host)
+  setTimeout(() => { openingFolder.value = '' }, 800)
+}
+
 const findCertForDomain = (domain, aliases = []) => {
   const allDomains = [domain, ...aliases.filter(a => !a.includes('*'))]
   for (const d of allDomains) {
@@ -42,7 +58,7 @@ const confirmDelete = (site) => {
     warning: t('sites.deleteWarning'),
     onConfirm: async () => {
       const result = await sitesStore.remove(site.host)
-      if (result === 'OK') success(t('notify.siteDeleted'))
+      if (result && !String(result).startsWith('Error')) success(t('notify.siteDeleted'))
       else error(String(result))
       modal.close()
     },
@@ -79,7 +95,7 @@ const confirmDelete = (site) => {
               {{ site.name }}
             </td>
             <td>
-              <code class="clickable-link">{{ site.host }} <i class="fas fa-external-link-alt"></i></code>
+              <code class="clickable-link" @click="openUrl(site.host)">{{ site.host }} <i class="fas fa-external-link-alt"></i></code>
             </td>
             <td><code>{{ site.alias?.join(', ') || '—' }}</code></td>
             <td>
@@ -89,8 +105,9 @@ const confirmDelete = (site) => {
             </td>
             <td><code>{{ site.root_file }}</code></td>
             <td>
-              <button class="icon-btn" :title="t('sites.openFolder')" @click="sitesStore.openFolder(site.host)">
-                <i class="fas fa-folder-open"></i>
+              <button class="icon-btn" :title="t('sites.openFolder')" :disabled="openingFolder === site.host" @click="openFolder(site.host)">
+                <i v-if="openingFolder === site.host" class="fas fa-spinner icon-spin"></i>
+                <i v-else class="fas fa-folder-open"></i>
               </button>
               <button class="icon-btn" :title="t('sites.editVaccess')" @click="router.push(`/vaccess/${site.host}`)">
                 <i class="fas fa-user-lock"></i>

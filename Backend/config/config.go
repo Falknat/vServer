@@ -34,6 +34,7 @@ type Soft_Settings struct {
 }
 
 type Proxy_Service struct {
+	Name            string `json:"Name"`
 	Enable          bool   `json:"Enable"`
 	ExternalDomain  string `json:"ExternalDomain"`
 	LocalAddress    string `json:"LocalAddress"`

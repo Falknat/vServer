@@ -16,7 +16,7 @@ defineEmits(['click'])
     :disabled="disabled || loading"
     @click="$emit('click', $event)"
   >
-    <i v-if="loading" class="fas fa-spinner fa-spin"></i>
+    <i v-if="loading" class="fas fa-spinner icon-spin"></i>
     <i v-else-if="icon" :class="icon"></i>
     <span v-if="$slots.default"><slot /></span>
   </button>

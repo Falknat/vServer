@@ -6,11 +6,13 @@ const certsStore = useCertsStore()
 
 onMounted(async () => {
   await Promise.all([
-    servicesStore.load(),
     sitesStore.load(),
     proxiesStore.load(),
     certsStore.loadAll(),
   ])
+  if (!servicesStore.loaded) {
+    await servicesStore.load()
+  }
 })
 </script>
 

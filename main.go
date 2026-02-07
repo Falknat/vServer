@@ -12,7 +12,7 @@ import (
 	admin "vServer/Backend/admin/go"
 )
 
-//go:embed all:Backend/admin/frontend
+//go:embed all:front_vue/dist
 var assets embed.FS
 
 func main() {

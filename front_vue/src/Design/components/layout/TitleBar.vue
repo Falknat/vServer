@@ -1,7 +1,16 @@
 <script setup>
+import { api } from '@core/api/index.js'
+
 const { t, locale } = useI18n()
 const appStore = useAppStore()
+const servicesStore = useServicesStore()
 const { isDark, toggleTheme } = useTheme()
+
+const isWails = typeof window !== 'undefined' && window?.runtime
+const operating = ref(false)
+const statusLabel = ref('')
+
+const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
 const toggleLocale = () => {
   const next = locale.value === 'ru' ? 'en' : 'ru'
@@ -10,12 +19,42 @@ const toggleLocale = () => {
 }
 
 const serverToggle = async () => {
+  if (operating.value) return
+
   if (appStore.serverRunning) {
+    operating.value = true
+    statusLabel.value = t('server.stopping')
+    servicesStore.setPending(t('server.stopping'))
+    await api.stopServer()
+    await sleep(1500)
+    servicesStore.clearPending()
     appStore.setServerRunning(false)
+    statusLabel.value = ''
+    operating.value = false
   } else {
+    operating.value = true
+    statusLabel.value = t('server.starting')
+    servicesStore.setPending(t('server.starting'))
+    await api.startServer()
+
+    let attempts = 0
+    while (attempts < 20) {
+      await sleep(500)
+      const ready = await api.checkServicesReady()
+      if (ready) break
+      attempts++
+    }
+
+    servicesStore.clearPending()
     appStore.setServerRunning(true)
+    statusLabel.value = ''
+    operating.value = false
   }
 }
+
+const windowMinimise = () => { if (isWails) window.runtime.WindowMinimise() }
+const windowMaximise = () => { if (isWails) window.runtime.WindowToggleMaximise() }
+const windowClose = () => { if (isWails) window.runtime.Quit() }
 </script>
 
 <template>
@@ -26,14 +65,14 @@ const serverToggle = async () => {
         <span class="logo-text">{{ t('app.logo') }}</span>
       </div>
       <div class="server-status">
-        <span class="status-indicator" :class="appStore.serverRunning ? 'status-online' : 'status-offline'"></span>
-        <span class="status-text">{{ appStore.serverRunning ? t('server.running') : t('server.stopped') }}</span>
+        <span class="status-indicator" :class="[operating ? 'status-pending' : (appStore.serverRunning ? 'status-online' : 'status-offline')]"></span>
+        <span class="status-text">{{ statusLabel || (appStore.serverRunning ? t('server.running') : t('server.stopped')) }}</span>
       </div>
     </div>
     <div class="title-bar-right" style="--wails-draggable: no-drag">
-      <button class="server-control-btn" @click="serverToggle">
+      <button class="server-control-btn" :disabled="operating" @click="serverToggle">
         <i class="fas fa-power-off"></i>
-        <span class="btn-text">{{ appStore.serverRunning ? t('server.stop') : t('server.start') }}</span>
+        <span class="btn-text">{{ operating ? t('server.wait') : (appStore.serverRunning ? t('server.stop') : t('server.start')) }}</span>
       </button>
       <button class="locale-btn" @click="toggleLocale" :title="locale === 'ru' ? 'English' : 'Русский'">
         {{ locale === 'ru' ? 'EN' : 'RU' }}
@@ -41,13 +80,13 @@ const serverToggle = async () => {
       <button class="theme-btn" @click="toggleTheme" :title="isDark ? t('theme.light') : t('theme.dark')">
         <i :class="isDark ? 'fas fa-sun' : 'fas fa-moon'"></i>
       </button>
-      <button class="window-btn minimize-btn" :title="t('window.minimize')">
+      <button class="window-btn minimize-btn" :title="t('window.minimize')" @click="windowMinimise">
         <i class="fas fa-window-minimize"></i>
       </button>
-      <button class="window-btn maximize-btn" :title="t('window.maximize')">
+      <button class="window-btn maximize-btn" :title="t('window.maximize')" @click="windowMaximise">
         <i class="far fa-window-maximize"></i>
       </button>
-      <button class="window-btn close-btn" :title="t('window.close')">
+      <button class="window-btn close-btn" :title="t('window.close')" @click="windowClose">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -110,6 +149,17 @@ const serverToggle = async () => {
 .status-offline {
   background: var(--accent-red);
   box-shadow: 0 0 8px var(--accent-red);
+}
+
+.status-pending {
+  background: var(--accent-yellow, #f0ad4e);
+  box-shadow: 0 0 8px var(--accent-yellow, #f0ad4e);
+  animation: pulse-pending 1s ease-in-out infinite;
+}
+
+@keyframes pulse-pending {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 .status-text {

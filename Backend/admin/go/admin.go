@@ -2,10 +2,18 @@ package admin
 
 import (
 	"context"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
+	"crypto/x509/pkix"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
+	"math/big"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -32,9 +40,102 @@ func NewApp() *App {
 
 var isSingleInstance bool = false
 
+func initDirectories() {
+	dirs := []string{
+		"WebServer",
+		"WebServer/www",
+		"WebServer/cert",
+		"WebServer/cert/no_cert",
+		"WebServer/tools",
+		"WebServer/tools/logs",
+		"WebServer/tools/error_page",
+		"WebServer/tools/Proxy_vAccess",
+	}
+
+	for _, dir := range dirs {
+		os.MkdirAll(dir, 0755)
+	}
+
+	// Дефолтный config.json
+	if _, err := os.Stat(config.ConfigPath); os.IsNotExist(err) {
+		defaultConfig := map[string]interface{}{
+			"Site_www":      []interface{}{},
+			"Proxy_Service": []interface{}{},
+			"Soft_Settings": map[string]interface{}{
+				"php_host":      "localhost",
+				"php_port":      8000,
+				"mysql_host":    "127.0.0.1",
+				"mysql_port":    3306,
+				"proxy_enabled": false,
+				"ACME_enabled":  false,
+			},
+		}
+		data, _ := json.MarshalIndent(defaultConfig, "", "    ")
+		os.WriteFile(config.ConfigPath, data, 0644)
+	}
+
+	// Страница ошибки
+	errorPage := "WebServer/tools/error_page/index.html"
+	if _, err := os.Stat(errorPage); os.IsNotExist(err) {
+		os.WriteFile(errorPage, []byte("<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>Error</title></head><body><h1>Error</h1></body></html>"), 0644)
+	}
+
+	// Fallback SSL-сертификат (самоподписанный)
+	certFile := filepath.Join("WebServer", "cert", "no_cert", "certificate.crt")
+	keyFile := filepath.Join("WebServer", "cert", "no_cert", "private.key")
+	if _, err := os.Stat(certFile); os.IsNotExist(err) {
+		generateSelfSignedCert(certFile, keyFile)
+	}
+}
+
+func generateSelfSignedCert(certPath, keyPath string) {
+	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		return
+	}
+
+	template := x509.Certificate{
+		SerialNumber: big.NewInt(1),
+		Subject:      pkix.Name{CommonName: "localhost"},
+		NotBefore:    time.Now(),
+		NotAfter:     time.Now().Add(10 * 365 * 24 * time.Hour),
+		KeyUsage:     x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
+		ExtKeyUsage:  []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
+		IsCA:         true,
+		BasicConstraintsValid: true,
+	}
+
+	certDER, err := x509.CreateCertificate(rand.Reader, &template, &template, &key.PublicKey, key)
+	if err != nil {
+		return
+	}
+
+	certOut, err := os.Create(certPath)
+	if err != nil {
+		return
+	}
+	pem.Encode(certOut, &pem.Block{Type: "CERTIFICATE", Bytes: certDER})
+	certOut.Close()
+
+	keyDER, err := x509.MarshalECPrivateKey(key)
+	if err != nil {
+		return
+	}
+
+	keyOut, err := os.Create(keyPath)
+	if err != nil {
+		return
+	}
+	pem.Encode(keyOut, &pem.Block{Type: "EC PRIVATE KEY", Bytes: keyDER})
+	keyOut.Close()
+}
+
 func (a *App) Startup(ctx context.Context) {
 	a.ctx = ctx
 	appContext = ctx
+
+	// Создаём структуру папок при первом запуске
+	initDirectories()
 
 	// Проверяем, не запущен ли уже vServer
 	if !tools.CheckSingleInstance() {
@@ -125,7 +226,11 @@ func (a *App) Shutdown(ctx context.Context) {
 }
 
 func (a *App) monitorServices() {
-	time.Sleep(1 * time.Second) // Ждём секунду перед первой проверкой
+	time.Sleep(300 * time.Millisecond)
+
+	// Первое событие сразу
+	status := services.GetAllServicesStatus()
+	runtime.EventsEmit(appContext, "service:changed", status)
 
 	for {
 		time.Sleep(500 * time.Millisecond)
@@ -318,19 +423,12 @@ func (a *App) DisableACMEService() string {
 func (a *App) OpenSiteFolder(host string) string {
 	folderPath := "WebServer/www/" + host
 
-	// Получаем абсолютный путь
 	absPath, err := tools.AbsPath(folderPath)
 	if err != nil {
 		return "Error: " + err.Error()
 	}
 
-	// Открываем папку в проводнике
-	cmd := exec.Command("explorer", absPath)
-	err = cmd.Start()
-	if err != nil {
-		return "Error: " + err.Error()
-	}
-
+	exec.Command("explorer", absPath).Start()
 	return "Folder opened"
 }
 

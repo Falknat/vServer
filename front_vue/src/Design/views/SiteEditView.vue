@@ -19,6 +19,8 @@ const form = reactive({
   autoSSL: false,
 })
 
+import { api } from '@core/api/index.js'
+
 const saving = ref(false)
 const aliasInput = ref('')
 
@@ -55,9 +57,28 @@ const removeAlias = (index) => {
 
 const saveSite = async () => {
   saving.value = true
-  success(t('notify.dataSaved'))
+  const config = await api.getConfig()
+  const idx = config.Site_www.findIndex(s => s.host === props.host)
+  if (idx >= 0) {
+    config.Site_www[idx].host = form.host
+    config.Site_www[idx].name = form.name
+    config.Site_www[idx].alias = form.alias
+    config.Site_www[idx].root_file = form.rootFile
+    config.Site_www[idx].status = form.status
+    config.Site_www[idx].root_file_routing = form.routing
+    config.Site_www[idx].AutoCreateSSL = form.autoSSL
+    const result = await api.saveConfig(JSON.stringify(config))
+    if (!String(result).startsWith('Error')) {
+      await sitesStore.load()
+      success(t('notify.dataSaved'))
+      router.push('/')
+    } else {
+      error(result)
+    }
+  } else {
+    error('Site not found in config')
+  }
   saving.value = false
-  router.push('/')
 }
 
 const confirmDelete = () => {
@@ -67,7 +88,7 @@ const confirmDelete = () => {
     warning: t('sites.deleteWarning'),
     onConfirm: async () => {
       const result = await sitesStore.remove(form.host)
-      if (result === 'OK') {
+      if (result && !String(result).startsWith('Error')) {
         success(t('notify.siteDeleted'))
         router.push('/')
       } else {
@@ -107,6 +128,7 @@ const confirmDelete = () => {
         </div>
 
         <!-- Основная информация -->
+        <VInput v-model="form.host" :label="t('sites.host')" required />
         <VInput v-model="form.name" :label="t('sites.formName')" required />
 
         <!-- Alias с тегами -->

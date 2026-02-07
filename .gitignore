@@ -13,6 +13,7 @@ front_vue/node_modules/
 front_vue/dist/
 front_vue/src/auto-imports.d.ts
 front_vue/src/components.d.ts
+wailsjs
 
 # Cursor
 .cursorrules

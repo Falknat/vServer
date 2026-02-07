@@ -86,7 +86,7 @@ func getProxyStatus() ServiceStatus {
 	return ServiceStatus{
 		Name:   "Proxy",
 		Status: status,
-		Port:   "-",
+		Port:   "",
 		Info:   info,
 	}
 }

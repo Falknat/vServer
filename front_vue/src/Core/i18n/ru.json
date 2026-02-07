@@ -2,7 +2,7 @@
   "app": {
     "title": "vServer Admin Panel",
     "logo": "vServer",
-    "footer": "vServer Admin Panel © 2025 | Автор: Суманеев Роман",
+    "footerAuthor": "Автор: Суманеев Роман",
     "loading": "Запуск vServer..."
   },
   "nav": {
@@ -18,7 +18,10 @@
     "running": "Сервер запущен",
     "stopped": "Сервер остановлен",
     "start": "Запустить",
-    "stop": "Остановить"
+    "stop": "Остановить",
+    "starting": "Запускается...",
+    "stopping": "Выключается...",
+    "wait": "Ожидайте..."
   },
   "services": {
     "title": "Статус сервисов",
@@ -174,10 +177,11 @@
   },
   "notify": {
     "settingsSaved": "Настройки сохранены и сервисы перезапущены!",
-    "settingsTestMode": "Настройки сохранены (тестовый режим)",
-    "dataSaved": "Данные сохранены (тестовый режим)",
+    "settingsSaved": "Настройки сохранены",
+    "dataSaved": "Данные сохранены",
     "siteCreated": "Сайт успешно создан!",
     "siteDeleted": "Сайт успешно удалён!",
+    "proxyCreated": "Прокси успешно создан!",
     "proxyDeleted": "Прокси успешно удалён!",
     "changesSaved": "Изменения сохранены и применены!",
     "serversRestarted": "Серверы перезапущены!",

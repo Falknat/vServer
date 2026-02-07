@@ -9,8 +9,13 @@ const props = defineProps({
 
 const certs = ref([])
 const loading = ref(true)
+const issuing = ref('')
+const renewing = ref('')
+const deleting = ref('')
 
-onMounted(async () => {
+const sleep = (ms) => new Promise(r => setTimeout(r, ms))
+
+const refreshCerts = async () => {
   await certsStore.loadAll()
   certs.value = certsStore.list.filter(c =>
     c.dns_names?.some(d => d === props.host || d === `*.${props.host}` || props.host.match(new RegExp(d.replace('*.', '.*\\.'))))
@@ -19,25 +24,47 @@ onMounted(async () => {
     const info = await certsStore.getInfo(props.host)
     if (info && info.has_cert) certs.value = [info]
   }
+}
+
+onMounted(async () => {
+  await refreshCerts()
   loading.value = false
 })
 
 const issueCert = async (domain) => {
-  const result = await certsStore.issue(domain)
-  if (result === 'OK') success(t('notify.certIssued'))
-  else error(String(result))
+  issuing.value = domain
+  const [result] = await Promise.all([certsStore.issue(domain), sleep(1000)])
+  if (result && !String(result).startsWith('Error')) {
+    success(t('notify.certIssued'))
+    await refreshCerts()
+  } else {
+    error(String(result))
+  }
+  issuing.value = ''
 }
 
 const renewCert = async (domain) => {
-  const result = await certsStore.renew(domain)
-  if (result === 'OK') success(t('notify.certRenewed'))
-  else error(String(result))
+  renewing.value = domain
+  const [result] = await Promise.all([certsStore.renew(domain), sleep(1000)])
+  if (result && !String(result).startsWith('Error')) {
+    success(t('notify.certRenewed'))
+    await refreshCerts()
+  } else {
+    error(String(result))
+  }
+  renewing.value = ''
 }
 
 const deleteCert = async (domain) => {
-  const result = await certsStore.remove(domain)
-  if (result === 'OK') success(t('notify.certDeleted'))
-  else error(String(result))
+  deleting.value = domain
+  const [result] = await Promise.all([certsStore.remove(domain), sleep(1000)])
+  if (result && !String(result).startsWith('Error')) {
+    success(t('notify.certDeleted'))
+    await refreshCerts()
+  } else {
+    error(String(result))
+  }
+  deleting.value = ''
 }
 </script>
 
@@ -53,7 +80,7 @@ const deleteCert = async (domain) => {
         <i class="fas fa-certificate"></i>
         <h3>{{ t('certs.noCert') }}</h3>
         <p>{{ t('certs.subtitle') }}</p>
-        <VButton icon="fas fa-plus" @click="issueCert(host)">{{ t('certs.issue') }}</VButton>
+        <VButton icon="fas fa-plus" :loading="issuing === host" @click="issueCert(host)">{{ t('certs.issue') }}</VButton>
       </div>
 
       <!-- Карточки сертификатов -->
@@ -64,13 +91,13 @@ const deleteCert = async (domain) => {
             <h3>{{ cert.domain }}</h3>
           </div>
           <div class="cert-card-actions">
-            <VButton v-if="cert.has_cert && !cert.is_expired" variant="success" icon="fas fa-sync" @click="renewCert(cert.domain)">
+            <VButton v-if="cert.has_cert && !cert.is_expired" variant="success" icon="fas fa-sync" :loading="renewing === cert.domain" @click="renewCert(cert.domain)">
               {{ t('certs.renew') }}
             </VButton>
-            <VButton v-if="!cert.has_cert || cert.is_expired" icon="fas fa-plus" @click="issueCert(cert.domain)">
+            <VButton v-if="!cert.has_cert || cert.is_expired" icon="fas fa-plus" :loading="issuing === cert.domain" @click="issueCert(cert.domain)">
               {{ t('certs.issue') }}
             </VButton>
-            <VButton v-if="cert.has_cert" variant="danger" icon="fas fa-trash" @click="deleteCert(cert.domain)">
+            <VButton v-if="cert.has_cert" variant="danger" icon="fas fa-trash" :loading="deleting === cert.domain" @click="deleteCert(cert.domain)">
               {{ t('certs.delete') }}
             </VButton>
           </div>

@@ -166,3 +166,10 @@
     border-color: var(--btn-icon-hover-border);
     transform: translateY(-1px);
 }
+
+.icon-btn:disabled {
+    opacity: 0.6;
+    cursor: wait;
+    transform: none;
+}
+

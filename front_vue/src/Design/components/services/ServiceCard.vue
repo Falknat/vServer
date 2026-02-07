@@ -29,8 +29,8 @@ const serviceInfoLabel = {
         <i :class="serviceIcons[service.name] || 'fas fa-server'"></i>
         {{ service.name }}
       </h3>
-      <VBadge :variant="service.status ? 'online' : 'offline'">
-        {{ service.status ? t('common.enabled') : t('common.disabled') }}
+      <VBadge :variant="service.pending ? 'pending' : (service.status ? 'online' : 'offline')">
+        {{ service.pending || (service.status ? t('common.enabled') : t('common.disabled')) }}
       </VBadge>
     </div>
     <div class="service-info">

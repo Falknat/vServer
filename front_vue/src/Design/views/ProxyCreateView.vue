@@ -5,11 +5,11 @@ const proxiesStore = useProxiesStore()
 const { success, error } = useNotification()
 
 const form = reactive({
+  name: '',
   domain: '',
   localAddr: '127.0.0.1',
   localPort: '',
   serviceHttps: false,
-  autoHttps: true,
   certMode: 'none',
 })
 
@@ -18,10 +18,23 @@ const creating = ref(false)
 const createProxy = async () => {
   if (!form.domain || !form.localPort) return
   creating.value = true
-  const result = await proxiesStore.load()
+  const result = await proxiesStore.create({
+    name: form.name,
+    domain: form.domain,
+    localAddr: form.localAddr,
+    localPort: form.localPort,
+    enabled: true,
+    serviceHttps: form.serviceHttps,
+    autoHttps: form.serviceHttps,
+    autoSSL: false,
+  })
   creating.value = false
-  success(t('notify.dataSaved'))
-  router.push('/')
+  if (result && !String(result).startsWith('Error')) {
+    success(t('notify.proxyCreated'))
+    router.push('/')
+  } else {
+    error(String(result))
+  }
 }
 </script>
 
@@ -41,6 +54,7 @@ const createProxy = async () => {
       <div class="settings-form">
         <h3 class="form-subsection-title"><i class="fas fa-info-circle"></i> {{ t('common.basicInfo') }}</h3>
 
+        <VInput v-model="form.name" :label="t('sites.formName')" placeholder="My Proxy" />
         <VInput v-model="form.domain" :label="t('proxies.formDomain')" :placeholder="t('proxies.formDomainPlaceholder')" :hint="t('proxies.formDomainHint')" required />
 
         <div class="form-row">
@@ -48,21 +62,12 @@ const createProxy = async () => {
           <VInput v-model="form.localPort" :label="t('proxies.formLocalPort')" placeholder="3000" required />
         </div>
 
-        <div class="form-row">
-          <div class="form-group">
-            <div class="form-label-row">
-              <VTooltip :text="t('proxies.formServiceHttpsHint')" />
-              <label class="form-label">{{ t('proxies.formServiceHttps') }}</label>
-            </div>
-            <VToggle v-model="form.serviceHttps" :label="t('common.enabled')" />
+        <div class="form-group">
+          <div class="form-label-row">
+            <VTooltip :text="t('proxies.formServiceHttpsHint')" />
+            <label class="form-label">HTTPS</label>
           </div>
-          <div class="form-group">
-            <div class="form-label-row">
-              <VTooltip :text="t('proxies.formAutoHttpsHint')" />
-              <label class="form-label">{{ t('proxies.formAutoHttps') }}</label>
-            </div>
-            <VToggle v-model="form.autoHttps" :label="t('common.enabled')" />
-          </div>
+          <VToggle v-model="form.serviceHttps" :label="t('common.enabled')" />
         </div>
 
         <SslUploadSection v-model="form.certMode" />

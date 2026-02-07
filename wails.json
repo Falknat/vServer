@@ -13,10 +13,14 @@
     "copyright": "Copyright © 2025 vServer",
     "comments": "Панель управления vServer"
   },
-  "wailsjsdir": "./Backend/admin/frontend/wailsjs",
-  "frontend:dir": "./Backend/admin/frontend",
-  "assetdir": "./Backend/admin/frontend",
-  "reloaddirs": "Backend/admin",
+  "wailsjsdir": "./front_vue/wailsjs",
+  "frontend:dir": "./front_vue",
+  "frontend:install": "npm install",
+  "frontend:build": "npm run build",
+  "frontend:dev:watcher": "npm run dev",
+  "frontend:dev:serverUrl": "http://localhost:4444",
+  "assetdir": "./front_vue/dist",
+  "reloaddirs": "./front_vue/src",
   "build:dir": ".",
   "appicon": "appicon.png"
 }

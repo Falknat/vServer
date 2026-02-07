@@ -1,5 +1,6 @@
 <script setup>
 import { api } from '@core/api/index.js'
+import { useDraggable } from '@core/composables/useDraggable.js'
 
 const { t } = useI18n()
 const route = useRoute()
@@ -12,6 +13,8 @@ const props = defineProps({
 const activeTab = ref('rules')
 const rules = ref([])
 const loading = ref(true)
+
+const { dragIndex, dragOverIndex, onDragStart, onDragOver, onDragEnter, onDragLeave, onDrop, onDragEnd } = useDraggable(rules)
 
 onMounted(async () => {
   const data = await api.getVAccessRules(props.host, false)
@@ -91,7 +94,18 @@ const formatList = (arr) => {
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(rule, index) in rules" :key="index">
+            <tr
+              v-for="(rule, index) in rules"
+              :key="index"
+              draggable="true"
+              :class="{ 'drag-over': dragOverIndex === index, 'dragging': dragIndex === index }"
+              @dragstart="onDragStart(index, $event)"
+              @dragover="onDragOver(index, $event)"
+              @dragenter="onDragEnter(index, $event)"
+              @dragleave="onDragLeave"
+              @drop="onDrop(index)"
+              @dragend="onDragEnd($event)"
+            >
               <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
               <td>
                 <VBadge :variant="rule.type === 'Allow' ? 'yes' : 'no'">{{ rule.type }}</VBadge>
@@ -308,6 +322,18 @@ const formatList = (arr) => {
 .drag-handle:hover {
   opacity: 1;
   color: var(--accent-purple-light);
+}
+
+.vaccess-table tbody tr.dragging {
+  opacity: 0.4;
+}
+
+.vaccess-table tbody tr.drag-over {
+  border-top: 2px solid var(--accent-purple);
+}
+
+.vaccess-table tbody tr.drag-over td {
+  border-top: 2px solid var(--accent-purple);
 }
 
 .mini-tags {

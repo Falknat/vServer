@@ -49,6 +49,11 @@ export const mockApi = {
     return 'OK'
   },
 
+  async updateSiteCache() {
+    await delay(200)
+    return 'OK'
+  },
+
   async openSiteFolder(host) {
     await delay(100)
   },

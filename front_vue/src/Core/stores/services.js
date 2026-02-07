@@ -5,15 +5,26 @@ export const useServicesStore = defineStore('services', {
   state: () => ({
     list: [],
     loaded: false,
+    isOperating: false,
   }),
 
   actions: {
     async load() {
       const data = await api.getAllServicesStatus()
       if (data) {
-        this.list = Array.isArray(data) ? data : [data]
+        this.list = Array.isArray(data) ? data : Object.values(data)
         this.loaded = true
       }
+    },
+
+    setPending(text) {
+      this.isOperating = true
+      this.list = this.list.map(s => ({ ...s, pending: text }))
+    },
+
+    async clearPending() {
+      await this.load()
+      this.isOperating = false
     },
 
     async startService(name) {

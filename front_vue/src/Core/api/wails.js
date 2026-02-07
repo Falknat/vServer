@@ -37,6 +37,10 @@ export const wailsApi = {
     return await app().DeleteSite(host)
   },
 
+  async updateSiteCache() {
+    return await app().UpdateSiteCache()
+  },
+
   async openSiteFolder(host) {
     return await app().OpenSiteFolder(host)
   },

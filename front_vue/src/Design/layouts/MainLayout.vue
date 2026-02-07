@@ -1,9 +1,31 @@
 <script setup>
+import { useWailsEvents } from '@core/composables/useWailsEvents.js'
+
 const { theme, isDark, toggleTheme, initTheme } = useTheme()
 const appStore = useAppStore()
+const servicesStore = useServicesStore()
+const { on, off } = useWailsEvents()
 
 onMounted(() => {
   initTheme()
+
+  on('service:changed', (status) => {
+    if (status && !servicesStore.isOperating) {
+      servicesStore.list = Object.values(status)
+      servicesStore.loaded = true
+      const hasRunning = status.http?.status || status.https?.status
+      appStore.setServerRunning(hasRunning)
+    }
+  })
+
+  on('server:already_running', () => {
+    appStore.setServerRunning(false)
+  })
+})
+
+onUnmounted(() => {
+  off('service:changed')
+  off('server:already_running')
 })
 </script>
 
@@ -53,6 +75,6 @@ onMounted(() => {
 .main-content {
   flex: 1;
   overflow-y: auto;
-  padding: var(--space-lg);
+  padding: 40px var(--space-3xl);
 }
 </style>
