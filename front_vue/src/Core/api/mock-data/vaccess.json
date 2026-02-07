@@ -1,0 +1,20 @@
+{
+  "rules": [
+    {
+      "type": "Disable",
+      "type_file": ["*.php"],
+      "path_access": ["/uploads/*"],
+      "ip_list": [],
+      "exceptions_dir": [],
+      "url_error": "404"
+    },
+    {
+      "type": "Allow",
+      "type_file": [],
+      "path_access": ["/admin/*"],
+      "ip_list": ["192.168.1.100", "127.0.0.1"],
+      "exceptions_dir": ["/admin/public/*"],
+      "url_error": "404"
+    }
+  ]
+}

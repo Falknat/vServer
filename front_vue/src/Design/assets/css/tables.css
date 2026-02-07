@@ -1,0 +1,168 @@
+/* ============================================
+   Общие стили таблиц
+   ============================================ */
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-lg);
+}
+
+.section-title {
+    font-size: var(--text-md);
+    font-weight: var(--font-bold);
+    color: var(--text-primary);
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-lg);
+}
+
+.section-title::before {
+    content: '';
+    width: 4px;
+    height: 16px;
+    background: linear-gradient(180deg, var(--accent-purple), var(--accent-purple-light));
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.table-container {
+    background: var(--glass-bg-light);
+    backdrop-filter: var(--backdrop-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.data-table thead {
+    background: var(--table-header-bg);
+}
+
+.data-table thead tr {
+    border-bottom: 1px solid var(--table-border);
+}
+
+.data-table th {
+    padding: 18px 20px;
+    text-align: left;
+    font-size: var(--text-sm);
+    font-weight: var(--font-bold);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+}
+
+.data-table th:last-child {
+    width: 160px;
+    text-align: center;
+}
+
+.data-table tbody tr {
+    border-bottom: 1px solid var(--table-border);
+    transition: all var(--transition-base);
+}
+
+.data-table tbody tr:hover {
+    background: var(--table-hover-bg);
+}
+
+.data-table td {
+    padding: 16px 20px;
+    font-size: var(--text-base);
+    color: var(--text-primary);
+}
+
+.data-table td:last-child {
+    text-align: center;
+    display: flex;
+    gap: var(--space-xs);
+    justify-content: center;
+    align-items: center;
+}
+
+.data-table code {
+    font-family: var(--font-mono);
+    font-size: var(--text-sm);
+}
+
+.clickable-link {
+    color: var(--link-color);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+}
+
+.clickable-link:hover {
+    color: var(--link-hover-color);
+    text-decoration: underline;
+}
+
+.clickable-link i {
+    font-size: var(--text-xs);
+}
+
+/* Cert icons */
+.cert-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    margin-right: 8px;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+}
+
+.cert-valid {
+    background: rgba(var(--success-rgb), 0.2);
+    color: var(--accent-green);
+    border: 1px solid rgba(var(--success-rgb), 0.4);
+}
+
+.cert-expired {
+    background: rgba(var(--danger-rgb), 0.2);
+    color: var(--accent-red);
+    border: 1px solid rgba(var(--danger-rgb), 0.4);
+}
+
+.cert-none {
+    background: rgba(var(--muted-rgb), 0.15);
+    color: var(--text-muted);
+    border: 1px solid rgba(var(--muted-rgb), 0.3);
+    opacity: 0.5;
+}
+
+/* Icon buttons */
+.icon-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--btn-icon-bg);
+    border: 1px solid var(--btn-icon-border);
+    border-radius: var(--radius-md);
+    color: var(--btn-icon-color);
+    font-size: var(--text-md);
+    cursor: pointer;
+    transition: all var(--transition-base);
+}
+
+.icon-btn:hover {
+    background: var(--btn-icon-hover-bg);
+    border-color: var(--btn-icon-hover-border);
+    transform: translateY(-1px);
+}

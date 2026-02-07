@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Локальный сайт",
+    "host": "127.0.0.1",
+    "alias": ["localhost"],
+    "status": "active",
+    "root_file": "index.html",
+    "root_file_routing": true,
+    "AutoCreateSSL": false
+  },
+  {
+    "name": "Тестовый проект",
+    "host": "test.local",
+    "alias": ["*.test.local", "test.com"],
+    "status": "active",
+    "root_file": "index.php",
+    "root_file_routing": false,
+    "AutoCreateSSL": false
+  },
+  {
+    "name": "API сервис",
+    "host": "api.example.com",
+    "alias": ["*.api.example.com"],
+    "status": "inactive",
+    "root_file": "index.php",
+    "root_file_routing": true,
+    "AutoCreateSSL": true
+  }
+]

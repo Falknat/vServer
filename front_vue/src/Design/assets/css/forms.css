@@ -1,0 +1,112 @@
+/* ============================================
+   Общие стили форм
+   ============================================ */
+
+.vaccess-page {
+    animation: fadeIn var(--transition-slow);
+}
+
+.form-section {
+    padding: var(--space-xl);
+    background: rgba(var(--accent-rgb), 0.02);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--glass-border);
+    transition: all var(--transition-base);
+}
+
+.form-section:hover {
+    background: rgba(var(--accent-rgb), 0.04);
+    border-color: rgba(var(--accent-rgb), 0.2);
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+}
+
+.form-subsection-title {
+    font-size: var(--text-lg);
+    font-weight: var(--font-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-lg) 0;
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    padding-bottom: var(--space-sm);
+    border-bottom: 1px solid rgba(var(--accent-rgb), 0.1);
+}
+
+.form-subsection-title i {
+    color: var(--accent-purple-light);
+    font-size: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sm);
+}
+
+.form-label {
+    font-size: 12px;
+    font-weight: var(--font-semibold);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-label-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+}
+
+.form-row-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+/* Status toggle buttons */
+.status-toggle {
+    display: flex;
+    gap: var(--space-sm);
+}
+
+.status-btn {
+    flex: 1;
+    padding: 10px var(--space-md);
+    background: rgba(var(--muted-rgb), 0.1);
+    border: 1px solid rgba(var(--muted-rgb), 0.3);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    font-weight: var(--font-semibold);
+    cursor: pointer;
+    transition: all var(--transition-base);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+}
+
+.status-btn:hover {
+    background: rgba(var(--muted-rgb), 0.15);
+}
+
+.status-btn.active {
+    background: rgba(var(--success-rgb), 0.2);
+    border-color: rgba(var(--success-rgb), 0.5);
+    color: var(--accent-green);
+}
+
+.status-btn:last-child.active {
+    background: rgba(var(--danger-rgb), 0.2);
+    border-color: rgba(var(--danger-rgb), 0.5);
+    color: var(--accent-red);
+}

@@ -1,0 +1,98 @@
+/* ============================================
+   Тёмная тема (по умолчанию)
+   ============================================ */
+
+[data-theme="dark"] {
+    /* Background */
+    --bg-primary: #0b101f;
+    --bg-secondary: #121420;
+    --bg-tertiary: #0d0f1c;
+
+    /* Glass Effect */
+    --glass-bg: rgba(20, 20, 40, 0.4);
+    --glass-bg-light: rgba(20, 20, 40, 0.3);
+    --glass-bg-dark: rgba(10, 14, 26, 0.5);
+    --glass-border: rgba(139, 92, 246, 0.15);
+    --glass-border-hover: rgba(139, 92, 246, 0.3);
+
+    /* Accent */
+    --accent-blue: #5b21b6;
+    --accent-blue-light: #7c3aed;
+    --accent-purple: #8b5cf6;
+    --accent-purple-light: #a78bfa;
+    --accent-cyan: #06b6d4;
+    --accent-green: #10b981;
+    --accent-red: #ef4444;
+    --accent-yellow: #f59e0b;
+
+    /* Text */
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.5);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.7);
+    --shadow-purple: 0 8px 32px rgba(139, 92, 246, 0.3);
+    --shadow-green: 0 4px 12px rgba(16, 185, 129, 0.3);
+    --shadow-red: 0 4px 12px rgba(239, 68, 68, 0.3);
+
+    /* Sidebar */
+    --sidebar-bg: rgba(10, 14, 26, 0.95);
+    --sidebar-border: rgba(139, 92, 246, 0.15);
+    --nav-color: #94a3b8;
+    --nav-hover-bg: rgba(139, 92, 246, 0.1);
+    --nav-hover-color: #a78bfa;
+    --nav-active-bg: rgba(139, 92, 246, 0.15);
+    --nav-active-color: #a78bfa;
+    --nav-indicator: linear-gradient(180deg, #8b5cf6, #a78bfa);
+
+    /* Titlebar */
+    --titlebar-bg: rgba(10, 14, 26, 0.5);
+    --titlebar-border: rgba(139, 92, 246, 0.15);
+
+    /* Tables */
+    --table-header-bg: rgba(139, 92, 246, 0.12);
+    --table-hover-bg: rgba(139, 92, 246, 0.08);
+    --table-border: rgba(255, 255, 255, 0.05);
+
+    /* Компоненты */
+    --card-hover-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
+    --card-border-hover: rgba(139, 92, 246, 0.3);
+    --service-card-gradient: linear-gradient(90deg, #8b5cf6, #a78bfa, #06b6d4);
+    --btn-icon-bg: rgba(139, 92, 246, 0.1);
+    --btn-icon-border: rgba(139, 92, 246, 0.3);
+    --btn-icon-color: #a78bfa;
+    --btn-icon-hover-bg: rgba(139, 92, 246, 0.25);
+    --btn-icon-hover-border: rgba(139, 92, 246, 0.5);
+    --btn-primary-bg: rgba(139, 92, 246, 0.15);
+    --btn-primary-border: rgba(139, 92, 246, 0.3);
+    --btn-primary-color: #a78bfa;
+    --btn-primary-hover-bg: rgba(139, 92, 246, 0.25);
+    --btn-primary-hover-border: rgba(139, 92, 246, 0.5);
+    --cert-tag-bg: rgba(139, 92, 246, 0.15);
+    --cert-tag-color: #a78bfa;
+    --link-color: #a78bfa;
+    --link-hover-color: #8b5cf6;
+
+    /* Scrollbar */
+    --scrollbar-bg: rgba(20, 20, 40, 0.3);
+    --scrollbar-thumb: rgba(139, 92, 246, 0.3);
+
+    /* RGB base — для alpha-композитинга: rgba(var(--x-rgb), 0.15) */
+    --accent-rgb: 139, 92, 246;
+    --success-rgb: 16, 185, 129;
+    --danger-rgb: 239, 68, 68;
+    --warning-rgb: 245, 158, 11;
+    --info-rgb: 6, 182, 212;
+    --muted-rgb: 100, 116, 139;
+
+    /* Utility */
+    --overlay-bg: rgba(0, 0, 0, 0.6);
+    --selection-bg: rgba(139, 92, 246, 0.3);
+    --input-focus-shadow: 0 0 0 2px rgba(139, 92, 246, 0.15);
+    --subtle-overlay: rgba(255, 255, 255, 0.02);
+    --divider-subtle: rgba(255, 255, 255, 0.1);
+    --warning-icon-color: rgba(251, 191, 36, 0.9);
+}

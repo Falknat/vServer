@@ -1,0 +1,7 @@
+[
+  { "name": "HTTP", "status": true, "port": "80", "info": "" },
+  { "name": "HTTPS", "status": true, "port": "443", "info": "" },
+  { "name": "MySQL", "status": true, "port": "3306", "info": "" },
+  { "name": "PHP", "status": true, "port": "8000-8003", "info": "" },
+  { "name": "Proxy", "status": true, "port": "", "info": "2 из 3" }
+]

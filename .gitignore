@@ -7,4 +7,12 @@ WebServer/tools/logs/*
 WebServer/soft/*
 !WebServer/soft/soft.rar
 Backend/admin/frontend/wailsjs*
+
+# Frontend
+front_vue/node_modules/
+front_vue/dist/
+front_vue/src/auto-imports.d.ts
+front_vue/src/components.d.ts
+
+# Cursor
 .cursorrules

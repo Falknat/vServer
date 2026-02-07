@@ -1,0 +1,10 @@
+{
+  "Soft_Settings": {
+    "php_port": 8000,
+    "php_host": "localhost",
+    "mysql_port": 3306,
+    "mysql_host": "127.0.0.1",
+    "proxy_enabled": true,
+    "ACME_enabled": true
+  }
+}

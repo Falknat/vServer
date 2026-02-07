@@ -1,0 +1,29 @@
+[
+  {
+    "Enable": true,
+    "ExternalDomain": "git.example.ru",
+    "LocalAddress": "127.0.0.1",
+    "LocalPort": "3333",
+    "ServiceHTTPSuse": false,
+    "AutoHTTPS": true,
+    "AutoCreateSSL": false
+  },
+  {
+    "Enable": true,
+    "ExternalDomain": "api.example.com",
+    "LocalAddress": "127.0.0.1",
+    "LocalPort": "8080",
+    "ServiceHTTPSuse": true,
+    "AutoHTTPS": false,
+    "AutoCreateSSL": true
+  },
+  {
+    "Enable": false,
+    "ExternalDomain": "test.example.net",
+    "LocalAddress": "127.0.0.1",
+    "LocalPort": "5000",
+    "ServiceHTTPSuse": false,
+    "AutoHTTPS": false,
+    "AutoCreateSSL": false
+  }
+]

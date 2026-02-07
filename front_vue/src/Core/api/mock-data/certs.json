@@ -1,0 +1,42 @@
+[
+  {
+    "domain": "voxsel.ru",
+    "issuer": "R13",
+    "not_before": "2026-01-07",
+    "not_after": "2026-04-07",
+    "days_left": 79,
+    "is_expired": false,
+    "has_cert": true,
+    "dns_names": ["*.voxsel.com", "*.voxsel.ru", "voxsel.com", "voxsel.ru"]
+  },
+  {
+    "domain": "finance.voxsel.ru",
+    "issuer": "E8",
+    "not_before": "2026-01-17",
+    "not_after": "2026-04-17",
+    "days_left": 89,
+    "is_expired": false,
+    "has_cert": true,
+    "dns_names": ["finance.voxsel.ru"]
+  },
+  {
+    "domain": "test.local",
+    "issuer": "Let's Encrypt",
+    "not_before": "2025-01-01",
+    "not_after": "2025-03-31",
+    "days_left": 73,
+    "is_expired": false,
+    "has_cert": true,
+    "dns_names": ["test.local", "*.test.local", "test.com"]
+  },
+  {
+    "domain": "api.example.com",
+    "issuer": "Let's Encrypt",
+    "not_before": "2024-10-01",
+    "not_after": "2024-12-30",
+    "days_left": -18,
+    "is_expired": true,
+    "has_cert": true,
+    "dns_names": ["api.example.com", "*.api.example.com"]
+  }
+]
