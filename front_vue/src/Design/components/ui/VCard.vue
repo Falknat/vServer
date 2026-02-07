@@ -26,7 +26,7 @@ defineProps({
 .v-card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   backdrop-filter: var(--backdrop-blur);
   transition: all var(--transition-base);
 }

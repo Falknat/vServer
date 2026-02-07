@@ -34,7 +34,7 @@
     background: var(--glass-bg-light);
     backdrop-filter: var(--backdrop-blur);
     border: 1px solid var(--glass-border);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius);
     overflow: hidden;
     box-shadow: var(--shadow-md);
 }
@@ -121,7 +121,7 @@
     width: 22px;
     height: 22px;
     margin-right: 8px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     font-size: 12px;
 }
 
@@ -154,7 +154,7 @@
     justify-content: center;
     background: var(--btn-icon-bg);
     border: 1px solid var(--btn-icon-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius);
     color: var(--btn-icon-color);
     font-size: var(--text-md);
     cursor: pointer;

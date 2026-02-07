@@ -176,7 +176,7 @@ const confirmDelete = () => {
   padding: 10px 14px;
   background: var(--glass-bg-dark);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   color: var(--text-primary);
   font-size: var(--text-base);
   outline: none;
@@ -197,7 +197,7 @@ const confirmDelete = () => {
   padding: var(--space-sm) var(--space-md);
   background: rgba(var(--accent-rgb), 0.15);
   border: 1px solid rgba(var(--accent-rgb), 0.3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   color: var(--accent-purple-light);
   font-size: var(--text-base);
   font-weight: var(--font-semibold);
@@ -222,7 +222,7 @@ const confirmDelete = () => {
   padding: 12px;
   background: var(--glass-bg-dark);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   min-height: 48px;
 }
 

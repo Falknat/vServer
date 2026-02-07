@@ -44,7 +44,7 @@ code {
     font-family: var(--font-mono);
     background: rgba(var(--accent-rgb), 0.1);
     padding: 3px 8px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius);
     font-size: var(--text-sm);
     color: var(--accent-purple-light);
     border: 1px solid var(--glass-border);

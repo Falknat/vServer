@@ -131,7 +131,7 @@ const windowClose = () => { if (isWails) window.runtime.Quit() }
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-md);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   background: var(--glass-bg);
 }
 
@@ -173,7 +173,7 @@ const windowClose = () => { if (isWails) window.runtime.Quit() }
   gap: var(--space-sm);
   padding: var(--space-xs) var(--space-md);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   background: var(--glass-bg);
   color: var(--text-primary);
   cursor: pointer;
@@ -194,7 +194,7 @@ const windowClose = () => { if (isWails) window.runtime.Quit() }
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;
@@ -208,7 +208,7 @@ const windowClose = () => { if (isWails) window.runtime.Quit() }
   width: 32px;
   height: 32px;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   background: transparent;
   color: var(--text-secondary);
   cursor: pointer;

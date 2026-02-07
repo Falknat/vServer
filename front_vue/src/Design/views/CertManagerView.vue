@@ -142,7 +142,7 @@ const deleteCert = async (domain) => {
 .cert-card {
   background: rgba(var(--accent-rgb), 0.03);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius);
   padding: var(--space-lg);
   transition: all var(--transition-base);
 }
@@ -196,7 +196,7 @@ const deleteCert = async (domain) => {
 .cert-info-item {
   padding: var(--space-md);
   background: var(--subtle-overlay);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
 }
 
 .cert-info-label {
@@ -229,7 +229,7 @@ const deleteCert = async (domain) => {
 .cert-domain-tag {
   padding: 4px 12px;
   background: rgba(var(--accent-rgb), 0.15);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   font-size: var(--text-sm);
   color: var(--accent-purple-light);
   font-family: var(--font-mono);

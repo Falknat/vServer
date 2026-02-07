@@ -39,7 +39,6 @@ func StartHTTPS() {
 			serverName := chi.ServerName
 
 			if serverName == "" {
-				tools.Logs_file(1, "HTTPS", "⚠️ Подключение без SNI (возможно по IP)", "logs_https.log", false)
 
 			} else if cert, ok := certMap[serverName]; ok {
 				// Найден точный сертификат для домена
@@ -59,7 +58,6 @@ func StartHTTPS() {
 			}
 
 			if fallbackCert != nil {
-				tools.Logs_file(1, "HTTPS", "⚠️ Используем fallback-сертификат", "logs_https.log", false)
 				return fallbackCert, nil
 			}
 

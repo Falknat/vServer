@@ -82,11 +82,22 @@ func Logs_file(type_log int, service string, message string, log_file string, co
 	}
 
 	// Открываем файл для дозаписи, создаём если нет, права на запись.
-	file, err := os.OpenFile(logsDir+"/"+log_files, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	filePath := logsDir + "/" + log_files
+	isNew := false
+	if _, err := os.Stat(filePath); os.IsNotExist(err) {
+		isNew = true
+	}
+
+	file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer file.Close()
+
+	// UTF-8 BOM для новых файлов (чтобы Windows корректно читал)
+	if isNew {
+		file.Write([]byte{0xEF, 0xBB, 0xBF})
+	}
 
 	// Пишем строку в файл
 	if _, err := file.WriteString(text); err != nil {

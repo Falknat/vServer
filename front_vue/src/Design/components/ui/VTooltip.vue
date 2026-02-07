@@ -50,7 +50,7 @@ const show = ref(false)
   padding: 10px 14px;
   background: var(--bg-secondary);
   border: 1px solid rgba(var(--accent-rgb), 0.3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
   z-index: 1000;
   font-size: var(--text-sm);

@@ -29,7 +29,7 @@ defineEmits(['click'])
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   background: var(--glass-bg);
   color: var(--text-primary);
   cursor: pointer;

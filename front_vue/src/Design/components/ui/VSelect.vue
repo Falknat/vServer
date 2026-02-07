@@ -88,7 +88,7 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
   padding: 10px 14px;
   background: var(--glass-bg-dark);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   color: var(--text-primary);
   font-size: var(--text-base);
   cursor: pointer;
@@ -129,7 +129,7 @@ onUnmounted(() => document.removeEventListener('click', onDocClick))
   right: 0;
   background: var(--bg-secondary);
   border: 1px solid rgba(var(--accent-rgb), 0.3);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
   max-height: 300px;
   overflow-y: auto;

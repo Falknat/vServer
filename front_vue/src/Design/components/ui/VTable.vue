@@ -30,7 +30,7 @@ defineProps({
 <style scoped>
 .v-table-container {
   overflow-x: auto;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   border: 1px solid var(--glass-border);
 }
 

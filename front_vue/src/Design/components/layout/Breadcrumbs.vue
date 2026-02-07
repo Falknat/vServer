@@ -39,7 +39,7 @@ const goBack = () => {
   margin-bottom: var(--space-md);
   padding: var(--space-md) 20px;
   background: rgba(var(--accent-rgb), 0.05);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   border: 1px solid var(--glass-border);
 }
 
@@ -61,7 +61,7 @@ const goBack = () => {
   background: none;
   border: none;
   padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   cursor: pointer;
   transition: all var(--transition-base);
   display: flex;

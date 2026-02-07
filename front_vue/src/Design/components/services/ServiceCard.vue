@@ -51,7 +51,7 @@ const serviceInfoLabel = {
   background: var(--glass-bg-light);
   backdrop-filter: var(--backdrop-blur);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius);
   padding: var(--space-lg);
   transition: all var(--transition-bounce);
   position: relative;

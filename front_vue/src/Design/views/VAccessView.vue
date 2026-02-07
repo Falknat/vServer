@@ -10,6 +10,8 @@ const props = defineProps({
   host: { type: String, required: true },
 })
 
+const isProxy = computed(() => route.query.proxy === 'true')
+
 const activeTab = ref('rules')
 const rules = ref([])
 const loading = ref(true)
@@ -17,13 +19,13 @@ const loading = ref(true)
 const { dragIndex, dragOverIndex, onDragStart, onDragOver, onDragEnter, onDragLeave, onDrop, onDragEnd } = useDraggable(rules)
 
 onMounted(async () => {
-  const data = await api.getVAccessRules(props.host, false)
+  const data = await api.getVAccessRules(props.host, isProxy.value)
   rules.value = data?.rules || []
   loading.value = false
 })
 
 const saveRules = async () => {
-  await api.saveVAccessRules(props.host, false, JSON.stringify({ rules: rules.value }))
+  await api.saveVAccessRules(props.host, isProxy.value, JSON.stringify({ rules: rules.value }))
   success(t('notify.changesSaved'))
 }
 
@@ -84,12 +86,12 @@ const formatList = (arr) => {
           <thead>
             <tr>
               <th class="col-drag"></th>
-              <th class="col-type">{{ t('vaccess.type') }}</th>
-              <th class="col-files">{{ t('vaccess.files') }}</th>
-              <th class="col-paths">{{ t('vaccess.paths') }}</th>
-              <th class="col-ips">{{ t('vaccess.ips') }}</th>
-              <th class="col-exceptions">{{ t('vaccess.exceptions') }}</th>
-              <th class="col-error">{{ t('vaccess.error') }}</th>
+              <th class="col-type"><span class="th-with-info">{{ t('vaccess.type') }} <VTooltip text="Allow — разрешить доступ, Disable — запретить. Клик для переключения" /></span></th>
+              <th class="col-files"><span class="th-with-info">{{ t('vaccess.files') }} <VTooltip text="Расширения файлов через запятую" :items="['*.php', '*.exe', '*.sh', 'no_extension']" /></span></th>
+              <th class="col-paths"><span class="th-with-info">{{ t('vaccess.paths') }} <VTooltip text="Пути доступа через запятую" :items="['/admin/*', '/api/*', '/uploads/*']" /></span></th>
+              <th class="col-ips"><span class="th-with-info">{{ t('vaccess.ips') }} <VTooltip text="IP адреса через запятую" :items="['192.168.1.1', '10.0.0.0/24', '127.0.0.1']" /></span></th>
+              <th class="col-exceptions"><span class="th-with-info">{{ t('vaccess.exceptions') }} <VTooltip text="Пути-исключения: правило НЕ применяется к ним" :items="['/public/*', '/bot/*', '/api/open/*']" /></span></th>
+              <th class="col-error"><span class="th-with-info">{{ t('vaccess.error') }} <VTooltip text="Куда перенаправить при блокировке" :items="['404', 'https://site.com', '/error.html']" /></span></th>
               <th class="col-actions"></th>
             </tr>
           </thead>
@@ -108,33 +110,25 @@ const formatList = (arr) => {
             >
               <td class="drag-handle"><i class="fas fa-grip-vertical"></i></td>
               <td>
-                <VBadge :variant="rule.type === 'Allow' ? 'yes' : 'no'">{{ rule.type }}</VBadge>
+                <VBadge class="type-toggle" :variant="rule.type === 'Allow' ? 'yes' : 'no'" @click="rule.type = rule.type === 'Allow' ? 'Disable' : 'Allow'">
+                  {{ rule.type }}
+                </VBadge>
               </td>
               <td>
-                <span v-if="rule.type_file?.length" class="mini-tags">
-                  <code v-for="f in rule.type_file" :key="f">{{ f }}</code>
-                </span>
-                <span v-else class="empty-field">—</span>
+                <FieldEditor v-model="rule.type_file" placeholder="*.php" />
               </td>
               <td>
-                <span v-if="rule.path_access?.length" class="mini-tags">
-                  <code v-for="p in rule.path_access" :key="p">{{ p }}</code>
-                </span>
-                <span v-else class="empty-field">—</span>
+                <FieldEditor v-model="rule.path_access" placeholder="/admin/*" />
               </td>
               <td>
-                <span v-if="rule.ip_list?.length" class="mini-tags">
-                  <code v-for="ip in rule.ip_list" :key="ip">{{ ip }}</code>
-                </span>
-                <span v-else class="empty-field">—</span>
+                <FieldEditor v-model="rule.ip_list" placeholder="192.168.1.1" />
               </td>
               <td>
-                <span v-if="rule.exceptions_dir?.length" class="mini-tags">
-                  <code v-for="e in rule.exceptions_dir" :key="e">{{ e }}</code>
-                </span>
-                <span v-else class="empty-field">—</span>
+                <FieldEditor v-model="rule.exceptions_dir" placeholder="/public/*" />
               </td>
-              <td><code>{{ rule.url_error || '—' }}</code></td>
+              <td>
+                <input v-model="rule.url_error" class="inline-input" placeholder="404" />
+              </td>
               <td class="col-actions-cell">
                 <button class="icon-btn-small" @click="removeRule(index)"><i class="fas fa-trash"></i></button>
               </td>
@@ -235,7 +229,7 @@ const formatList = (arr) => {
   padding: 10px 18px;
   background: transparent;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   color: var(--text-muted);
   font-size: var(--text-base);
   font-weight: var(--font-medium);
@@ -302,6 +296,12 @@ const formatList = (arr) => {
   border-bottom: 1px solid rgba(var(--accent-rgb), 0.05);
 }
 
+.th-with-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
 .col-drag { width: 3%; min-width: 40px; text-align: center; }
 .col-type { width: 8%; min-width: 80px; }
 .col-files { width: 15%; min-width: 120px; }
@@ -345,7 +345,7 @@ const formatList = (arr) => {
 .mini-tags code {
   padding: 2px 6px;
   background: rgba(var(--accent-rgb), 0.15);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   font-size: var(--text-sm);
   color: var(--accent-purple-light);
 }
@@ -354,6 +354,36 @@ const formatList = (arr) => {
   color: var(--text-muted);
   opacity: 0.4;
   font-style: italic;
+}
+
+.type-toggle {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.type-toggle:hover {
+  opacity: 0.7;
+}
+
+.inline-input {
+  padding: 4px 8px;
+  background: var(--glass-bg-dark);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-family: var(--font-mono);
+  outline: none;
+  width: 80px;
+}
+
+.inline-input:focus {
+  border-color: rgba(var(--accent-rgb), 0.5);
+}
+
+.inline-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.4;
 }
 
 .col-actions-cell {
@@ -368,7 +398,7 @@ const formatList = (arr) => {
   justify-content: center;
   background: rgba(var(--danger-rgb), 0.1);
   border: 1px solid rgba(var(--danger-rgb), 0.3);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   color: var(--accent-red);
   font-size: 12px;
   cursor: pointer;
@@ -413,7 +443,7 @@ const formatList = (arr) => {
 
 .help-card {
   background: var(--subtle-overlay);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius);
   padding: var(--space-xl);
   border: 1px solid var(--glass-border);
   transition: all var(--transition-slow);
@@ -459,7 +489,7 @@ const formatList = (arr) => {
 .help-param {
   padding: 20px;
   background: rgba(var(--accent-rgb), 0.03);
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   border-left: 3px solid var(--accent-purple);
 }
 
@@ -479,7 +509,7 @@ const formatList = (arr) => {
 .help-param code {
   padding: 3px 8px;
   background: rgba(var(--accent-rgb), 0.15);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius);
   font-size: var(--text-base);
   color: var(--accent-purple-light);
 }

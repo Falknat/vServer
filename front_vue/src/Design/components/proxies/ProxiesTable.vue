@@ -82,7 +82,7 @@ const findCertForDomain = (domain) => {
               </VBadge>
             </td>
             <td>
-              <button class="icon-btn" :title="t('sites.editVaccess')" @click="router.push(`/vaccess/${proxy.ExternalDomain}`)">
+              <button class="icon-btn" :title="t('sites.editVaccess')" @click="router.push(`/vaccess/${proxy.ExternalDomain}?proxy=true`)">
                 <i class="fas fa-user-lock"></i>
               </button>
               <button class="icon-btn" :title="t('certs.title')" @click="router.push(`/certs/${proxy.ExternalDomain}`)">

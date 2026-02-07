@@ -42,7 +42,7 @@ func CreateNewSite(siteData SiteInfo) error {
 		return fmt.Errorf("ошибка добавления в конфиг: %w", err)
 	}
 
-	tools.Logs_file(0, "SITES", fmt.Sprintf("✅ Новый сайт создан: %s (%s)", siteData.Name, siteData.Host), "logs_config.log", true)
+	tools.Logs_file(0, "SITES", fmt.Sprintf("✅ Новый сайт создан: %s (%s)", siteData.Name, siteData.Host), "logs_error.log", true)
 	return nil
 }
 
@@ -91,7 +91,7 @@ func CreateSiteFolder(host string) error {
 		return fmt.Errorf("не удалось создать папку: %w", err)
 	}
 
-	tools.Logs_file(0, "SITES", fmt.Sprintf("📁 Создана папка: %s", folderPath), "logs_config.log", false)
+	tools.Logs_file(0, "SITES", fmt.Sprintf("📁 Создана папка: %s", folderPath), "logs_error.log", false)
 	return nil
 }
 
@@ -113,7 +113,7 @@ func CreateStarterFile(host, rootFile string) error {
 		return fmt.Errorf("не удалось создать файл: %w", err)
 	}
 
-	tools.Logs_file(0, "SITES", fmt.Sprintf("📄 Создан стартовый файл: %s", rootFile), "logs_config.log", false)
+	tools.Logs_file(0, "SITES", fmt.Sprintf("📄 Создан стартовый файл: %s", rootFile), "logs_error.log", false)
 	return nil
 }
 
@@ -142,7 +142,7 @@ func CreateVAccessFile(host string) error {
 		return fmt.Errorf("не удалось создать vAccess.conf: %w", err)
 	}
 
-	tools.Logs_file(0, "SITES", "🔒 Создан vAccess.conf", "logs_config.log", false)
+	tools.Logs_file(0, "SITES", "🔒 Создан vAccess.conf", "logs_error.log", false)
 	return nil
 }
 
@@ -166,7 +166,7 @@ func AddSiteToConfig(siteData SiteInfo) error {
 		return err
 	}
 
-	tools.Logs_file(0, "SITES", "💾 Конфигурация обновлена", "logs_config.log", false)
+	tools.Logs_file(0, "SITES", "💾 Конфигурация обновлена", "logs_error.log", false)
 	return nil
 }
 
@@ -227,7 +227,7 @@ func UploadSiteCertificate(host, certType string, certData []byte) error {
 		return fmt.Errorf("не удалось сохранить сертификат: %w", err)
 	}
 
-	tools.Logs_file(0, "SITES", fmt.Sprintf("🔒 Загружен сертификат: %s для %s", fileName, host), "logs_config.log", true)
+	tools.Logs_file(0, "SITES", fmt.Sprintf("🔒 Загружен сертификат: %s для %s", fileName, host), "logs_error.log", true)
 	return nil
 }
 
@@ -251,7 +251,7 @@ func DeleteSiteCertificates(host string) error {
 		return fmt.Errorf("не удалось удалить папку сертификатов: %w", err)
 	}
 
-	tools.Logs_file(0, "SITES", fmt.Sprintf("🗑️ Удалены сертификаты для: %s", host), "logs_config.log", true)
+	tools.Logs_file(0, "SITES", fmt.Sprintf("🗑️ Удалены сертификаты для: %s", host), "logs_error.log", true)
 	return nil
 }
 
@@ -281,13 +281,13 @@ func DeleteSite(host string) error {
 		if err := os.RemoveAll(absSiteDir); err != nil {
 			return fmt.Errorf("не удалось удалить папку сайта: %w", err)
 		}
-		tools.Logs_file(0, "SITES", fmt.Sprintf("🗑️ Удалена папка сайта: %s", siteDir), "logs_config.log", false)
+		tools.Logs_file(0, "SITES", fmt.Sprintf("🗑️ Удалена папка сайта: %s", siteDir), "logs_error.log", false)
 	}
 
 	// 3. Удаляем сертификаты
 	if err := DeleteSiteCertificates(host); err != nil {
 		// Логируем ошибку, но продолжаем удаление
-		tools.Logs_file(1, "SITES", fmt.Sprintf("Ошибка удаления сертификатов: %v", err), "logs_config.log", false)
+		tools.Logs_file(1, "SITES", fmt.Sprintf("Ошибка удаления сертификатов: %v", err), "logs_error.log", false)
 	}
 
 	// 4. Удаляем из конфига
@@ -301,7 +301,7 @@ func DeleteSite(host string) error {
 		return fmt.Errorf("ошибка сохранения конфигурации: %w", err)
 	}
 
-	tools.Logs_file(0, "SITES", fmt.Sprintf("✅ Сайт '%s' полностью удалён", host), "logs_config.log", true)
+	tools.Logs_file(0, "SITES", fmt.Sprintf("✅ Сайт '%s' полностью удалён", host), "logs_error.log", true)
 	return nil
 }
 

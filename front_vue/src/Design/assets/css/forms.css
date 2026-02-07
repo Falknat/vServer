@@ -9,7 +9,7 @@
 .form-section {
     padding: var(--space-xl);
     background: rgba(var(--accent-rgb), 0.02);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius);
     border: 1px solid var(--glass-border);
     transition: all var(--transition-base);
 }
@@ -83,7 +83,7 @@
     padding: 10px var(--space-md);
     background: rgba(var(--muted-rgb), 0.1);
     border: 1px solid rgba(var(--muted-rgb), 0.3);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius);
     color: var(--text-muted);
     font-size: var(--text-base);
     font-weight: var(--font-semibold);

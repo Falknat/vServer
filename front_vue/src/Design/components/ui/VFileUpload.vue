@@ -69,7 +69,7 @@ const onFileSelect = (event) => {
   padding: var(--space-sm) var(--space-md);
   background: var(--glass-bg);
   border: 1px dashed var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   color: var(--text-secondary);
   transition: all var(--transition-fast);
 }

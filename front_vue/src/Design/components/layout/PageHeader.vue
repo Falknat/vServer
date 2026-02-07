@@ -29,7 +29,7 @@ defineProps({
   margin-bottom: var(--space-md);
   padding: var(--space-lg);
   background: rgba(var(--accent-rgb), 0.03);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius);
   border: 1px solid var(--glass-border);
 }
 

@@ -59,7 +59,7 @@ defineEmits(['update:modelValue'])
   padding: 10px 14px;
   background: var(--glass-bg-dark);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   color: var(--text-primary);
   font-size: var(--text-base);
   transition: all var(--transition-fast);

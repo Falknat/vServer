@@ -49,7 +49,7 @@ const modal = useModal()
 .v-modal-window {
   background: var(--bg-secondary);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-xl);
+  border-radius: var(--radius);
   width: 90%;
   max-width: 700px;
   max-height: 85vh;
@@ -79,7 +79,7 @@ const modal = useModal()
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   background: transparent;
   color: var(--text-muted);
   cursor: pointer;

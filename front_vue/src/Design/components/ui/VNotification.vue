@@ -42,7 +42,7 @@ const { notifications, remove } = useNotification()
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius);
   font-size: var(--text-md);
   cursor: pointer;
   backdrop-filter: var(--backdrop-blur);

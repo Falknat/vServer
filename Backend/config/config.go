@@ -49,16 +49,13 @@ func LoadConfig() {
 	data, err := os.ReadFile(ConfigPath)
 
 	if err != nil {
-		tools.Logs_file(0, "JSON", "Ошибка загрузки конфигурационного файла", "logs_config.log", true)
-	} else {
-		tools.Logs_file(0, "JSON", "config.json успешно загружен", "logs_config.log", true)
+		tools.Logs_file(1, "JSON", "Ошибка загрузки конфигурационного файла", "logs_error.log", true)
+		return
 	}
 
 	err = json.Unmarshal(data, &ConfigData)
 	if err != nil {
-		tools.Logs_file(0, "JSON", "Ошибка парсинга конфигурационного файла", "logs_config.log", true)
-	} else {
-		tools.Logs_file(0, "JSON", "config.json успешно прочитан", "logs_config.log", true)
+		tools.Logs_file(1, "JSON", "Ошибка парсинга конфигурационного файла", "logs_error.log", true)
 	}
 
 	// Миграция: добавляем новые поля если их нет
@@ -116,7 +113,7 @@ func migrateConfig(originalData []byte) {
 
 	// Если нужно обновить - сохраняем конфиг с новыми полями
 	if needsSave {
-		tools.Logs_file(0, "JSON", "🔄 Миграция конфига: добавляем новые поля", "logs_config.log", true)
+		tools.Logs_file(0, "JSON", "🔄 Миграция конфига: добавляем новые поля", "logs_error.log", true)
 		saveConfig()
 	}
 }
@@ -125,15 +122,15 @@ func migrateConfig(originalData []byte) {
 func saveConfig() {
 	formattedJSON, err := json.MarshalIndent(ConfigData, "", "    ")
 	if err != nil {
-		tools.Logs_file(1, "JSON", "Ошибка форматирования конфига: "+err.Error(), "logs_config.log", true)
+		tools.Logs_file(1, "JSON", "Ошибка форматирования конфига: "+err.Error(), "logs_error.log", true)
 		return
 	}
 
 	err = os.WriteFile(ConfigPath, formattedJSON, 0644)
 	if err != nil {
-		tools.Logs_file(1, "JSON", "Ошибка сохранения конфига: "+err.Error(), "logs_config.log", true)
+		tools.Logs_file(1, "JSON", "Ошибка сохранения конфига: "+err.Error(), "logs_error.log", true)
 		return
 	}
 
-	tools.Logs_file(0, "JSON", "✅ Конфиг обновлён с новыми полями", "logs_config.log", true)
+	tools.Logs_file(0, "JSON", "✅ Конфиг обновлён с новыми полями", "logs_error.log", true)
 }

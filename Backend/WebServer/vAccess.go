@@ -388,32 +388,32 @@ func checkRules(rules []VAccessRule, requestPath string, r *http.Request, checkF
 				if errorPage == "" {
 					errorPage = "404"
 				}
-				tools.Logs_file(1, logPrefix, "🚫 Доступ запрещён для "+getClientIP(r)+" к "+requestPath, logFile, false)
-				return false, errorPage
+			tools.Logs_file(1, logPrefix, "🚫 Доступ запрещён для "+getClientIP(r)+" к "+r.Host+requestPath, logFile, false)
+			return false, errorPage
+		}
+		// Все условия Allow выполнены - разрешаем доступ
+		return true, ""
+
+	case "Disable":
+		// Disable правило: запрещаем если ЛЮБОЕ условие выполнено
+		shouldBlock := true
+
+		// Для расширений файлов (только если проверка включена)
+		if checkFileExtensions && len(rule.TypeFile) > 0 && !fileMatches {
+			shouldBlock = false
+		}
+
+		// Для IP адресов
+		if len(rule.IPList) > 0 && !ipMatches {
+			shouldBlock = false
+		}
+
+		if shouldBlock {
+			errorPage := rule.UrlError
+			if errorPage == "" {
+				errorPage = "404"
 			}
-			// Все условия Allow выполнены - разрешаем доступ
-			return true, ""
-
-		case "Disable":
-			// Disable правило: запрещаем если ЛЮБОЕ условие выполнено
-			shouldBlock := true
-
-			// Для расширений файлов (только если проверка включена)
-			if checkFileExtensions && len(rule.TypeFile) > 0 && !fileMatches {
-				shouldBlock = false
-			}
-
-			// Для IP адресов
-			if len(rule.IPList) > 0 && !ipMatches {
-				shouldBlock = false
-			}
-
-			if shouldBlock {
-				errorPage := rule.UrlError
-				if errorPage == "" {
-					errorPage = "404"
-				}
-				tools.Logs_file(1, logPrefix, "🚫 Доступ запрещён для "+getClientIP(r)+" к "+requestPath, logFile, false)
+			tools.Logs_file(1, logPrefix, "🚫 Доступ запрещён для "+getClientIP(r)+" к "+r.Host+requestPath, logFile, false)
 				return false, errorPage
 			}
 

@@ -28,16 +28,9 @@ func isWebSocketRequest(r *http.Request) bool {
 
 // Проксирует WebSocket соединение
 func handleWebSocketProxy(w http.ResponseWriter, r *http.Request, proxyConfig config.Proxy_Service) bool {
-	// Определяем протокол для локального соединения
-	protocol := "ws"
 	networkProtocol := "tcp"
-	if proxyConfig.ServiceHTTPSuse {
-		protocol = "wss"
-	}
-
 	targetAddr := proxyConfig.LocalAddress + ":" + proxyConfig.LocalPort
 
-	tools.Logs_file(0, "WS-PROXY", "🔌 WebSocket: "+r.RemoteAddr+" → "+protocol+"://"+targetAddr+r.URL.Path, "logs_proxy.log", false)
 
 	// Захватываем клиентское соединение через Hijacker
 	hijacker, ok := w.(http.Hijacker)
@@ -135,7 +128,6 @@ func handleWebSocketProxy(w http.ResponseWriter, r *http.Request, proxyConfig co
 		return true
 	}
 
-	tools.Logs_file(0, "WS-PROXY", "✅ WebSocket установлен: "+r.Host+r.URL.Path, "logs_proxy.log", false)
 
 	// Двунаправленное проксирование данных
 	done := make(chan struct{}, 2)
@@ -171,7 +163,6 @@ func handleWebSocketProxy(w http.ResponseWriter, r *http.Request, proxyConfig co
 	// Ждём завершения одного из направлений
 	<-done
 
-	tools.Logs_file(0, "WS-PROXY", "🔌 WebSocket закрыт: "+r.Host+r.URL.Path, "logs_proxy.log", false)
 	return true
 }
 

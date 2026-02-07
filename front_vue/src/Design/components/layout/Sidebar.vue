@@ -60,7 +60,7 @@ const navigate = (item) => {
   justify-content: center;
   background: transparent;
   border: none;
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   color: var(--nav-color);
   font-size: 20px;
   cursor: pointer;

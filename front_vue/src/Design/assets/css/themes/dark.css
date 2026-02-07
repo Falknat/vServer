@@ -58,9 +58,9 @@
     --table-border: rgba(255, 255, 255, 0.05);
 
     /* Компоненты */
-    --card-hover-shadow: 0 8px 32px rgba(139, 92, 246, 0.3);
-    --card-border-hover: rgba(139, 92, 246, 0.3);
-    --service-card-gradient: linear-gradient(90deg, #8b5cf6, #a78bfa, #06b6d4);
+    --card-hover-shadow: 0 4px 16px rgba(139, 92, 246, 0.12);
+    --card-border-hover: rgba(139, 92, 246, 0.2);
+    --service-card-gradient: linear-gradient(90deg, rgba(139, 92, 246, 0.6), rgba(167, 139, 250, 0.6), rgba(6, 182, 212, 0.6));
     --btn-icon-bg: rgba(139, 92, 246, 0.1);
     --btn-icon-border: rgba(139, 92, 246, 0.3);
     --btn-icon-color: #a78bfa;

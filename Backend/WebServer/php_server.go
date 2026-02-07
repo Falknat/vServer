@@ -377,7 +377,6 @@ func PHPHandler(w http.ResponseWriter, r *http.Request, host string, originalURI
 		return
 	}
 
-	tools.Logs_file(0, "PHP", fmt.Sprintf("✅ FastCGI обработал: %s (порт %d)", phpPath, port), "logs_php.log", false)
 }
 
 // Streaming чтение FastCGI ответа с поддержкой SSE и chunked transfer
