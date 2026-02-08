@@ -22,6 +22,14 @@ type Site_www struct {
 	Root_file         string   `json:"root_file"`
 	Root_file_routing bool     `json:"root_file_routing"`
 	AutoCreateSSL     bool     `json:"AutoCreateSSL"`
+	Compression       *bool    `json:"Compression"`
+}
+
+func (s Site_www) IsCompressionEnabled() bool {
+	if s.Compression == nil {
+		return true
+	}
+	return *s.Compression
 }
 
 type Soft_Settings struct {
@@ -42,6 +50,14 @@ type Proxy_Service struct {
 	ServiceHTTPSuse bool   `json:"ServiceHTTPSuse"`
 	AutoHTTPS       bool   `json:"AutoHTTPS"`
 	AutoCreateSSL   bool   `json:"AutoCreateSSL"`
+	Compression     *bool  `json:"Compression"`
+}
+
+func (p Proxy_Service) IsCompressionEnabled() bool {
+	if p.Compression == nil {
+		return true
+	}
+	return *p.Compression
 }
 
 func LoadConfig() {
@@ -88,6 +104,20 @@ func migrateConfig(originalData []byte) {
 		}
 	}
 
+	// Проверяем Site_www на наличие Compression
+	if rawSites, ok := rawConfig["Site_www"]; ok {
+		var sites2 []map[string]interface{}
+		if err := json.Unmarshal(rawSites, &sites2); err == nil {
+			for i, site := range sites2 {
+				if _, exists := site["Compression"]; !exists {
+					needsSave = true
+					compressionTrue := true
+					ConfigData.Site_www[i].Compression = &compressionTrue
+				}
+			}
+		}
+	}
+
 	// Проверяем Proxy_Service
 	if rawProxies, ok := rawConfig["Proxy_Service"]; ok {
 		var proxies []map[string]interface{}
@@ -96,6 +126,20 @@ func migrateConfig(originalData []byte) {
 				if _, exists := proxy["AutoCreateSSL"]; !exists {
 					needsSave = true
 					break
+				}
+			}
+		}
+	}
+
+	// Проверяем Proxy_Service на наличие Compression
+	if rawProxies, ok := rawConfig["Proxy_Service"]; ok {
+		var proxies2 []map[string]interface{}
+		if err := json.Unmarshal(rawProxies, &proxies2); err == nil {
+			for i, proxy := range proxies2 {
+				if _, exists := proxy["Compression"]; !exists {
+					needsSave = true
+					compressionTrue := true
+					ConfigData.Proxy_Service[i].Compression = &compressionTrue
 				}
 			}
 		}

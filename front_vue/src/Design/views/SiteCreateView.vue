@@ -11,6 +11,7 @@ const form = reactive({
   rootFile: 'index.html',
   status: 'active',
   routing: true,
+  compression: true,
   certMode: 'none',
 })
 
@@ -36,6 +37,7 @@ const createSite = async () => {
     root_file: form.rootFile,
     status: form.status,
     root_file_routing: form.routing,
+    Compression: form.compression,
     AutoCreateSSL: form.certMode === 'auto',
   }
   const result = await sitesStore.create(siteData)
@@ -80,6 +82,14 @@ const createSite = async () => {
             <label class="form-label">{{ t('sites.formRouting') }}</label>
           </div>
           <VToggle v-model="form.routing" :label="t('common.enabled')" />
+        </div>
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <VTooltip :text="t('sites.formCompressionHint')" />
+            <label class="form-label">{{ t('sites.formCompression') }}</label>
+          </div>
+          <VToggle v-model="form.compression" :label="t('common.enabled')" />
         </div>
 
         <SslUploadSection v-model="form.certMode" />

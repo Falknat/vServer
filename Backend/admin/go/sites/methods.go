@@ -156,6 +156,7 @@ func AddSiteToConfig(siteData SiteInfo) error {
 		Status:            siteData.Status,
 		Root_file:         siteData.RootFile,
 		Root_file_routing: siteData.RootFileRouting,
+		Compression:       siteData.Compression,
 	}
 
 	// Добавляем в массив

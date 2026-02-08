@@ -306,26 +306,30 @@ func StartHandlerProxy(w http.ResponseWriter, r *http.Request) (valid bool) {
 			}
 		}
 
+		// Сжатие ответа (gzip) — только если бэкенд не сжал сам
+		var gzw *gzipResponseWriter
+		if proxyConfig.IsCompressionEnabled() && clientAcceptsGzip(r) && !isAlreadyCompressed(resp.Header) {
+			gzw = newGzipResponseWriter(w)
+			defer gzw.close()
+			w = gzw
+		}
+
 		// Устанавливаем статус код
 		w.WriteHeader(resp.StatusCode)
 
 		// Копируем тело ответа с поддержкой streaming (SSE, chunked responses)
-		// Используем буферизированное копирование с принудительной отправкой данных
 		flusher, canFlush := w.(http.Flusher)
 		
-		// Буфер для чанков (32KB - оптимальный размер для баланса производительности)
 		buffer := make([]byte, 32*1024)
 		
 		for {
 			n, err := resp.Body.Read(buffer)
 			if n > 0 {
-				// Записываем прочитанные данные
 				if _, writeErr := w.Write(buffer[:n]); writeErr != nil {
 					log.Printf("Ошибка записи тела ответа: %v", writeErr)
 					break
 				}
 				
-				// Принудительно отправляем данные клиенту (критично для SSE)
 				if canFlush {
 					flusher.Flush()
 				}

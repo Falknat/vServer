@@ -64,6 +64,8 @@
     "formStatus": "Status",
     "formRouting": "Root file routing",
     "formRoutingHint": "If enabled, all requests to non-existent files will be redirected to the root file",
+    "formCompression": "Gzip compression",
+    "formCompressionHint": "Compress text responses (HTML, CSS, JS, JSON, SVG) to reduce traffic",
     "deleteTitle": "Delete Site",
     "deleteConfirm": "Are you sure you want to delete site \"{name}\" ({host})?",
     "deleteWarning": "This action is IRREVERSIBLE!"
@@ -88,6 +90,8 @@
     "formLocalPort": "Local Port",
     "formServiceHttps": "HTTPS to service",
     "formServiceHttpsHint": "Use HTTPS when connecting to the local service",
+    "formCompression": "Gzip compression",
+    "formCompressionHint": "Compress text responses (HTML, CSS, JS, JSON, SVG) to reduce traffic",
     "formAutoHttps": "Auto HTTPS",
     "formAutoHttpsHint": "Automatically redirect HTTP requests to HTTPS",
     "deleteTitle": "Delete Proxy",

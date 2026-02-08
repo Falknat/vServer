@@ -9,6 +9,7 @@ type ProxyInfo struct {
 	ServiceHTTPSuse bool   `json:"ServiceHTTPSuse"`
 	AutoHTTPS       bool   `json:"AutoHTTPS"`
 	AutoCreateSSL   bool   `json:"AutoCreateSSL"`
+	Compression     *bool  `json:"Compression"`
 	Status          string `json:"Status"`
 }
 

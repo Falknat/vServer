@@ -16,6 +16,7 @@ const form = reactive({
   rootFile: 'index.html',
   status: 'active',
   routing: true,
+  compression: true,
   autoSSL: false,
 })
 
@@ -38,6 +39,7 @@ onMounted(async () => {
     form.rootFile = site.root_file
     form.status = site.status
     form.routing = site.root_file_routing
+    form.compression = site.Compression !== false
     form.autoSSL = site.AutoCreateSSL || false
   }
 })
@@ -65,6 +67,7 @@ const saveSite = async () => {
     config.Site_www[idx].root_file = form.rootFile
     config.Site_www[idx].status = form.status
     config.Site_www[idx].root_file_routing = form.routing
+    config.Site_www[idx].Compression = form.compression
     config.Site_www[idx].AutoCreateSSL = form.autoSSL
     const result = await api.saveConfig(JSON.stringify(config))
     if (isSuccess(result)) {
@@ -147,7 +150,11 @@ const confirmDelete = async () => {
         <VSelect v-model="form.rootFile" :label="t('sites.formRootFile')" :options="rootFileOptions" />
 
         <!-- Toggles -->
-        <div class="form-row">
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label class="form-label">{{ t('sites.formCompression') }}:</label>
+            <VToggle v-model="form.compression" :label="t('common.enabled')" />
+          </div>
           <div class="form-group">
             <label class="form-label">{{ t('sites.formRouting') }}:</label>
             <VToggle v-model="form.routing" :label="t('common.enabled')" />

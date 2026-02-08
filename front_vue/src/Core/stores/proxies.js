@@ -30,6 +30,7 @@ export const useProxiesStore = defineStore('proxies', {
           LocalPort: proxyData.localPort,
           ServiceHTTPSuse: proxyData.serviceHttps,
           AutoHTTPS: proxyData.autoHttps,
+          Compression: proxyData.compression !== undefined ? proxyData.compression : true,
           AutoCreateSSL: proxyData.autoSSL,
         })
         const result = await api.saveConfig(JSON.stringify(config))

@@ -10,6 +10,7 @@ const form = reactive({
   localAddr: '127.0.0.1',
   localPort: '',
   serviceHttps: false,
+  compression: true,
   certMode: 'none',
 })
 
@@ -26,6 +27,7 @@ const createProxy = async () => {
     enabled: true,
     serviceHttps: form.serviceHttps,
     autoHttps: form.serviceHttps,
+    compression: form.compression,
     autoSSL: false,
   })
   creating.value = false
@@ -68,6 +70,14 @@ const createProxy = async () => {
             <label class="form-label">HTTPS</label>
           </div>
           <VToggle v-model="form.serviceHttps" :label="t('common.enabled')" />
+        </div>
+
+        <div class="form-group">
+          <div class="form-label-row">
+            <VTooltip :text="t('proxies.formCompressionHint')" />
+            <label class="form-label">{{ t('proxies.formCompression') }}</label>
+          </div>
+          <VToggle v-model="form.compression" :label="t('common.enabled')" />
         </div>
 
         <SslUploadSection v-model="form.certMode" />

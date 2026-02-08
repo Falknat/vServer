@@ -16,6 +16,7 @@ const form = reactive({
   localPort: '',
   enabled: true,
   serviceHttps: false,
+  compression: true,
   autoHttps: true,
   autoSSL: false,
 })
@@ -33,6 +34,7 @@ onMounted(async () => {
     form.localPort = proxy.LocalPort
     form.enabled = proxy.Enable
     form.serviceHttps = proxy.ServiceHTTPSuse
+    form.compression = proxy.Compression !== false
     form.autoHttps = proxy.AutoHTTPS
     form.autoSSL = proxy.AutoCreateSSL || false
   }
@@ -50,6 +52,7 @@ const saveProxy = async () => {
     config.Proxy_Service[idx].Enable = form.enabled
     config.Proxy_Service[idx].ServiceHTTPSuse = form.serviceHttps
     config.Proxy_Service[idx].AutoHTTPS = form.serviceHttps
+    config.Proxy_Service[idx].Compression = form.compression
     config.Proxy_Service[idx].AutoCreateSSL = form.autoSSL
     const result = await api.saveConfig(JSON.stringify(config))
     if (isSuccess(result)) {
@@ -120,7 +123,11 @@ const confirmDelete = async () => {
         </div>
 
         <!-- Toggles -->
-        <div class="form-row">
+        <div class="form-row form-row-3">
+          <div class="form-group">
+            <label class="form-label">{{ t('proxies.formCompression') }}:</label>
+            <VToggle v-model="form.compression" :label="t('common.enabled')" />
+          </div>
           <div class="form-group">
             <label class="form-label">HTTPS:</label>
             <VToggle v-model="form.serviceHttps" :label="t('common.enabled')" />

@@ -170,8 +170,17 @@ func isRootFileRoutingEnabled(host string) bool {
 			return site.Root_file_routing
 		}
 	}
-	// По умолчанию роутинг выключен
 	return false
+}
+
+// Проверяет включено ли сжатие для сайта
+func isSiteCompressionEnabled(host string) bool {
+	for _, site := range config.ConfigData.Site_www {
+		if site.Host == host {
+			return site.IsCompressionEnabled()
+		}
+	}
+	return true
 }
 
 // Проверка vAccess с обработкой ошибки
@@ -244,6 +253,13 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			return // Прерываем выполнение после редиректа
 		}
 
+	}
+
+	// Сжатие ответа (gzip)
+	if isSiteCompressionEnabled(host) && clientAcceptsGzip(r) {
+		gzw := newGzipResponseWriter(w)
+		defer gzw.close()
+		w = gzw
 	}
 
 	// Проверяем существование директории сайта

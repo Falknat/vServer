@@ -64,6 +64,8 @@
     "formStatus": "Статус",
     "formRouting": "Root file routing",
     "formRoutingHint": "Если включено, все запросы к несуществующим файлам будут перенаправляться на root файл",
+    "formCompression": "Gzip сжатие",
+    "formCompressionHint": "Сжатие текстовых ответов (HTML, CSS, JS, JSON, SVG) для уменьшения трафика",
     "deleteTitle": "Удалить сайт",
     "deleteConfirm": "Вы действительно хотите удалить сайт \"{name}\" ({host})?",
     "deleteWarning": "Это действие НЕОБРАТИМО!"
@@ -88,6 +90,8 @@
     "formLocalPort": "Локальный порт",
     "formServiceHttps": "HTTPS к сервису",
     "formServiceHttpsHint": "Использовать HTTPS при подключении к локальному сервису",
+    "formCompression": "Gzip сжатие",
+    "formCompressionHint": "Сжатие текстовых ответов (HTML, CSS, JS, JSON, SVG) для уменьшения трафика",
     "formAutoHttps": "Авто HTTPS",
     "formAutoHttpsHint": "Автоматически перенаправлять HTTP запросы на HTTPS",
     "deleteTitle": "Удалить прокси",

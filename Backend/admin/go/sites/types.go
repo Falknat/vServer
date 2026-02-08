@@ -8,5 +8,6 @@ type SiteInfo struct {
 	RootFile          string   `json:"root_file"`
 	RootFileRouting   bool     `json:"root_file_routing"`
 	AutoCreateSSL     bool     `json:"auto_create_ssl"`
+	Compression       *bool    `json:"Compression"`
 }
 
