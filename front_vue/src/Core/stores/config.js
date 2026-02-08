@@ -1,5 +1,4 @@
-import { defineStore } from 'pinia'
-import { api } from '@core/api/index.js'
+﻿import { defineStore } from 'pinia'
 
 export const useConfigStore = defineStore('config', {
   state: () => ({

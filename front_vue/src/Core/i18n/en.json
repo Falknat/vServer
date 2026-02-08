@@ -1,7 +1,7 @@
 {
   "app": {
     "title": "vServer Admin Panel",
-    "logo": "vServer",
+    "logo": "vServer v1.0",
     "footerAuthor": "Author: Sumaneev Roman",
     "loading": "Starting vServer..."
   },
@@ -21,7 +21,9 @@
     "stop": "Stop",
     "starting": "Starting...",
     "stopping": "Stopping...",
-    "wait": "Please wait..."
+    "wait": "Please wait...",
+    "stopConfirmTitle": "Stop server?",
+    "stopConfirmMessage": "All services will be stopped"
   },
   "services": {
     "title": "Services Status",

@@ -1,6 +1,4 @@
-<script setup>
-import { api } from '@core/api/index.js'
-import { useDraggable } from '@core/composables/useDraggable.js'
+﻿<script setup>
 
 const { t } = useI18n()
 const route = useRoute()

@@ -12,117 +12,80 @@ const serviceIcons = {
   PHP: 'fab fa-php',
   Proxy: 'fas fa-exchange-alt',
 }
-
-const serviceInfoLabel = {
-  HTTP: 'services.port',
-  HTTPS: 'services.port',
-  MySQL: 'services.port',
-  PHP: 'services.ports',
-  Proxy: 'services.rules',
-}
 </script>
 
 <template>
-  <div class="service-card">
-    <div class="service-header">
-      <h3 class="service-name">
-        <i :class="serviceIcons[service.name] || 'fas fa-server'"></i>
-        {{ service.name }}
-      </h3>
-      <VBadge :variant="service.pending ? 'pending' : (service.status ? 'online' : 'offline')">
-        {{ service.pending || (service.status ? t('common.enabled') : t('common.disabled')) }}
-      </VBadge>
-    </div>
-    <div class="service-info">
-      <div class="info-row">
-        <span class="info-label">{{ t(serviceInfoLabel[service.name] || 'services.port') }}:</span>
-        <span class="info-value">{{ service.port || service.info || '—' }}</span>
-      </div>
-      <div v-if="service.info && service.port" class="info-row">
-        <span class="info-label">{{ t('services.rules') }}:</span>
-        <span class="info-value">{{ service.info }}</span>
-      </div>
-    </div>
+  <div class="service-item" :class="{ 'service-active': service.status, 'service-pending': service.pending }">
+    <span class="service-dot"></span>
+    <i :class="serviceIcons[service.name] || 'fas fa-server'" class="service-icon"></i>
+    <span class="service-label">{{ service.name }}</span>
+    <span v-if="service.pending" class="service-status-text pending">{{ service.pending }}</span>
   </div>
 </template>
 
 <style scoped>
-.service-card {
-  background: var(--glass-bg-light);
-  backdrop-filter: var(--backdrop-blur);
-  border: 1px solid var(--glass-border);
+.service-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 18px;
   border-radius: var(--radius);
-  padding: var(--space-lg);
-  transition: all var(--transition-bounce);
-  position: relative;
-  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-light);
+  transition: all var(--transition-base);
+  cursor: default;
 }
 
-.service-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: var(--service-card-gradient);
-  opacity: 0;
-  transition: opacity var(--transition-slow);
-}
-
-.service-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--card-hover-shadow);
+.service-item:hover {
   border-color: var(--card-border-hover);
 }
 
-.service-card:hover::before {
-  opacity: 1;
+.service-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--accent-red);
+  flex-shrink: 0;
+  transition: all var(--transition-base);
 }
 
-.service-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 18px;
+.service-active .service-dot {
+  background: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
 }
 
-.service-name {
+.service-pending .service-dot {
+  background: var(--accent-yellow, #f0ad4e);
+  box-shadow: 0 0 8px var(--accent-yellow, #f0ad4e);
+  animation: dot-blink 1s ease-in-out infinite;
+}
+
+.service-icon {
+  font-size: var(--text-md);
+  color: var(--text-muted);
+  width: 18px;
+  text-align: center;
+  transition: color var(--transition-base);
+}
+
+.service-active .service-icon {
+  color: var(--accent-purple-light);
+}
+
+.service-label {
   font-size: var(--text-md);
   font-weight: var(--font-semibold);
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin: 0;
 }
 
-.service-name i {
-  color: var(--accent-purple-light);
-  font-size: var(--text-lg);
-}
-
-.service-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.info-label {
+.service-status-text.pending {
+  margin-left: auto;
   font-size: var(--text-sm);
-  color: var(--text-secondary);
-  font-weight: var(--font-medium);
+  color: var(--accent-yellow, #f0ad4e);
 }
 
-.info-value {
-  font-size: 12px;
-  color: var(--text-primary);
-  font-weight: var(--font-semibold);
+@keyframes dot-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
 }
 </style>

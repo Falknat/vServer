@@ -1,100 +1,91 @@
 /* ============================================
-   Общие стили таблиц
+   Общие стили таблиц — Modern Clean
    ============================================ */
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--space-lg);
-}
 
-.section-title {
-    font-size: var(--text-md);
-    font-weight: var(--font-bold);
-    color: var(--text-primary);
-    margin: 0;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    display: flex;
-    align-items: center;
-    gap: var(--space-lg);
-}
-
-.section-title::before {
-    content: '';
-    width: 4px;
-    height: 16px;
-    background: linear-gradient(180deg, var(--accent-purple), var(--accent-purple-light));
-    border-radius: 2px;
-    flex-shrink: 0;
-}
-
+/* Table Container */
 .table-container {
-    background: var(--glass-bg-light);
-    backdrop-filter: var(--backdrop-blur);
-    border: 1px solid var(--glass-border);
-    border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: var(--shadow-md);
 }
 
+/* Table */
 .data-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0 8px;
 }
 
-.data-table thead {
-    background: var(--table-header-bg);
-}
-
+/* Header */
 .data-table thead tr {
-    border-bottom: 1px solid var(--table-border);
+    border: none;
 }
 
 .data-table th {
-    padding: 18px 20px;
+    padding: 8px 20px;
     text-align: left;
-    font-size: var(--text-sm);
-    font-weight: var(--font-bold);
-    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: var(--font-semibold);
+    color: var(--text-muted);
     text-transform: uppercase;
-    letter-spacing: 1.2px;
+    letter-spacing: 1.5px;
+    border: none;
+    background: none;
 }
 
-.data-table th:last-child {
-    width: 160px;
-    text-align: center;
+.th-icon {
+    opacity: 0.4;
+    font-size: 10px;
+    margin-right: 2px;
 }
 
+.th-actions {
+    text-align: right !important;
+    padding-right: 20px !important;
+}
+
+/* Rows */
 .data-table tbody tr {
-    border-bottom: 1px solid var(--table-border);
     transition: all var(--transition-base);
+    background: var(--glass-bg-light);
 }
 
 .data-table tbody tr:hover {
-    background: var(--table-hover-bg);
+    background: rgba(var(--accent-rgb), 0.06);
 }
 
 .data-table td {
-    padding: 16px 20px;
+    padding: 14px 20px;
     font-size: var(--text-base);
     color: var(--text-primary);
+    border-top: 1px solid var(--glass-border);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.data-table td:first-child {
+    border-left: 1px solid var(--glass-border);
+    border-radius: var(--radius) 0 0 var(--radius);
 }
 
 .data-table td:last-child {
-    text-align: center;
+    border-right: 1px solid var(--glass-border);
+    border-radius: 0 var(--radius) var(--radius) 0;
     display: flex;
     gap: var(--space-xs);
-    justify-content: center;
     align-items: center;
+    justify-content: flex-end;
 }
 
+.data-table tbody tr:hover td {
+    border-color: rgba(var(--accent-rgb), 0.15);
+}
+
+/* Code */
 .data-table code {
     font-family: var(--font-mono);
     font-size: var(--text-sm);
 }
 
+/* Links */
 .clickable-link {
     color: var(--link-color);
     cursor: pointer;
@@ -117,59 +108,82 @@
 .cert-icon {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 22px;
-    margin-right: 8px;
-    border-radius: var(--radius);
+    margin-right: 6px;
     font-size: 12px;
 }
 
 .cert-valid {
-    background: rgba(var(--success-rgb), 0.2);
     color: var(--accent-green);
-    border: 1px solid rgba(var(--success-rgb), 0.4);
 }
 
 .cert-expired {
-    background: rgba(var(--danger-rgb), 0.2);
     color: var(--accent-red);
-    border: 1px solid rgba(var(--danger-rgb), 0.4);
 }
 
 .cert-none {
-    background: rgba(var(--muted-rgb), 0.15);
     color: var(--text-muted);
-    border: 1px solid rgba(var(--muted-rgb), 0.3);
-    opacity: 0.5;
+    opacity: 0.25;
 }
 
 /* Icon buttons */
 .icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     padding: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: var(--btn-icon-bg);
-    border: 1px solid var(--btn-icon-border);
+    background: transparent;
+    border: none;
     border-radius: var(--radius);
-    color: var(--btn-icon-color);
-    font-size: var(--text-md);
+    color: var(--text-muted);
+    font-size: var(--text-sm);
     cursor: pointer;
     transition: all var(--transition-base);
 }
 
 .icon-btn:hover {
-    background: var(--btn-icon-hover-bg);
-    border-color: var(--btn-icon-hover-border);
-    transform: translateY(-1px);
+    background: rgba(var(--accent-rgb), 0.1);
+    color: var(--accent-purple-light);
 }
 
 .icon-btn:disabled {
     opacity: 0.6;
     cursor: wait;
-    transform: none;
 }
 
+.status-toggle {
+    cursor: pointer;
+    transition: opacity var(--transition-fast);
+}
+
+.status-toggle:hover {
+    opacity: 0.7;
+}
+
+/* Drag and drop */
+.drag-grip {
+    color: var(--text-muted);
+    opacity: 0.15;
+    cursor: grab;
+    font-size: 11px;
+    margin-right: 8px;
+    transition: all var(--transition-fast);
+}
+
+.data-table tbody tr:hover .drag-grip {
+    opacity: 0.4;
+}
+
+.drag-grip:hover {
+    opacity: 1 !important;
+    color: var(--accent-purple-light);
+}
+
+.data-table tbody tr.dragging {
+    opacity: 0.3;
+}
+
+.data-table tbody tr.drag-over td {
+    border-top-color: var(--accent-purple) !important;
+}

@@ -1,12 +1,49 @@
-<script setup>
+﻿<script setup>
 const { t } = useI18n()
 const router = useRouter()
 const sitesStore = useSitesStore()
 const certsStore = useCertsStore()
 const { success, error } = useNotification()
-const modal = useModal()
+const { confirmDelete: showConfirm } = useConfirm()
+
+
+const dragIdx = ref(null)
+const overIdx = ref(null)
+
+const onDragStart = (i, e) => { dragIdx.value = i; e.dataTransfer.effectAllowed = 'move' }
+const onDragOver = (i, e) => { e.preventDefault(); overIdx.value = i }
+const onDragLeave = () => { overIdx.value = null }
+const onDragEnd = () => { dragIdx.value = null; overIdx.value = null }
+
+const onDrop = async (i) => {
+  if (dragIdx.value === null || dragIdx.value === i) { dragIdx.value = null; overIdx.value = null; return }
+  const items = [...sitesStore.list]
+  const [moved] = items.splice(dragIdx.value, 1)
+  items.splice(i, 0, moved)
+  sitesStore.list = items
+  dragIdx.value = null
+  overIdx.value = null
+  const config = await api.getConfig()
+  config.Site_www = items.map(s => config.Site_www.find(c => c.host === s.host)).filter(Boolean)
+  await api.saveConfig(JSON.stringify(config))
+}
 
 const openingFolder = ref('')
+const togglingStatus = ref('')
+
+const toggleStatus = async (site) => {
+  togglingStatus.value = site.host
+  const newStatus = site.status === 'active' ? 'inactive' : 'active'
+  const config = await api.getConfig()
+  const idx = config.Site_www.findIndex(s => s.host === site.host)
+  if (idx >= 0) {
+    config.Site_www[idx].status = newStatus
+    await api.saveConfig(JSON.stringify(config))
+    await api.updateSiteCache()
+    await sitesStore.load()
+  }
+  togglingStatus.value = ''
+}
 
 const openUrl = (host) => {
   if (window.runtime?.BrowserOpenURL) {
@@ -51,44 +88,48 @@ const findCertForDomain = (domain, aliases = []) => {
   return null
 }
 
-const confirmDelete = (site) => {
-  modal.open({
+const confirmDelete = async (site) => {
+  const result = await showConfirm({
     title: t('sites.deleteTitle'),
-    message: t('sites.deleteConfirm', { name: site.name, host: site.host }),
-    warning: t('sites.deleteWarning'),
-    onConfirm: async () => {
-      const result = await sitesStore.remove(site.host)
-      if (result && !String(result).startsWith('Error')) success(t('notify.siteDeleted'))
-      else error(String(result))
-      modal.close()
-    },
+    message: `${site.name} (${site.host})`,
   })
+  if (result) {
+    const res = await sitesStore.remove(site.host)
+    if (res && !String(res).startsWith('Error')) success(t('notify.siteDeleted'))
+    else error(String(res))
+  }
 }
 </script>
 
 <template>
   <section class="section">
-    <div class="section-header">
-      <h2 class="section-title">{{ t('sites.title') }}</h2>
-      <VButton variant="primary" icon="fas fa-plus" @click="router.push('/sites/create')">
-        {{ t('sites.add') }}
-      </VButton>
-    </div>
+    <VSectionHeader :title="t('sites.title')" addable @add="router.push('/sites/create')" />
     <div class="table-container">
       <table class="data-table">
         <thead>
           <tr>
-            <th>{{ t('sites.name') }}</th>
-            <th>{{ t('sites.host') }}</th>
-            <th>{{ t('sites.alias') }}</th>
-            <th>{{ t('sites.status') }}</th>
-            <th>{{ t('sites.rootFile') }}</th>
-            <th>{{ t('sites.actions') }}</th>
+            <th><i class="fas fa-tag th-icon"></i> {{ t('sites.name') }}</th>
+            <th><i class="fas fa-globe th-icon"></i> {{ t('sites.host') }}</th>
+            <th><i class="fas fa-link th-icon"></i> {{ t('sites.alias') }}</th>
+            <th><i class="fas fa-circle-check th-icon"></i> {{ t('sites.status') }}</th>
+            <th><i class="fas fa-file th-icon"></i> {{ t('sites.rootFile') }}</th>
+            <th class="th-actions">{{ t('sites.actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="site in sitesStore.list" :key="site.host">
+          <tr
+            v-for="(site, i) in sitesStore.list"
+            :key="site.host"
+            draggable="true"
+            :class="{ 'drag-over': overIdx === i, 'dragging': dragIdx === i }"
+            @dragstart="onDragStart(i, $event)"
+            @dragover="onDragOver(i, $event)"
+            @dragleave="onDragLeave"
+            @drop="onDrop(i)"
+            @dragend="onDragEnd"
+          >
             <td>
+              <i class="fas fa-grip-vertical drag-grip"></i>
               <span class="cert-icon" :class="findCertForDomain(site.host, site.alias) ? (findCertForDomain(site.host, site.alias).is_expired ? 'cert-expired' : 'cert-valid') : 'cert-none'" :title="findCertForDomain(site.host, site.alias) ? (findCertForDomain(site.host, site.alias).is_expired ? 'SSL истёк' : `SSL (${findCertForDomain(site.host, site.alias).days_left} дн.)`) : 'Нет сертификата'">
                 <i class="fas fa-shield-alt"></i>
               </span>
@@ -99,8 +140,12 @@ const confirmDelete = (site) => {
             </td>
             <td><code>{{ site.alias?.join(', ') || '—' }}</code></td>
             <td>
-              <VBadge :variant="site.status === 'active' ? 'online' : 'offline'">
-                {{ site.status }}
+              <VBadge
+                class="status-toggle"
+                :variant="togglingStatus === site.host ? 'pending' : (site.status === 'active' ? 'online' : 'offline')"
+                @click="toggleStatus(site)"
+              >
+                {{ togglingStatus === site.host ? '...' : site.status }}
               </VBadge>
             </td>
             <td><code>{{ site.root_file }}</code></td>

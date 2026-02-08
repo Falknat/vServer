@@ -1,9 +1,9 @@
-<script setup>
+﻿<script setup>
 const { t } = useI18n()
 const router = useRouter()
 const sitesStore = useSitesStore()
 const { success, error } = useNotification()
-const modal = useModal()
+const { confirmDelete: showConfirm } = useConfirm()
 
 const props = defineProps({
   host: { type: String, required: true },
@@ -19,7 +19,6 @@ const form = reactive({
   autoSSL: false,
 })
 
-import { api } from '@core/api/index.js'
 
 const saving = ref(false)
 const aliasInput = ref('')
@@ -81,22 +80,20 @@ const saveSite = async () => {
   saving.value = false
 }
 
-const confirmDelete = () => {
-  modal.open({
+const confirmDelete = async () => {
+  const result = await showConfirm({
     title: t('sites.deleteTitle'),
-    message: t('sites.deleteConfirm', { name: form.name, host: form.host }),
-    warning: t('sites.deleteWarning'),
-    onConfirm: async () => {
-      const result = await sitesStore.remove(form.host)
-      if (result && !String(result).startsWith('Error')) {
-        success(t('notify.siteDeleted'))
-        router.push('/')
-      } else {
-        error(String(result))
-      }
-      modal.close()
-    },
+    message: `${form.name} (${form.host})`,
   })
+  if (result) {
+    const res = await sitesStore.remove(form.host)
+    if (res && !String(res).startsWith('Error')) {
+      success(t('notify.siteDeleted'))
+      router.push('/')
+    } else {
+      error(String(res))
+    }
+  }
 }
 </script>
 

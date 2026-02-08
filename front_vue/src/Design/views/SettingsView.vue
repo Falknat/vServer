@@ -62,7 +62,7 @@ const toggleAcme = async () => {
 <template>
   <div class="settings-view">
     <div class="settings-header">
-      <h2 class="section-title">{{ t('settings.title') }}</h2>
+      <VSectionHeader :title="t('settings.title')" />
       <VButton variant="success" icon="fas fa-save" :loading="saving" @click="saveSettings">
         {{ saving ? t('settings.saving') : t('settings.save') }}
       </VButton>
@@ -127,20 +127,25 @@ const toggleAcme = async () => {
 }
 
 .settings-card {
-  background: var(--glass-bg-light);
-  backdrop-filter: var(--backdrop-blur);
+  background: rgba(var(--accent-rgb), 0.02);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   padding: var(--space-lg);
+  transition: all var(--transition-base);
+}
+
+.settings-card:hover {
+  background: rgba(var(--accent-rgb), 0.04);
+  border-color: rgba(var(--accent-rgb), 0.2);
 }
 
 .settings-card-title {
-  font-size: var(--text-lg);
+  font-size: var(--text-md);
   font-weight: var(--font-semibold);
   color: var(--text-primary);
   margin: 0 0 20px 0;
   padding-bottom: 12px;
-  border-bottom: 1px solid var(--divider-subtle);
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.1);
   display: flex;
   align-items: center;
   gap: var(--space-sm);

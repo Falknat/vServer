@@ -43,3 +43,5 @@ export const STORAGE_KEYS = {
 }
 
 export const AUTO_REFRESH_INTERVAL = 5000
+
+export const APP_VERSION = __APP_VERSION__

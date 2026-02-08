@@ -1,5 +1,4 @@
-<script setup>
-import { api } from '@core/api/index.js'
+﻿<script setup>
 
 const { t, locale } = useI18n()
 const appStore = useAppStore()
@@ -7,6 +6,7 @@ const servicesStore = useServicesStore()
 const { isDark, toggleTheme } = useTheme()
 
 const isWails = typeof window !== 'undefined' && window?.runtime
+const { confirm } = useConfirm()
 const operating = ref(false)
 const statusLabel = ref('')
 
@@ -22,6 +22,18 @@ const serverToggle = async () => {
   if (operating.value) return
 
   if (appStore.serverRunning) {
+    const result = await confirm({
+      icon: 'fas fa-power-off',
+      iconColor: 'var(--accent-red)',
+      title: t('server.stopConfirmTitle'),
+      message: t('server.stopConfirmMessage'),
+      buttons: [
+        { label: t('common.cancel'), variant: 'default', value: false },
+        { label: t('server.stop'), variant: 'danger', icon: 'fas fa-power-off', value: true },
+      ],
+    })
+    if (!result) return
+
     operating.value = true
     statusLabel.value = t('server.stopping')
     servicesStore.setPending(t('server.stopping'))
@@ -63,6 +75,7 @@ const windowClose = () => { if (isWails) window.runtime.Quit() }
       <div class="app-logo">
         <span class="logo-icon">🚀</span>
         <span class="logo-text">{{ t('app.logo') }}</span>
+        <span class="logo-version">v{{ APP_VERSION }}</span>
       </div>
       <div class="server-status">
         <span class="status-indicator" :class="[operating ? 'status-pending' : (appStore.serverRunning ? 'status-online' : 'status-offline')]"></span>
@@ -124,6 +137,12 @@ const windowClose = () => { if (isWails) window.runtime.Quit() }
   font-size: var(--text-lg);
   font-weight: var(--font-bold);
   color: var(--text-primary);
+}
+
+.logo-version {
+  font-size: 10px;
+  color: var(--text-muted);
+  opacity: 0.5;
 }
 
 .server-status {

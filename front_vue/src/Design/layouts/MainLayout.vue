@@ -47,6 +47,7 @@ onUnmounted(() => {
     </div>
     <VNotification />
     <VModal />
+    <VConfirmDialog />
   </div>
 </template>
 
@@ -56,7 +57,15 @@ onUnmounted(() => {
   flex-direction: column;
   height: 100vh;
   width: 100vw;
-  background: var(--bg-primary);
+  
+  /* Красивый грандиент */
+  background:
+    /*
+    radial-gradient(circle at 100% 30%, rgba(53, 55, 126, 0.089) 0%, transparent 50%),
+    radial-gradient(circle at 45% 100%, rgba(126, 53, 98, 0.082) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(53, 55, 126, 0.089) 0%, transparent 50%),
+    */
+    var(--bg-primary);
 }
 
 .app-body {
@@ -73,8 +82,9 @@ onUnmounted(() => {
 }
 
 .main-content {
+  --page-padding: 50px;
   flex: 1;
   overflow-y: auto;
-  padding: 40px var(--space-3xl);
+  padding: var(--page-padding) var(--page-padding) var(--page-padding) var(--page-padding);
 }
 </style>

@@ -3,6 +3,9 @@ import vue from '@vitejs/plugin-vue'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { resolve } from 'path'
+import { readFileSync } from 'fs'
+
+const wailsConfig = JSON.parse(readFileSync(resolve(__dirname, '../wails.json'), 'utf-8'))
 
 export default defineConfig({
   plugins: [
@@ -14,6 +17,13 @@ export default defineConfig({
         'vue-router',
         'vue-i18n',
         'pinia',
+        {
+          '@core/api/index.js': ['api'],
+          '@core/constants.js': [
+            'SERVICE_NAMES', 'SITE_STATUS', 'PROXY_STATUS', 'VACCESS_TYPE',
+            'CERT_MODE', 'THEME', 'LOCALE', 'STORAGE_KEYS', 'AUTO_REFRESH_INTERVAL', 'APP_VERSION',
+          ],
+        },
       ],
       dirs: [
         'src/Core/composables',
@@ -39,6 +49,10 @@ export default defineConfig({
 
   server: {
     port: 4444,
+  },
+
+  define: {
+    __APP_VERSION__: JSON.stringify(wailsConfig.info.productVersion),
   },
 
   resolve: {

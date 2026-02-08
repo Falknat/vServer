@@ -1,9 +1,9 @@
-<script setup>
+﻿<script setup>
 const { t } = useI18n()
 const router = useRouter()
 const proxiesStore = useProxiesStore()
 const { success, error } = useNotification()
-const modal = useModal()
+const { confirmDelete: showConfirm } = useConfirm()
 
 const props = defineProps({
   domain: { type: String, required: true },
@@ -20,7 +20,6 @@ const form = reactive({
   autoSSL: false,
 })
 
-import { api } from '@core/api/index.js'
 
 const saving = ref(false)
 
@@ -66,21 +65,20 @@ const saveProxy = async () => {
   saving.value = false
 }
 
-const confirmDelete = () => {
-  modal.open({
+const confirmDelete = async () => {
+  const result = await showConfirm({
     title: t('proxies.deleteTitle'),
-    message: t('proxies.deleteConfirm', { domain: form.domain }),
-    onConfirm: async () => {
-      const result = await proxiesStore.remove(form.domain)
-      if (result && !String(result).startsWith('Error')) {
-        success(t('notify.proxyDeleted'))
-        router.push('/')
-      } else {
-        error(String(result))
-      }
-      modal.close()
-    },
+    message: form.domain,
   })
+  if (result) {
+    const res = await proxiesStore.remove(form.domain)
+    if (res && !String(res).startsWith('Error')) {
+      success(t('notify.proxyDeleted'))
+      router.push('/')
+    } else {
+      error(String(res))
+    }
+  }
 }
 </script>
 

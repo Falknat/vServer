@@ -5,7 +5,7 @@ const servicesStore = useServicesStore()
 
 <template>
   <section class="section">
-    <div class="services-grid">
+    <div class="services-row">
       <ServiceCard
         v-for="service in servicesStore.list"
         :key="service.name"
@@ -16,21 +16,14 @@ const servicesStore = useServicesStore()
 </template>
 
 <style>
-.services-grid {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: var(--space-lg);
+.services-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
-@media (max-width: 1200px) {
-  .services-grid { grid-template-columns: repeat(3, 1fr); }
-}
-
-@media (max-width: 900px) {
-  .services-grid { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 600px) {
-  .services-grid { grid-template-columns: 1fr; }
+.services-row > * {
+  flex: 1;
+  min-width: 140px;
 }
 </style>
