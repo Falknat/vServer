@@ -1,4 +1,11 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
+
+const SERVICE_METHODS = {
+  HTTP:  { start: () => api.startHTTPService(),  stop: () => api.stopHTTPService() },
+  HTTPS: { start: () => api.startHTTPSService(), stop: () => api.stopHTTPSService() },
+  MySQL: { start: () => api.startMySQLService(),  stop: () => api.stopMySQLService() },
+  PHP:   { start: () => api.startPHPService(),   stop: () => api.stopPHPService() },
+}
 
 export const useServicesStore = defineStore('services', {
   state: () => ({
@@ -9,10 +16,14 @@ export const useServicesStore = defineStore('services', {
 
   actions: {
     async load() {
-      const data = await api.getAllServicesStatus()
-      if (data) {
-        this.list = Array.isArray(data) ? data : Object.values(data)
-        this.loaded = true
+      try {
+        const data = await api.getAllServicesStatus()
+        if (data) {
+          this.list = Array.isArray(data) ? data : Object.values(data)
+          this.loaded = true
+        }
+      } catch (e) {
+        console.error('Failed to load services:', e)
       }
     },
 
@@ -26,26 +37,62 @@ export const useServicesStore = defineStore('services', {
       this.isOperating = false
     },
 
-    async startService(name) {
-      const methods = {
-        HTTP: () => api.startHTTPService(),
-        HTTPS: () => api.startHTTPSService(),
-        MySQL: () => api.startMySQLService(),
-        PHP: () => api.startPHPService(),
+    async toggleService(name, action) {
+      try {
+        const method = SERVICE_METHODS[name]?.[action]
+        if (method) await method()
+        await this.load()
+      } catch (e) {
+        console.error(`Failed to ${action} service ${name}:`, e)
       }
-      if (methods[name]) await methods[name]()
-      await this.load()
+    },
+
+    async startService(name) {
+      return this.toggleService(name, 'start')
     },
 
     async stopService(name) {
-      const methods = {
-        HTTP: () => api.stopHTTPService(),
-        HTTPS: () => api.stopHTTPSService(),
-        MySQL: () => api.stopMySQLService(),
-        PHP: () => api.stopPHPService(),
+      return this.toggleService(name, 'stop')
+    },
+
+    async enableProxy() {
+      try {
+        return await api.enableProxyService()
+      } catch (e) {
+        console.error('Failed to enable proxy:', e)
       }
-      if (methods[name]) await methods[name]()
-      await this.load()
+    },
+
+    async disableProxy() {
+      try {
+        return await api.disableProxyService()
+      } catch (e) {
+        console.error('Failed to disable proxy:', e)
+      }
+    },
+
+    async enableACME() {
+      try {
+        return await api.enableACMEService()
+      } catch (e) {
+        console.error('Failed to enable ACME:', e)
+      }
+    },
+
+    async disableACME() {
+      try {
+        return await api.disableACMEService()
+      } catch (e) {
+        console.error('Failed to disable ACME:', e)
+      }
+    },
+
+    async restartAll() {
+      try {
+        return await api.restartAllServices()
+      } catch (e) {
+        console.error('Failed to restart services:', e)
+      }
     },
   },
 })

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 
 const { t, locale } = useI18n()
 const appStore = useAppStore()
@@ -9,8 +9,6 @@ const isWails = typeof window !== 'undefined' && window?.runtime
 const { confirm } = useConfirm()
 const operating = ref(false)
 const statusLabel = ref('')
-
-const sleep = (ms) => new Promise(r => setTimeout(r, ms))
 
 const toggleLocale = () => {
   const next = locale.value === 'ru' ? 'en' : 'ru'

@@ -28,6 +28,7 @@ export default defineConfig({
       dirs: [
         'src/Core/composables',
         'src/Core/stores',
+        'src/Core/utils',
       ],
       vueTemplate: true,
       dts: 'src/auto-imports.d.ts',
@@ -40,9 +41,7 @@ export default defineConfig({
         'src/Design/components/services',
         'src/Design/components/sites',
         'src/Design/components/proxies',
-        'src/Design/components/vaccess',
-        'src/Design/components/certs',
-      ],
+        'src/Design/components/vaccess',      ],
       dts: 'src/components.d.ts',
     }),
   ],

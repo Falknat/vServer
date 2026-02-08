@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 const { t } = useI18n()
 const router = useRouter()
 const proxiesStore = useProxiesStore()
@@ -52,7 +52,7 @@ const saveProxy = async () => {
     config.Proxy_Service[idx].AutoHTTPS = form.serviceHttps
     config.Proxy_Service[idx].AutoCreateSSL = form.autoSSL
     const result = await api.saveConfig(JSON.stringify(config))
-    if (!String(result).startsWith('Error')) {
+    if (isSuccess(result)) {
       await proxiesStore.load()
       success(t('notify.dataSaved'))
       router.push('/')
@@ -72,7 +72,7 @@ const confirmDelete = async () => {
   })
   if (result) {
     const res = await proxiesStore.remove(form.domain)
-    if (res && !String(res).startsWith('Error')) {
+    if (isSuccess(res)) {
       success(t('notify.proxyDeleted'))
       router.push('/')
     } else {

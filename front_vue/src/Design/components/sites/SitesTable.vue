@@ -1,35 +1,26 @@
-﻿<script setup>
+<script setup>
 const { t } = useI18n()
 const router = useRouter()
 const sitesStore = useSitesStore()
-const certsStore = useCertsStore()
 const { success, error } = useNotification()
 const { confirmDelete: showConfirm } = useConfirm()
-
-
-const dragIdx = ref(null)
-const overIdx = ref(null)
-
-const onDragStart = (i, e) => { dragIdx.value = i; e.dataTransfer.effectAllowed = 'move' }
-const onDragOver = (i, e) => { e.preventDefault(); overIdx.value = i }
-const onDragLeave = () => { overIdx.value = null }
-const onDragEnd = () => { dragIdx.value = null; overIdx.value = null }
-
-const onDrop = async (i) => {
-  if (dragIdx.value === null || dragIdx.value === i) { dragIdx.value = null; overIdx.value = null; return }
-  const items = [...sitesStore.list]
-  const [moved] = items.splice(dragIdx.value, 1)
-  items.splice(i, 0, moved)
-  sitesStore.list = items
-  dragIdx.value = null
-  overIdx.value = null
-  const config = await api.getConfig()
-  config.Site_www = items.map(s => config.Site_www.find(c => c.host === s.host)).filter(Boolean)
-  await api.saveConfig(JSON.stringify(config))
-}
+const { findCertForDomain } = useCertLookup()
 
 const openingFolder = ref('')
 const togglingStatus = ref('')
+
+const siteList = computed({
+  get: () => sitesStore.list,
+  set: (v) => { sitesStore.list = v },
+})
+
+const { dragIndex, dragOverIndex, onDragStart, onDragOver, onDragLeave, onDrop, onDragEnd } = useDraggable(siteList, {
+  onReorder: async (items) => {
+    const config = await api.getConfig()
+    config.Site_www = items.map(s => config.Site_www.find(c => c.host === s.host)).filter(Boolean)
+    await api.saveConfig(JSON.stringify(config))
+  },
+})
 
 const toggleStatus = async (site) => {
   togglingStatus.value = site.host
@@ -45,47 +36,10 @@ const toggleStatus = async (site) => {
   togglingStatus.value = ''
 }
 
-const openUrl = (host) => {
-  if (window.runtime?.BrowserOpenURL) {
-    window.runtime.BrowserOpenURL('http://' + host)
-  } else {
-    window.open('http://' + host, '_blank')
-  }
-}
-
 const openFolder = async (host) => {
   openingFolder.value = host
   await sitesStore.openFolder(host)
   setTimeout(() => { openingFolder.value = '' }, 800)
-}
-
-const findCertForDomain = (domain, aliases = []) => {
-  const allDomains = [domain, ...aliases.filter(a => !a.includes('*'))]
-  for (const d of allDomains) {
-    const direct = certsStore.list.find(c => c.domain === d && c.has_cert)
-    if (direct) return direct
-
-    const parts = d.split('.')
-    if (parts.length >= 2) {
-      const wildcard = '*.' + parts.slice(1).join('.')
-      const wc = certsStore.list.find(c => c.domain === wildcard && c.has_cert)
-      if (wc) return wc
-    }
-
-    for (const cert of certsStore.list) {
-      if (cert.has_cert && cert.dns_names) {
-        for (const dns of cert.dns_names) {
-          if (dns === d) return cert
-          if (dns.startsWith('*.')) {
-            const base = dns.slice(2)
-            const dParts = d.split('.')
-            if (dParts.length >= 2 && dParts.slice(1).join('.') === base) return cert
-          }
-        }
-      }
-    }
-  }
-  return null
 }
 
 const confirmDelete = async (site) => {
@@ -95,7 +49,7 @@ const confirmDelete = async (site) => {
   })
   if (result) {
     const res = await sitesStore.remove(site.host)
-    if (res && !String(res).startsWith('Error')) success(t('notify.siteDeleted'))
+    if (isSuccess(res)) success(t('notify.siteDeleted'))
     else error(String(res))
   }
 }
@@ -121,12 +75,12 @@ const confirmDelete = async (site) => {
             v-for="(site, i) in sitesStore.list"
             :key="site.host"
             draggable="true"
-            :class="{ 'drag-over': overIdx === i, 'dragging': dragIdx === i }"
+            :class="{ 'drag-over': dragOverIndex === i, 'dragging': dragIndex === i }"
             @dragstart="onDragStart(i, $event)"
             @dragover="onDragOver(i, $event)"
             @dragleave="onDragLeave"
             @drop="onDrop(i)"
-            @dragend="onDragEnd"
+            @dragend="onDragEnd($event)"
           >
             <td>
               <i class="fas fa-grip-vertical drag-grip"></i>
@@ -136,7 +90,7 @@ const confirmDelete = async (site) => {
               {{ site.name }}
             </td>
             <td>
-              <code class="clickable-link" @click="openUrl(site.host)">{{ site.host }} <i class="fas fa-external-link-alt"></i></code>
+              <code class="clickable-link" @click="openUrl('http://' + site.host)">{{ site.host }} <i class="fas fa-external-link-alt"></i></code>
             </td>
             <td><code>{{ site.alias?.join(', ') || '—' }}</code></td>
             <td>

@@ -6,11 +6,12 @@ import certsData from './mock-data/certs.json'
 import vaccessData from './mock-data/vaccess.json'
 
 const delay = (ms = 300) => new Promise(r => setTimeout(r, ms))
+const clone = (data) => JSON.parse(JSON.stringify(data))
 
 export const mockApi = {
   async getAllServicesStatus() {
     await delay(200)
-    return JSON.parse(JSON.stringify(servicesData))
+    return clone(servicesData)
   },
 
   async checkServicesReady() {
@@ -36,7 +37,7 @@ export const mockApi = {
 
   async getSitesList() {
     await delay(200)
-    return JSON.parse(JSON.stringify(sitesData))
+    return clone(sitesData)
   },
 
   async createNewSite(siteJSON) {
@@ -65,12 +66,12 @@ export const mockApi = {
 
   async getProxyList() {
     await delay(200)
-    return JSON.parse(JSON.stringify(proxiesData))
+    return clone(proxiesData)
   },
 
   async getVAccessRules(host, isProxy) {
     await delay(200)
-    return JSON.parse(JSON.stringify(vaccessData))
+    return clone(vaccessData)
   },
 
   async saveVAccessRules(host, isProxy, configJSON) {
@@ -80,7 +81,7 @@ export const mockApi = {
 
   async getConfig() {
     await delay(200)
-    return JSON.parse(JSON.stringify(configData))
+    return clone(configData)
   },
 
   async saveConfig(configJSON) {
@@ -111,7 +112,7 @@ export const mockApi = {
 
   async getAllCertsInfo() {
     await delay(300)
-    return JSON.parse(JSON.stringify(certsData))
+    return clone(certsData)
   },
 
   async deleteCertificate(domain) {

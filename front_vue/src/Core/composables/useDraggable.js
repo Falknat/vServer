@@ -1,4 +1,4 @@
-export function useDraggable(list) {
+export function useDraggable(list, { onReorder } = {}) {
   const dragIndex = ref(null)
   const dragOverIndex = ref(null)
 
@@ -23,7 +23,7 @@ export function useDraggable(list) {
     dragOverIndex.value = null
   }
 
-  const onDrop = (index) => {
+  const onDrop = async (index) => {
     if (dragIndex.value === null || dragIndex.value === index) {
       dragIndex.value = null
       dragOverIndex.value = null
@@ -37,6 +37,8 @@ export function useDraggable(list) {
 
     dragIndex.value = null
     dragOverIndex.value = null
+
+    if (onReorder) await onReorder(items)
   }
 
   const onDragEnd = (event) => {

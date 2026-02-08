@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 
 export const useConfigStore = defineStore('config', {
   state: () => ({
@@ -12,39 +12,28 @@ export const useConfigStore = defineStore('config', {
 
   actions: {
     async load() {
-      const config = await api.getConfig()
-      if (config) {
-        this.data = config
-        this.loaded = true
+      try {
+        const config = await api.getConfig()
+        if (config) {
+          this.data = config
+          this.loaded = true
+        }
+      } catch (e) {
+        console.error('Failed to load config:', e)
       }
     },
 
     async save(configData) {
-      const result = await api.saveConfig(JSON.stringify(configData, null, 4))
-      if (result && !String(result).startsWith('Error')) {
-        this.data = configData
+      try {
+        const result = await api.saveConfig(JSON.stringify(configData, null, 4))
+        if (isSuccess(result)) {
+          this.data = configData
+        }
+        return result
+      } catch (e) {
+        console.error('Failed to save config:', e)
+        return `Error: ${e.message}`
       }
-      return result
-    },
-
-    async enableProxy() {
-      return await api.enableProxyService()
-    },
-
-    async disableProxy() {
-      return await api.disableProxyService()
-    },
-
-    async enableACME() {
-      return await api.enableACMEService()
-    },
-
-    async disableACME() {
-      return await api.disableACMEService()
-    },
-
-    async restartAll() {
-      return await api.restartAllServices()
     },
   },
 })

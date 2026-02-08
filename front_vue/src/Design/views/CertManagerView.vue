@@ -13,8 +13,6 @@ const issuing = ref('')
 const renewing = ref('')
 const deleting = ref('')
 
-const sleep = (ms) => new Promise(r => setTimeout(r, ms))
-
 const refreshCerts = async () => {
   await certsStore.loadAll()
   certs.value = certsStore.list.filter(c =>
@@ -34,7 +32,7 @@ onMounted(async () => {
 const issueCert = async (domain) => {
   issuing.value = domain
   const [result] = await Promise.all([certsStore.issue(domain), sleep(1000)])
-  if (result && !String(result).startsWith('Error')) {
+  if (isSuccess(result)) {
     success(t('notify.certIssued'))
     await refreshCerts()
   } else {
@@ -46,7 +44,7 @@ const issueCert = async (domain) => {
 const renewCert = async (domain) => {
   renewing.value = domain
   const [result] = await Promise.all([certsStore.renew(domain), sleep(1000)])
-  if (result && !String(result).startsWith('Error')) {
+  if (isSuccess(result)) {
     success(t('notify.certRenewed'))
     await refreshCerts()
   } else {
@@ -58,7 +56,7 @@ const renewCert = async (domain) => {
 const deleteCert = async (domain) => {
   deleting.value = domain
   const [result] = await Promise.all([certsStore.remove(domain), sleep(1000)])
-  if (result && !String(result).startsWith('Error')) {
+  if (isSuccess(result)) {
     success(t('notify.certDeleted'))
     await refreshCerts()
   } else {

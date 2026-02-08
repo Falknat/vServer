@@ -29,7 +29,7 @@ const createProxy = async () => {
     autoSSL: false,
   })
   creating.value = false
-  if (result && !String(result).startsWith('Error')) {
+  if (isSuccess(result)) {
     success(t('notify.proxyCreated'))
     router.push('/')
   } else {

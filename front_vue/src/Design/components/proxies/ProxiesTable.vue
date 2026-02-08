@@ -1,31 +1,24 @@
-﻿<script setup>
+<script setup>
 
 const { t } = useI18n()
 const router = useRouter()
 const proxiesStore = useProxiesStore()
-const certsStore = useCertsStore()
+const { findCertForDomain } = useCertLookup()
 
 const togglingStatus = ref('')
-const dragIdx = ref(null)
-const overIdx = ref(null)
 
-const onDragStart = (i, e) => { dragIdx.value = i; e.dataTransfer.effectAllowed = 'move' }
-const onDragOver = (i, e) => { e.preventDefault(); overIdx.value = i }
-const onDragLeave = () => { overIdx.value = null }
-const onDragEnd = () => { dragIdx.value = null; overIdx.value = null }
+const proxyList = computed({
+  get: () => proxiesStore.list,
+  set: (v) => { proxiesStore.list = v },
+})
 
-const onDrop = async (i) => {
-  if (dragIdx.value === null || dragIdx.value === i) { dragIdx.value = null; overIdx.value = null; return }
-  const items = [...proxiesStore.list]
-  const [moved] = items.splice(dragIdx.value, 1)
-  items.splice(i, 0, moved)
-  proxiesStore.list = items
-  dragIdx.value = null
-  overIdx.value = null
-  const config = await api.getConfig()
-  config.Proxy_Service = items.map(p => config.Proxy_Service.find(c => c.ExternalDomain === p.ExternalDomain)).filter(Boolean)
-  await api.saveConfig(JSON.stringify(config))
-}
+const { dragIndex, dragOverIndex, onDragStart, onDragOver, onDragLeave, onDrop, onDragEnd } = useDraggable(proxyList, {
+  onReorder: async (items) => {
+    const config = await api.getConfig()
+    config.Proxy_Service = items.map(p => config.Proxy_Service.find(c => c.ExternalDomain === p.ExternalDomain)).filter(Boolean)
+    await api.saveConfig(JSON.stringify(config))
+  },
+})
 
 const toggleStatus = async (proxy) => {
   togglingStatus.value = proxy.ExternalDomain
@@ -38,40 +31,6 @@ const toggleStatus = async (proxy) => {
     await proxiesStore.load()
   }
   togglingStatus.value = ''
-}
-
-const openUrl = (host) => {
-  if (window.runtime?.BrowserOpenURL) {
-    window.runtime.BrowserOpenURL('http://' + host)
-  } else {
-    window.open('http://' + host, '_blank')
-  }
-}
-
-const findCertForDomain = (domain) => {
-  const direct = certsStore.list.find(c => c.domain === domain && c.has_cert)
-  if (direct) return direct
-
-  const parts = domain.split('.')
-  if (parts.length >= 2) {
-    const wildcard = '*.' + parts.slice(1).join('.')
-    const wc = certsStore.list.find(c => c.domain === wildcard && c.has_cert)
-    if (wc) return wc
-  }
-
-  for (const cert of certsStore.list) {
-    if (cert.has_cert && cert.dns_names) {
-      for (const dns of cert.dns_names) {
-        if (dns === domain) return cert
-        if (dns.startsWith('*.')) {
-          const base = dns.slice(2)
-          const dParts = domain.split('.')
-          if (dParts.length >= 2 && dParts.slice(1).join('.') === base) return cert
-        }
-      }
-    }
-  }
-  return null
 }
 </script>
 
@@ -95,12 +54,12 @@ const findCertForDomain = (domain) => {
             v-for="(proxy, i) in proxiesStore.list"
             :key="proxy.ExternalDomain"
             draggable="true"
-            :class="{ 'drag-over': overIdx === i, 'dragging': dragIdx === i }"
+            :class="{ 'drag-over': dragOverIndex === i, 'dragging': dragIndex === i }"
             @dragstart="onDragStart(i, $event)"
             @dragover="onDragOver(i, $event)"
             @dragleave="onDragLeave"
             @drop="onDrop(i)"
-            @dragend="onDragEnd"
+            @dragend="onDragEnd($event)"
           >
             <td>
               <i class="fas fa-grip-vertical drag-grip"></i>
@@ -110,7 +69,7 @@ const findCertForDomain = (domain) => {
               {{ proxy.Name || '—' }}
             </td>
             <td>
-              <code class="clickable-link" @click="openUrl(proxy.ExternalDomain)">{{ proxy.ExternalDomain }} <i class="fas fa-external-link-alt"></i></code>
+              <code class="clickable-link" @click="openUrl('http://' + proxy.ExternalDomain)">{{ proxy.ExternalDomain }} <i class="fas fa-external-link-alt"></i></code>
             </td>
             <td><code>{{ proxy.LocalAddress }}:{{ proxy.LocalPort }}</code></td>
             <td>

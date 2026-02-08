@@ -2,19 +2,11 @@
 const { t } = useI18n()
 
 const currentYear = new Date().getFullYear()
-
-const openSite = () => {
-  if (window.runtime?.BrowserOpenURL) {
-    window.runtime.BrowserOpenURL('https://vserf.ru')
-  } else {
-    window.open('https://vserf.ru', '_blank')
-  }
-}
 </script>
 
 <template>
   <footer class="footer">
-    <p>vServer Admin Panel © 2025-{{ currentYear }} | <a href="#" class="footer-link" @click.prevent="openSite">https://vserf.ru</a> | {{ t('app.footerAuthor') }}</p>
+    <p>vServer Admin Panel © 2025-{{ currentYear }} | <a href="#" class="footer-link" @click.prevent="openUrl('https://vserf.ru')">https://vserf.ru</a> | {{ t('app.footerAuthor') }}</p>
   </footer>
 </template>
 

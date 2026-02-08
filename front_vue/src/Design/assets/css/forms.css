@@ -39,7 +39,7 @@
 
 .form-subsection-title i {
     color: var(--accent-purple-light);
-    font-size: 16px;
+    font-size: var(--text-lg);
 }
 
 .form-group {

@@ -40,7 +40,7 @@ const createSite = async () => {
   }
   const result = await sitesStore.create(siteData)
   creating.value = false
-  if (result && !String(result).startsWith('Error')) {
+  if (isSuccess(result)) {
     success(t('notify.siteCreated'))
     router.push('/')
   } else {

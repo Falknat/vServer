@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 const { t } = useI18n()
 const router = useRouter()
 const sitesStore = useSitesStore()
@@ -67,7 +67,7 @@ const saveSite = async () => {
     config.Site_www[idx].root_file_routing = form.routing
     config.Site_www[idx].AutoCreateSSL = form.autoSSL
     const result = await api.saveConfig(JSON.stringify(config))
-    if (!String(result).startsWith('Error')) {
+    if (isSuccess(result)) {
       await sitesStore.load()
       success(t('notify.dataSaved'))
       router.push('/')
@@ -87,7 +87,7 @@ const confirmDelete = async () => {
   })
   if (result) {
     const res = await sitesStore.remove(form.host)
-    if (res && !String(res).startsWith('Error')) {
+    if (isSuccess(res)) {
       success(t('notify.siteDeleted'))
       router.push('/')
     } else {

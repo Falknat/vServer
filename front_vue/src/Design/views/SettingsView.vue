@@ -1,6 +1,7 @@
 <script setup>
 const { t } = useI18n()
 const configStore = useConfigStore()
+const servicesStore = useServicesStore()
 const { success } = useNotification()
 
 const form = reactive({
@@ -39,22 +40,22 @@ const saveSettings = async () => {
     },
   }
   await configStore.save(configData)
-  await configStore.restartAll()
+  await servicesStore.restartAll()
   saving.value = false
   success(t('notify.settingsSaved'))
 }
 
 const toggleProxy = async () => {
   form.proxyEnabled = !form.proxyEnabled
-  if (form.proxyEnabled) await configStore.enableProxy()
-  else await configStore.disableProxy()
+  if (form.proxyEnabled) await servicesStore.enableProxy()
+  else await servicesStore.disableProxy()
   success(form.proxyEnabled ? t('notify.proxyEnabled') : t('notify.proxyDisabled'))
 }
 
 const toggleAcme = async () => {
   form.acmeEnabled = !form.acmeEnabled
-  if (form.acmeEnabled) await configStore.enableACME()
-  else await configStore.disableACME()
+  if (form.acmeEnabled) await servicesStore.enableACME()
+  else await servicesStore.disableACME()
   success(form.acmeEnabled ? t('notify.certManagerEnabled') : t('notify.certManagerDisabled'))
 }
 </script>

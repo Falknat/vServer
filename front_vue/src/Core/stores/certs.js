@@ -1,4 +1,4 @@
-﻿import { defineStore } from 'pinia'
+import { defineStore } from 'pinia'
 
 export const useCertsStore = defineStore('certs', {
   state: () => ({
@@ -8,37 +8,62 @@ export const useCertsStore = defineStore('certs', {
 
   actions: {
     async loadAll() {
-      const data = await api.getAllCertsInfo()
-      if (data) {
-        this.list = data
-        this.loaded = true
+      try {
+        const data = await api.getAllCertsInfo()
+        if (data) {
+          this.list = data
+          this.loaded = true
+        }
+      } catch (e) {
+        console.error('Failed to load certs:', e)
       }
     },
 
     async getInfo(domain) {
-      return await api.getCertInfo(domain)
+      try {
+        return await api.getCertInfo(domain)
+      } catch (e) {
+        console.error('Failed to get cert info:', e)
+        return null
+      }
+    },
+
+    async _obtainAndReload(domain) {
+      try {
+        const result = await api.obtainSSLCertificate(domain)
+        await this.loadAll()
+        return result
+      } catch (e) {
+        console.error('Failed to obtain certificate:', e)
+        return `Error: ${e.message}`
+      }
     },
 
     async issue(domain) {
-      const result = await api.obtainSSLCertificate(domain)
-      await this.loadAll()
-      return result
+      return this._obtainAndReload(domain)
     },
 
     async renew(domain) {
-      const result = await api.obtainSSLCertificate(domain)
-      await this.loadAll()
-      return result
+      return this._obtainAndReload(domain)
     },
 
     async remove(domain) {
-      const result = await api.deleteCertificate(domain)
-      await this.loadAll()
-      return result
+      try {
+        const result = await api.deleteCertificate(domain)
+        await this.loadAll()
+        return result
+      } catch (e) {
+        console.error('Failed to delete certificate:', e)
+        return `Error: ${e.message}`
+      }
     },
 
     async reload() {
-      return await api.reloadSSLCertificates()
+      try {
+        return await api.reloadSSLCertificates()
+      } catch (e) {
+        console.error('Failed to reload certificates:', e)
+      }
     },
   },
 })

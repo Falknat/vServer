@@ -23,7 +23,7 @@
 .data-table th {
     padding: 8px 20px;
     text-align: left;
-    font-size: 11px;
+    font-size: var(--text-sm);
     font-weight: var(--font-semibold);
     color: var(--text-muted);
     text-transform: uppercase;
@@ -34,7 +34,7 @@
 
 .th-icon {
     opacity: 0.4;
-    font-size: 10px;
+    font-size: var(--text-xs);
     margin-right: 2px;
 }
 
@@ -152,12 +152,12 @@
     cursor: wait;
 }
 
-.status-toggle {
+.data-table .status-toggle {
     cursor: pointer;
     transition: opacity var(--transition-fast);
 }
 
-.status-toggle:hover {
+.data-table .status-toggle:hover {
     opacity: 0.7;
 }
 
@@ -166,7 +166,7 @@
     color: var(--text-muted);
     opacity: 0.15;
     cursor: grab;
-    font-size: 11px;
+    font-size: var(--text-sm);
     margin-right: 8px;
     transition: all var(--transition-fast);
 }
